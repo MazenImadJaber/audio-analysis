@@ -1,4 +1,4 @@
-﻿// <copyright file="Create4Sonograms.cs" company="QutEcoacoustics">
+// <copyright file="Create4Sonograms.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
 
@@ -28,16 +28,19 @@ namespace AnalysisPrograms
     /// <summary>
     /// Call this class by using the activity (first command line argument) "Create4Sonograms"
     /// </summary>
-    public static class Create4Sonograms
+    public static class Create4Sonograms //: SpectrogramAnalyzer
     {
         public const string CommandName = "DrawSpectrograms";
 
         [Command(
             CommandName,
-            Description = "[BETA] Creates a set of four standard-scale spectrograms derived using different algorithms. For short recordings only.")]
-        public class Arguments : SourceAndConfigArguments
+            Description = "[BETA] Creates a set of four standard-scale spectrograms derived using different algorithms. For short recordings only.",
+            ExtendedHelpText = "The default config file is `Towsey.Sonogram.yml`")]
+        public class Arguments : SourceAndOptionalConfigArguments
         {
-            [Option(Description = "A file path to write output to")]
+            [Argument(
+                2,
+                Description = "A file path to write output to")]
             [NotExistingFile]
             [Required]
             [LegalFilePath]
@@ -52,7 +55,6 @@ namespace AnalysisPrograms
 
         public static void Main(Arguments arguments)
         {
-
             //1. set up the necessary files
             //DirectoryInfo diSource = arguments.Source.Directory;
             FileInfo fiSourceRecording = arguments.Source;
@@ -61,7 +63,7 @@ namespace AnalysisPrograms
 
             fiImage.CreateParentDirectories();
 
-            string title = "# CREATE FOUR (4) SONOGRAMS FROM AUDIO RECORDING";
+            const string title = "# CREATE FOUR (4) SONOGRAMS FROM AUDIO RECORDING";
             string date = "# DATE AND TIME: " + DateTime.Now;
             LoggedConsole.WriteLine(title);
             LoggedConsole.WriteLine(date);
@@ -77,25 +79,25 @@ namespace AnalysisPrograms
             //scoreThreshold = (double?)configuration[AnalysisKeys.EventThreshold] ?? scoreThreshold;
 
             //3 transfer conogram parameters to a dictionary to be passed around
-            var configDict = new Dictionary<string, string>();
-
-            // #Resample rate must be 2 X the desired Nyquist. Default is that of recording.
-            configDict["ResampleRate"] = (configuration.GetIntOrNull(AnalysisKeys.ResampleRate) ?? 17640).ToString();
-            configDict["FrameLength"] = configuration[AnalysisKeys.FrameLength] ?? "512";
+            // var configDict = new Dictionary<string, string>();
+            //
+            // // #Resample rate must be 2 X the desired Nyquist. Default is that of recording.
+            // configDict["ResampleRate"] = (configuration.GetIntOrNull(AnalysisKeys.ResampleRate) ?? 17640).ToString();
+            // configDict["FrameLength"] = configuration[AnalysisKeys.FrameLength] ?? "512";
             int frameSize = configuration.GetIntOrNull(AnalysisKeys.FrameLength) ?? 512;
-
-            // #Frame Overlap as fraction: default=0.0
-            configDict["FrameOverlap"] = configuration[AnalysisKeys.FrameOverlap] ?? "0.0";
+            //
+            // // #Frame Overlap as fraction: default=0.0
+            // configDict["FrameOverlap"] = configuration[AnalysisKeys.FrameOverlap] ?? "0.0";
             double windowOverlap = configuration.GetDoubleOrNull(AnalysisKeys.FrameOverlap) ?? 0.0;
-
-            // #MinHz: 500
-            // #MaxHz: 3500
-            // #NOISE REDUCTION PARAMETERS
-            configDict["DoNoiseReduction"] = configuration["DoNoiseReduction"] ?? "true";
-            configDict["BgNoiseThreshold"] = configuration["BgNoiseThreshold"] ?? "3.0";
-
-            configDict["ADD_AXES"] = configuration["ADD_AXES"] ?? "true";
-            configDict["AddSegmentationTrack"] = configuration["AddSegmentationTrack"] ?? "true";
+            //
+            // // #MinHz: 500
+            // // #MaxHz: 3500
+            // // #NOISE REDUCTION PARAMETERS
+            // configDict["DoNoiseReduction"] = configuration["DoNoiseReduction"] ?? "true";
+            // configDict["BgNoiseThreshold"] = configuration["BgNoiseThreshold"] ?? "3.0";
+            //
+            // configDict["ADD_AXES"] = configuration["ADD_AXES"] ?? "true";
+            // configDict["AddSegmentationTrack"] = configuration["AddSegmentationTrack"] ?? "true";
 
             // 3: GET RECORDING
             var startOffsetMins = TimeSpan.Zero;

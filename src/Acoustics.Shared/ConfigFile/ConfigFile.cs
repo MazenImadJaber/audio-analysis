@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ConfigFile.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
@@ -88,7 +88,10 @@ namespace Acoustics.Shared.ConfigFile
         {
             Contract.Requires<ArgumentNullException>(file != null);
 
-            return Resolve(file.FullName, searchPaths);
+            // we use .ToString() here to get the original input string - Using fullname always produces an absolute path wrt to pwd... we don't want to prematurely make asusmptions:
+            // e.g. We require a missing absolute path to fail... that wouldn't work with .Name
+            // e.g. We require a relative path to try and resolve, using .FullName would fail the first absolute check inside ResolveConfigFile
+            return Resolve(file.ToString(), searchPaths.Prepend(file.Directory));
         }
 
         public static FileInfo Resolve(string file, params DirectoryInfo[] searchPaths)

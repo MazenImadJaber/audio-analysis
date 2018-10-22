@@ -1,4 +1,4 @@
-// <copyright file="SourceAndConfigArguments.cs" company="QutEcoacoustics">
+// <copyright file="SourceAndOptionalConfigArguments.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
 
@@ -11,23 +11,22 @@ namespace AnalysisPrograms.Production.Arguments
     using log4net;
     using McMaster.Extensions.CommandLineUtils;
 
-    public abstract class SourceAndConfigArguments
+    public abstract class SourceAndOptionalConfigArguments
         : SourceArguments
     {
-        private static readonly ILog Log = LogManager.GetLogger(nameof(SourceAndConfigArguments));
+        private static readonly ILog Log = LogManager.GetLogger(nameof(SourceAndOptionalConfigArguments));
 
-        [Argument(
-            1,
-            Description = "The path to the config file. If not found we will search for the default config file of the same name.")]
-        [Required]
+        [Option(
+            Description = "The path to the config file. If not found a default config file will be loaded.")]
         [LegalFilePath]
         public string Config { get; set; }
 
-        public FileInfo ResolveConfigFile()
+        public FileInfo ResolveConfigFile<T>()
         {
             if (this.Config.IsNullOrEmpty())
             {
-                throw new FileNotFoundException("No config file argument provided");
+                Log.Info("Using default config file since no config file path was provided");
+                return ConfigFile.Default<T>();
             }
             else if (File.Exists(this.Config))
             {

@@ -293,6 +293,7 @@
     <Compile Include="Production\Arguments\LogVerbosity.cs" />
     <Compile Include="Production\Arguments\MainArgs.cs" />
     <Compile Include="Production\Arguments\SourceAndConfigArguments.cs" />
+    <Compile Include="Production\Arguments\SourceAndOptionalConfigArguments.cs" />
     <Compile Include="Production\Arguments\SourceArguments.cs" />
     <Compile Include="Production\Arguments\SourceConfigOutputDirArguments.cs" />
     <Compile Include="Production\Arguments\SubCommandBase.cs" />

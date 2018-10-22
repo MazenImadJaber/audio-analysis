@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ArrayExtensions.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
@@ -11,6 +11,7 @@
 namespace System
 {
     using System;
+    using Acoustics.Shared.Contracts;
     using Collections.Generic;
     using Diagnostics;
     using Linq;
@@ -18,23 +19,23 @@ namespace System
 
     public static class ArrayExtensions
     {
-         /// <summary>
-         /// A helper method designed to fill an array with the specified values.
-         /// Modifies the array in place, return value is only for fluent method calling.
-         /// Fast is a bit of a misnomer - this operation is only faster after about a million elements!
-         /// </summary>
-         /// <remarks>
-         /// https://github.com/mykohsu/Extensions/blob/master/ArrayExtensions.cs
-         /// Inspired from several Stack Overflow discussions and an implementation by David Walker at http://coding.grax.com/2011/11/initialize-array-to-value-in-c-very.html
-         /// </remarks>
-         /// <typeparam name="T">They type of the array.</typeparam>
-         /// <param name="destinationArray">The array being filled.</param>
-         /// <param name="value">The value[s] to insert into the array.</param>
+        /// <summary>
+        /// A helper method designed to fill an array with the specified values.
+        /// Modifies the array in place, return value is only for fluent method calling.
+        /// Fast is a bit of a misnomer - this operation is only faster after about a million elements!
+        /// </summary>
+        /// <typeparam name="T">They type of the array.</typeparam>
+        /// <param name="destinationArray">The array being filled.</param>
+        /// <param name="value">The value[s] to insert into the array.</param>
+        /// <remarks>
+        /// https://github.com/mykohsu/Extensions/blob/master/ArrayExtensions.cs
+        /// Inspired from several Stack Overflow discussions and an implementation by David Walker at http://coding.grax.com/2011/11/initialize-array-to-value-in-c-very.html
+        /// </remarks>
         public static T[] FastFill<T>(this T[] destinationArray, params T[] value)
         {
             if (destinationArray == null)
             {
-                throw new ArgumentNullException("destinationArray");
+                throw new ArgumentNullException(nameof(destinationArray));
             }
 
             if (value.Length > destinationArray.Length)
@@ -49,8 +50,8 @@ namespace System
             int copyLength;
 
             for (copyLength = value.Length; copyLength < arrayToFillHalfLength; copyLength <<= 1)
-             {
-                 Array.Copy(destinationArray, 0, destinationArray, copyLength, copyLength);
+            {
+                Array.Copy(destinationArray, 0, destinationArray, copyLength, copyLength);
             }
 
             Array.Copy(destinationArray, 0, destinationArray, copyLength, destinationArray.Length - copyLength);
@@ -82,6 +83,15 @@ namespace System
             }
 
             return destinationArray;
+        }
+
+        public static T[] Prepend<T>(this T[] source, params T[] other)
+        {
+            Contract.RequiresNotNull(source);
+            var result = new T[source.Length + other.Length];
+            other.CopyTo(result, 0);
+            source.CopyTo(result, other.Length);
+            return result;
         }
 
         /// <summary>

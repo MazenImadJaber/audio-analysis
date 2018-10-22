@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AnalyseLongRecording.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
@@ -52,7 +52,6 @@ namespace AnalysisPrograms.AnalyseLongRecordings
 
             // 1. set up the necessary files
             var sourceAudio = arguments.Source;
-            var configFile = arguments.Config.ToFileInfo();
             var outputDirectory = arguments.Output;
             var tempFilesDirectory = arguments.TempDir;
 
@@ -64,19 +63,7 @@ namespace AnalysisPrograms.AnalyseLongRecordings
             }
 
             // try an automatically find the config file
-            if (configFile == null)
-            {
-                throw new FileNotFoundException("No config file argument provided");
-            }
-            else if (!configFile.Exists)
-            {
-                Log.Warn($"Config file {configFile.FullName} not found... attempting to resolve config file");
-
-                // we use .ToString() here to get the original input string - Using fullname always produces an absolute path wrt to pwd... we don't want to prematurely make asusmptions:
-                // e.g. We require a missing absolute path to fail... that wouldn't work with .Name
-                // e.g. We require a relative path to try and resolve, using .FullName would fail the first absolute check inside ResolveConfigFile
-                configFile = ConfigFile.Resolve(configFile.ToString(), Directory.GetCurrentDirectory().ToDirectoryInfo());
-            }
+            var configFile = arguments.ResolveConfigFile();
 
             if (arguments.StartOffset.HasValue ^ arguments.EndOffset.HasValue)
             {

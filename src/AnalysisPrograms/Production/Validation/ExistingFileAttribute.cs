@@ -1,4 +1,4 @@
-﻿// <copyright file="ExistingFileAttribute.cs" company="QutEcoacoustics">
+// <copyright file="ExistingFileAttribute.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
 
@@ -51,8 +51,12 @@ namespace AnalysisPrograms.Production.Validation
                 }
                 else
                 {
-                    string expected = this.shouldExist ? " was expected" : string.Empty;
-                    return new ValidationResult($"The specified file ({path}) for argument {validationContext.DisplayName} {expected}, but was not found.");
+                    if (this.shouldExist)
+                    {
+                        string expected = this.shouldExist ? " was expected" : string.Empty;
+                        return new ValidationResult(
+                            $"The specified file ({path}) for argument {validationContext.DisplayName} {expected}, but was not found.");
+                    }
                 }
             }
 
