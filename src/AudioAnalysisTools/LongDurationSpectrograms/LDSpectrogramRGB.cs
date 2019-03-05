@@ -1094,16 +1094,15 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
             int trackHeight = 18;
             Bitmap timeBmp1 = ImageTrack.DrawTimeRelativeTrack(fullDuration, bmp1.Width, trackHeight);
-            Bitmap timeBmp2 = (Bitmap)timeBmp1.Clone();
-            Bitmap suntrack = null;
 
-            DateTimeOffset? dateTimeOffset = cs.RecordingStartDate;
-            if (dateTimeOffset.HasValue)
+            // draw an UTC time scale IFF a valid DateTimeOffset is available, i.e. was read from the file name.
+            //Bitmap timeBmp2 = (Bitmap)timeBmp1.Clone();
+            var timeBmp2 = ImageTrack.DrawTimeTrack(fullDuration, cs.RecordingStartDate, bmp1.Width, trackHeight);
+            //timeBmp2 = null;
+            if (timeBmp2 == null)
             {
-                // draw extra time scale with absolute start time. AND THEN Do SOMETHING WITH IT.
-                timeBmp2 = ImageTrack.DrawTimeTrack(fullDuration, cs.RecordingStartDate, bmp1.Width, trackHeight);
-
-                //suntrack = SunAndMoon.AddSunTrackToImage(bmp1.Width, dateTimeOffset, cs.SunriseDataFile);
+                // Draw a default time track when UTC time start not available.
+                timeBmp2 = ImageTrack.DrawTimeTrackWarning(bmp1.Width, trackHeight);
             }
 
             if (cs.FreqScale == null)
@@ -1118,6 +1117,9 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
             // draw the composite bitmap
             var imageList = new List<Image> { titleBar, timeBmp1, bmp1, timeBmp2 };
+
+            // drawing a track showing sunrise and sunset was discontinued during 2018.
+            //Bitmap suntrack = suntrack = SunAndMoon.AddSunTrackToImage(bmp1.Width, dateTimeOffset, cs.SunriseDataFile);
             //if (suntrack != null)
             //{
             //    imageList.Add(suntrack);

@@ -1,4 +1,4 @@
-﻿// <copyright file="ImageTrack.cs" company="QutEcoacoustics">
+// <copyright file="ImageTrack.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
 
@@ -1156,17 +1156,15 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// This method is used for long duration spectrograms.
         /// It could be generalised for any time track.
         /// </summary>
-        /// <param name="fullDuration">time span of entire time track to be drawn</param>
-        /// <param name="dateTime">date and time at start of the track </param>
-        /// <param name="trackWidth">X pixel dimension</param>
-        /// <param name="trackHeight">Y pixel dimension</param>
-        /// <returns></returns>
+        /// <param name="fullDuration">time span of entire time track to be drawn.</param>
+        /// <param name="dateTime">date and time at start of the track.</param>
+        /// <param name="trackWidth">X pixel dimension.</param>
+        /// <param name="trackHeight">Y pixel dimension.</param>
         public static Bitmap DrawTimeTrack(TimeSpan fullDuration, DateTimeOffset? dateTime, int trackWidth, int trackHeight)
         {
-            // if null date time then just send back relative
-            if (dateTime == null)
+            if (!dateTime.HasValue)
             {
-                return DrawTimeRelativeTrack(fullDuration, trackWidth, trackHeight);
+                return null;
             }
 
             DateTime startDate = ((DateTimeOffset)dateTime).DateTime.Date;
@@ -1366,6 +1364,21 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             g.DrawLine(whitePen, 0, 0, trackWidth, 0); //draw upper boundary
             g.DrawLine(grayPen, 0, trackHeight - 1, trackWidth, trackHeight - 1); //draw lower boundary
+            return bmp;
+        }
+
+        public static Bitmap DrawTimeTrackWarning(int trackWidth, int trackHeight)
+        {
+            Bitmap bmp = new Bitmap(trackWidth, trackHeight);
+            Graphics g = Graphics.FromImage(bmp);
+            g.Clear(Color.Black);
+            var whitePen = new Pen(Color.White);
+            var grayPen = new Pen(Color.Gray);
+            var stringFont = new Font("Arial", 7);
+            string message = "UTC time not available";
+            g.DrawLine(whitePen, 0, 0, trackWidth, 0); //draw upper boundary
+            g.DrawLine(grayPen, 0, trackHeight - 1, trackWidth, trackHeight - 1); //draw lower boundary
+            g.DrawString(message, stringFont, Brushes.White, new PointF(2, 2)); //draw time
             return bmp;
         }
 
