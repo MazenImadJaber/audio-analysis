@@ -319,8 +319,11 @@ namespace AnalysisPrograms.AnalyseLongRecordings
                     string imageTitle = $"SOURCE:{basename},   {Meta.OrganizationTag};  ";
 
                     // Draw Tracks-Image of Summary indices
-                    // set time scale resolution for drawing of summary index tracks
-                    TimeSpan timeScale = TimeSpan.FromSeconds(0.1);
+                    // set time scale resolution for drawing of summary index tracks.
+                    // If it cannot be found in setting.Configuration, then assign default segment length of 60s.
+                    var timeScale = (configuration is AcousticIndices.AcousticIndicesConfig aic)
+                        ? aic.IndexCalculationDuration.Seconds()
+                        : segmentDuration.Value;
                     Bitmap tracksImage =
                         IndexDisplay.DrawImageOfSummaryIndices(
                             IndexProperties.GetIndexProperties(indicesPropertiesConfig),
