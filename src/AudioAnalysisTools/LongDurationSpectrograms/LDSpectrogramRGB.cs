@@ -73,7 +73,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
         // the defaults
         public static readonly string DefaultColorMap1 = SpectrogramConstants.RGBMap_ACI_ENT_EVN;
-        public static readonly string DefaultColorMap2 = SpectrogramConstants.RGBMap_BGN_PMN_R3D;
+        public static readonly string DefaultColorMap2 = SpectrogramConstants.RGBMap_BGN_PMN_RHZ;
 
         public static string[] GetArrayOfAvailableKeys()
         {
@@ -163,7 +163,9 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
         {
             this.SampleRate = indexGenerationData.SampleRateResampled;
             this.FrameWidth = indexGenerationData.FrameLength;
-            this.StartOffset = indexGenerationData.AnalysisStartOffset;
+            this.RecordingStartDate = indexGenerationData.RecordingStartDate;
+            this.ColorMode = "NEGATIVE"; // the default
+            this.ColorMap = colourMap;
 
             // default BackgroundFilter value
             this.BackgroundFilter = SpectrogramConstants.BACKGROUND_FILTER_COEFF;
@@ -216,9 +218,6 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                 default:
                     throw new ArgumentException($"{config.FreqScale} is an unknown option for drawing a frequency scale");
             }
-
-            this.ColorMode = "NEGATIVE"; // the default
-            this.ColorMap = colourMap;
         }
 
         public string[] SpectrogramKeys { get; private set; }
@@ -227,9 +226,9 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
         /// <summary>
         /// Gets or sets the date and time at which the current LDspectrogram starts
-        /// This can be used to correctly
+        /// This can be used to draw a correct absolute timescale on the LDFC spectrogram.
         /// </summary>
-        public DateTimeOffset RecordingStartDate { get; set; }
+        public DateTimeOffset? RecordingStartDate { get; set; }
 
         public string SiteName { get; set; }
 
@@ -1067,27 +1066,11 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
         /// <summary>
         /// Frames a false-colourspectrogram.
-        /// That is, it creates the title bar and the time scale. Also adds frequency grid lines to the image.
-        /// Note that to call this method, the field cs.Freqscale MUST NOT = null.
-        /// </summary>
-        public static Image FrameFalseColourSpectrogram(Image bmp1, Image titleBar, LDSpectrogramRGB cs)
-        {
-            if (cs.FreqScale == null)
-            {
-                LoggedConsole.WriteErrorLine("Error: LDSpectrogramRGB.FreqScale==null. You cannot call this method. Call the overload.");
-            }
-
-            Image compositeBmp = FrameLDSpectrogram(bmp1, titleBar, cs, 0, 0);
-            return compositeBmp;
-        }
-
-        /// <summary>
-        /// Frames a false-colourspectrogram.
         /// Creates the title bar and the time scale. Also adds frequency grid lines to the image.
         /// Note that the 'nyquist' and 'hertzGridInterval' arguments are used ONLY if the cs.Freqscale field==null.
         /// Also note that in this case, the frequency scale will be linear.
         /// </summary>
-        public static Image FrameLDSpectrogram(Image bmp1, Image titleBar, LDSpectrogramRGB cs, int nyquist, int herzInterval)
+        public static Image FrameLDSpectrogram(Image bmp1, Image titleBar, LDSpectrogramRGB cs)
         {
             var xAxisPixelDuration = cs.IndexCalculationDuration;
             var fullDuration = TimeSpan.FromTicks(xAxisPixelDuration.Ticks * bmp1.Width);
@@ -1095,20 +1078,22 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             int trackHeight = 18;
             Bitmap timeBmp1 = ImageTrack.DrawTimeRelativeTrack(fullDuration, bmp1.Width, trackHeight);
 
-            // draw an UTC time scale IFF a valid DateTimeOffset is available, i.e. was read from the file name.
-            //Bitmap timeBmp2 = (Bitmap)timeBmp1.Clone();
+            // draw an absolute time scale IFF a valid DateTimeOffset hint is available,
+            // i.e. was read from the file name or provided as separate hint.
             var timeBmp2 = ImageTrack.DrawTimeTrack(fullDuration, cs.RecordingStartDate, bmp1.Width, trackHeight);
-            //timeBmp2 = null;
             if (timeBmp2 == null)
             {
-                // Draw a default time track when UTC time start not available.
+                // Draw a default time track when Absolute start time not available.
                 timeBmp2 = ImageTrack.DrawTimeTrackWarning(bmp1.Width, trackHeight);
             }
 
+            // if freq scale not provided default to linear scale with 1000Hz spaced grid lines
             if (cs.FreqScale == null)
             {
-                // WARNING: The following will create a linear frequency scale.
+                LoggedConsole.WriteErrorLine("Warning: LDSpectrogramRGB.FreqScale==null. Will default to linear frequency scale.");
+                int nyquist = cs.SampleRate / 2;
                 int frameSize = bmp1.Height;
+                int herzInterval = 1000;
                 var freqScale = new FrequencyScale(nyquist, frameSize, herzInterval);
                 cs.FreqScale = freqScale;
             }
@@ -1400,7 +1385,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             LdSpectrogramConfig ldSpectrogramConfig,
             FileInfo indexPropertiesConfigPath,
             IndexGenerationData indexGenerationData,
-            string basename,
+            string basename, // to be used as file stem
             string analysisType,
             Dictionary<string, double[,]> indexSpectrograms = null,
             SummaryIndexBase[] summaryIndices = null,
@@ -1422,21 +1407,18 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                 config.ColourFilter = SpectrogramConstants.BACKGROUND_FILTER_COEFF;
             }
 
-            var cs1 = new LDSpectrogramRGB(config, indexGenerationData, colorMap1);
-            string fileStem = basename;
+            var cs1 = new LDSpectrogramRGB(config, indexGenerationData, colorMap1)
+            {
+                FileName = basename,
+                SiteName = siteDescription?.SiteName,
+                Latitude = siteDescription?.Latitude,
+                Longitude = siteDescription?.Longitude,
+                ErroneousSegments = segmentErrors,
 
-            cs1.FileName = fileStem;
+                // calculate start time by combining DatetimeOffset with minute offset.
+                StartOffset = indexGenerationData.AnalysisStartOffset,
+            };
 
-            // we do not necessarily want to keep previous BackgroundFilter
-            // cs1.BackgroundFilter = indexGenerationData.BackgroundFilterCoeff;
-            cs1.SiteName = siteDescription?.SiteName;
-            cs1.Latitude = siteDescription?.Latitude;
-            cs1.Longitude = siteDescription?.Longitude;
-            //cs1.SunriseDataFile = sunriseDataFile;
-            cs1.ErroneousSegments = segmentErrors;
-
-            // calculate start time by combining DatetimeOffset with minute offset.
-            cs1.StartOffset = indexGenerationData.AnalysisStartOffset;
             if (indexGenerationData.RecordingStartDate.HasValue)
             {
                 DateTimeOffset dto = (DateTimeOffset)indexGenerationData.RecordingStartDate;
@@ -1462,7 +1444,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                 Logger.Info("Reading spectra files from disk");
 
                 // reads all known files spectral indices
-                cs1.ReadCsvFiles(inputDirectory, fileStem, cs1.SpectrogramKeys);
+                cs1.ReadCsvFiles(inputDirectory, basename, cs1.SpectrogramKeys);
 
                 //var now2 = DateTime.Now;
                 sw.Stop();
@@ -1484,7 +1466,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             // If index distribution statistics has not been passed, then read from json file.
             if (indexStatistics == null)
             {
-                indexStatistics = IndexDistributions.ReadSpectralIndexDistributionStatistics(inputDirectory, fileStem);
+                indexStatistics = IndexDistributions.ReadSpectralIndexDistributionStatistics(inputDirectory, basename);
 
                 if (indexStatistics == null)
                 {
@@ -1497,19 +1479,9 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
             cs1.IndexStats = indexStatistics;
 
-            // draw gray scale spectrogram for each index.
-            //string[] keys = colorMap1.Split('-');
-            //cs1.DrawGreyScaleSpectrograms(outputDirectory, fileStem, keys);
-            //keys = colorMap2.Split('-');
             // draw all available gray scale index spectrograms.
             var keys = SpectralIndexValues.Keys;
-            cs1.DrawGreyScaleSpectrograms(outputDirectory, fileStem, keys);
-
-            //    //string[] keys = this.SpectrogramKeys;
-            //cs1.DrawGreyScaleSpectrograms(outputDirectory, fileStem, keys);
-            //}
-            //keys = colorMap2.Split('-');
-            //cs1.DrawGreyScaleSpectrograms(outputDirectory, fileStem, keys);
+            cs1.DrawGreyScaleSpectrograms(outputDirectory, basename, keys);
 
             // create and save first false-colour spectrogram image
             var image1NoChrome = cs1.DrawFalseColourSpectrogramChromeless(cs1.ColorMode, colorMap1);
@@ -1546,7 +1518,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             {
                 string indicesFile = FilenameHelpers.AnalysisResultPath(
                     inputDirectory,
-                    fileStem,
+                    basename,
                     analysisType + ".Indices",
                     "csv");
                 imageX = IndexDisplay.DrawHighAmplitudeClippingTrack(indicesFile.ToFileInfo());
@@ -1556,14 +1528,14 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                 imageX = IndexDisplay.DrawHighAmplitudeClippingTrack(summaryIndices);
             }
 
-            imageX?.Save(FilenameHelpers.AnalysisResultPath(outputDirectory, fileStem, ".ClipHiAmpl", "png"));
+            imageX?.Save(FilenameHelpers.AnalysisResultPath(outputDirectory, basename, ".ClipHiAmpl", "png"));
 
             if (image1 == null || image2 == null)
             {
                 throw new Exception("NULL image returned. Cannot proceed!");
             }
 
-            CreateTwoMapsImage(outputDirectory, fileStem, image1, imageX, image2);
+            CreateTwoMapsImage(outputDirectory, basename, image1, imageX, image2);
 
             // AS OF DECEMBER 2018, no longer produce SUMMARY RIBBONS. Did not prove useful.
             //ribbon = cs.GetSummaryIndexRibbon(colorMap1);
@@ -1575,9 +1547,9 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
             // Spectrogram ribbons are very useful for viewing multiple days of recording.
             var ribbon = cs1.GetSpectrogramRibbon(colorMap1, 32);
-            ribbon.Save(FilenameHelpers.AnalysisResultPath(outputDirectory, fileStem, colorMap1 + ".SpectralRibbon", "png"));
+            ribbon.Save(FilenameHelpers.AnalysisResultPath(outputDirectory, basename, colorMap1 + ".SpectralRibbon", "png"));
             ribbon = cs1.GetSpectrogramRibbon(colorMap2, 32);
-            ribbon.Save(FilenameHelpers.AnalysisResultPath(outputDirectory, fileStem, colorMap2 + ".SpectralRibbon", "png"));
+            ribbon.Save(FilenameHelpers.AnalysisResultPath(outputDirectory, basename, colorMap2 + ".SpectralRibbon", "png"));
 
             // only return images if chromeless
             return imageChrome == ImageChrome.Without
@@ -1597,7 +1569,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             int nyquist = cs.SampleRate / 2;
             string title = $"<{cs.ColorMap}> SPECTROGRAM  of \"{cs.FileName}\".   Starts at {startTime}; Nyquist={nyquist}";
             var titleBar = DrawTitleBarOfFalseColourSpectrogram(title, imageSansChrome.Width);
-            var image = FrameFalseColourSpectrogram(imageSansChrome, titleBar, cs);
+            var image = FrameLDSpectrogram(imageSansChrome, titleBar, cs);
             return image;
         }
 

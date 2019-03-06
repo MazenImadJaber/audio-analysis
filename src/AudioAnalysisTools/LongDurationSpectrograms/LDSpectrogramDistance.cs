@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="LDSpectrogramDistance.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
@@ -130,11 +130,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                     inputFileName1,
                     cs1.ColorMode);
             Image titleBar = LDSpectrogramRGB.DrawTitleBarOfFalseColourSpectrogram(title, spg1Image.Width);
-            spg1Image = LDSpectrogramRGB.FrameLDSpectrogram(
-                spg1Image,
-                titleBar,
-                cs1,
-                nyquist, herzInterval);
+            spg1Image = LDSpectrogramRGB.FrameLDSpectrogram(spg1Image, titleBar, cs1);
 
             string outputFileName2 = inputFileName2.Name;
             var cs2 = new LDSpectrogramRGB(minuteOffset, xScale, sampleRate, frameWidth, colorMap);
@@ -157,11 +153,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                 inputFileName2,
                 cs2.ColorMode);
             titleBar = LDSpectrogramRGB.DrawTitleBarOfFalseColourSpectrogram(title, spg2Image.Width);
-            spg2Image = LDSpectrogramRGB.FrameLDSpectrogram(
-                spg2Image,
-                titleBar,
-                cs1,
-                nyquist, herzInterval);
+            spg2Image = LDSpectrogramRGB.FrameLDSpectrogram(spg2Image, titleBar, cs1);
 
             string outputFileName4 = inputFileName1 + ".EuclidianDistance.png";
             Image deltaSp = DrawDistanceSpectrogram(cs1, cs2);
@@ -172,7 +164,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                 colorArray,
                 deltaSp.Width,
                 SpectrogramConstants.HEIGHT_OF_TITLE_BAR);
-            deltaSp = LDSpectrogramRGB.FrameLDSpectrogram(deltaSp, titleBar, cs2, nyquist, herzInterval);
+            deltaSp = LDSpectrogramRGB.FrameLDSpectrogram(deltaSp, titleBar, cs2);
             deltaSp.Save(Path.Combine(outputDirectory.FullName, outputFileName4));
 
             string outputFileName5 = inputFileName1 + ".2SpectrogramsAndDistance.png";
