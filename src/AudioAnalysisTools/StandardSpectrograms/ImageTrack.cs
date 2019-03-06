@@ -32,11 +32,11 @@ namespace AudioAnalysisTools.StandardSpectrograms
     {
         public const int DefaultHeight = 30;       //pixel height of a track
         public const int HeightOfTimeScale = 15;   //pixel height of the top and bottom time scales
-        public const int syllablesTrackHeight = 10;   //pixel height of a track
-        public const int envelopeTrackHeight = 40;   //pixel height of a track
-        public const int scoreTrackHeight = 40;   //pixel height of a track
+        public const int SyllablesTrackHeight = 10;   //pixel height of a track
+        public const int EnvelopeTrackHeight = 40;   //pixel height of a track
+        public const int ScoreTrackHeight = 40;   //pixel height of a track
 
-        public static Color[] TrackColors =
+        private static readonly Color[] TrackColors =
         {
             Color.White, Color.Red, Color.Orange, Color.Cyan, Color.OrangeRed, Color.Pink, Color.Salmon, Color.Tomato, Color.DarkRed, Color.Purple,
                                           /*Color.AliceBlue,*/ /*Color.Aqua, Color.Aquamarine, Color.Azure, Color.Bisque,*/
@@ -126,17 +126,14 @@ namespace AudioAnalysisTools.StandardSpectrograms
         }
 
         /// <summary>
-        /// CONSTRUCTOR
+        /// Initializes a new instance of the <see cref="ImageTrack"/> class.
+        /// CONSTRUCTOR.
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="data"></param>
         public ImageTrack(TrackType type, int[] data)
         {
             this.TrackType = type;
             this.intData = data;
             this.height = this.SetTrackHeight();
-
-            //if(SonoImage.Verbose)LoggedConsole.WriteLine("\tTrack CONSTRUCTOR: trackType = " + type + "  Data = " + data.ToString());
         }
 
         public ImageTrack(TrackType type, double[] data)
@@ -149,11 +146,9 @@ namespace AudioAnalysisTools.StandardSpectrograms
         }
 
         /// <summary>
-        /// used for showing the singal envelope track
+        /// Initializes a new instance of the <see cref="ImageTrack"/> class.
+        /// Used for showing the singal envelope track.
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="data1"></param>
-        /// <param name="data2"></param>
         public ImageTrack(TrackType type, double[] data1, double[] data2)
         {
             this.TrackType = type;
@@ -194,17 +189,17 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 case TrackType.timeTics:
                     return HeightOfTimeScale;
                 case TrackType.syllables:
-                    return syllablesTrackHeight;
+                    return SyllablesTrackHeight;
                 case TrackType.scoreArray:
-                    return scoreTrackHeight;
+                    return ScoreTrackHeight;
                 case TrackType.similarityScoreList:
-                    return scoreTrackHeight;
+                    return ScoreTrackHeight;
                 case TrackType.scoreArrayNamed:
-                    return scoreTrackHeight;
+                    return ScoreTrackHeight;
                 case TrackType.deciBels:
                     return DefaultHeight;
                 case TrackType.waveEnvelope:
-                    return envelopeTrackHeight;
+                    return EnvelopeTrackHeight;
                 case TrackType.segmentation:
                     return DefaultHeight;
                 case TrackType.scoreMatrix:
@@ -850,10 +845,8 @@ namespace AudioAnalysisTools.StandardSpectrograms
         }
 
         /// <summary>
-        /// ASSUME that passed decibel array has been normalised
+        /// ASSUME that passed decibel array has been normalised.
         /// </summary>
-        /// <param name="sg"></param>
-        /// <returns></returns>
         public static ImageTrack GetDecibelTrack(BaseSonogram sg)
         {
             var track = new ImageTrack(TrackType.deciBels, sg.DecibelsNormalised);
@@ -861,16 +854,16 @@ namespace AudioAnalysisTools.StandardSpectrograms
         }
 
         /// <summary>
-        /// ASSUME that passed decibel array has been normalised
+        /// ASSUME that passed decibel array has been normalised.
         /// </summary>
-        /// <param name="sg"></param>
-        /// <returns></returns>
         public static ImageTrack GetSegmentationTrack(BaseSonogram sg)
         {
-            var track = new ImageTrack(TrackType.segmentation, sg.DecibelsNormalised);
-            track.intData = sg.SigState;
-            track.SegmentationThreshold_k1 = EndpointDetectionConfiguration.K1Threshold / sg.DecibelReference;
-            track.SegmentationThreshold_k2 = EndpointDetectionConfiguration.K2Threshold / sg.DecibelReference;
+            var track = new ImageTrack(TrackType.segmentation, sg.DecibelsNormalised)
+            {
+                intData = sg.SigState,
+                SegmentationThreshold_k1 = EndpointDetectionConfiguration.K1Threshold / sg.DecibelReference,
+                SegmentationThreshold_k2 = EndpointDetectionConfiguration.K2Threshold / sg.DecibelReference,
+            };
             return track;
         }
 
@@ -944,13 +937,8 @@ namespace AudioAnalysisTools.StandardSpectrograms
         }
 
         /// <summary>
-        /// used to draw richness indices
+        /// used to draw richness indices.
         /// </summary>
-        /// <param name="scores"></param>
-        /// <param name="scoreMin"></param>
-        /// <param name="scoreMax"></param>
-        /// <param name="scoreThreshold"></param>
-        /// <returns></returns>
         public static void DrawScoreTrack(Bitmap bmp, double[] array, int yOffset, int trackHeight, double minVal, double maxVal, double threshold, string title)
         {
             Color[] grayScale = ImageTools.GrayScale();
@@ -985,13 +973,8 @@ namespace AudioAnalysisTools.StandardSpectrograms
         }
 
         /// <summary>
-        /// used to draw score track or any array of values
+        /// used to draw score track or any array of values.
         /// </summary>
-        /// <param name="scores"></param>
-        /// <param name="scoreMin"></param>
-        /// <param name="scoreMax"></param>
-        /// <param name="scoreThreshold"></param>
-        /// <returns></returns>
         public static Bitmap DrawGrayScaleScoreTrack(double[] array, double minVal, double maxVal, double threshold, string title)
         {
             int trackHeight = IndexDisplay.DefaultTrackHeight;
@@ -1000,7 +983,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             Bitmap bmp = new Bitmap(imageWidth, trackHeight);
 
             double range = maxVal - minVal;
-            for (int x = 0; x < imageWidth; x++) //for pixels in the line
+            for (int x = 0; x < imageWidth; x++)
             {
                 // NormaliseMatrixValues and bound the value - use min bound, max and 255 image intensity range
                 double value = (array[x] - minVal) / range;
@@ -1033,11 +1016,6 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// used to draw score track of an array of values
         /// The values in array MUST lie in [0,1].
         /// </summary>
-        /// <param name="scores"></param>
-        /// <param name="scoreMin"></param>
-        /// <param name="scoreMax"></param>
-        /// <param name="scoreThreshold"></param>
-        /// <returns></returns>
         public static Bitmap DrawBarScoreTrack(double[] order, double[] array, int trackWidth, double threshold, string title)
         {
             int trackHeight = IndexDisplay.DefaultTrackHeight;
@@ -1048,7 +1026,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             Bitmap bmp = new Bitmap(trackWidth, trackHeight);
             Graphics g = Graphics.FromImage(bmp);
             g.Clear(grayScale[240]);
-            for (int i = 0; i < array.Length; i++) //for pixels in the line
+            for (int i = 0; i < array.Length; i++)
             {
                 int x = (int)order[i];
                 double value = array[i];
@@ -1074,13 +1052,8 @@ namespace AudioAnalysisTools.StandardSpectrograms
         }
 
         /// <summary>
-        /// used to draw coloured score track or any array of values
+        /// used to draw coloured score track or any array of values.
         /// </summary>
-        /// <param name="scores"></param>
-        /// <param name="scoreMin"></param>
-        /// <param name="scoreMax"></param>
-        /// <param name="scoreThreshold"></param>
-        /// <returns></returns>
         public static Bitmap DrawColourScoreTrack(double[] order, double[] array, int trackWidth, int trackHeight, double threshold, string title)
         {
             Color[] colorScale = { Color.LightGray, Color.Gray, Color.Orange, Color.Red, Color.Purple };
@@ -1089,7 +1062,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             g.Clear(Color.FromArgb(240, 240, 240));
 
             //double range = maxVal - minVal;
-            for (int i = 0; i < array.Length; i++) //for pixels in the line
+            for (int i = 0; i < array.Length; i++)
             {
                 int x = (int)order[i];
 
@@ -1115,33 +1088,23 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
         public static void DrawScoreTrack(Bitmap bmp, double[] array, int yOffset, int trackHeight, double threshold, string title)
         {
-            double minVal;
-            double maxVal;
-            DataTools.MinMax(array, out minVal, out maxVal);
+            DataTools.MinMax(array, out var minVal, out var maxVal);
             DrawScoreTrack(bmp, array, yOffset, trackHeight, minVal, maxVal, threshold, title);
         }
 
         public static Bitmap DrawGrayScaleScoreTrack(double[] array, int trackHeight, double threshold, string title)
         {
-            double minVal;
-            double maxVal;
-            DataTools.MinMax(array, out minVal, out maxVal);
+            DataTools.MinMax(array, out var minVal, out var maxVal);
             Bitmap bitmap = DrawGrayScaleScoreTrack(array, minVal, maxVal, threshold, title);
             return bitmap;
         }
 
-        // mark of time scale according to scale.
         public static Bitmap DrawTitleTrack(int trackWidth, int trackHeight, string title)
         {
             Bitmap bmp = new Bitmap(trackWidth, trackHeight);
             Graphics g = Graphics.FromImage(bmp);
             g.Clear(Color.Black);
-            Pen pen = new Pen(Color.White);
-
             g.DrawLine(new Pen(Color.Gray), 0, 0, trackWidth, 0); //draw upper boundary
-
-            //g.DrawLine(pen, duration + 1, 0, trackWidth, 0);
-
             g.DrawString(title, new Font("Tahoma", 9), Brushes.Wheat, new PointF(4, 3));
             return bmp;
         }
@@ -1169,19 +1132,16 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             DateTime startDate = ((DateTimeOffset)dateTime).DateTime.Date;
 
-            Bitmap bmp = new Bitmap(trackWidth, trackHeight);
-            Graphics g = Graphics.FromImage(bmp);
+            var bmp = new Bitmap(trackWidth, trackHeight);
+            var g = Graphics.FromImage(bmp);
             g.Clear(Color.Black);
-
             double xAxisPixelDurationInMilliseconds = fullDuration.TotalMilliseconds / trackWidth;
-
-            TimeSpan startTimeAbs = TimeSpan.Zero;
             DateTimeOffset dto = (DateTimeOffset)dateTime;
-            startTimeAbs = dto.TimeOfDay;
+            TimeSpan startTimeAbs = dto.TimeOfDay;
 
             // round start time to nearest second or minute depending on the scale. If low resolution, round to nearest minute
             int roundedStartSeconds = (int)Math.Ceiling(startTimeAbs.TotalSeconds);
-            TimeSpan roundedStartTime = TimeSpan.FromSeconds(roundedStartSeconds);
+            var roundedStartTime = TimeSpan.FromSeconds(roundedStartSeconds);
             if (xAxisPixelDurationInMilliseconds > 1000)
             {
                 int roundedStartMinutes = (int)Math.Round(startTimeAbs.TotalMinutes);
@@ -1190,23 +1150,21 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             int roundedStartHours = roundedStartTime.Hours;
 
-            TimeSpan ticStartTime = TimeSpan.FromHours(roundedStartHours);
-            TimeSpan ticStartOffset = ticStartTime - roundedStartTime;
+            var ticStartTime = TimeSpan.FromHours(roundedStartHours);
+            var ticStartOffset = ticStartTime - roundedStartTime;
             int pixelStartOffset = (int)(ticStartOffset.TotalMilliseconds / xAxisPixelDurationInMilliseconds);
 
             TimeSpan xAxisTicInterval = CalculateGridInterval(fullDuration, trackWidth);
 
-            Pen whitePen = new Pen(Color.White);
-            Pen grayPen = new Pen(Color.Gray);
-            Font stringFont = new Font("Arial", 8);
-
-            int rows = bmp.Height;
-            int cols = bmp.Width;
+            var whitePen = new Pen(Color.White);
+            var grayPen = new Pen(Color.Gray);
+            var stringFont = new Font("Arial", 8);
 
             // for columns, draw in X-axis lines
             int xPixelInterval = (int)Math.Round(xAxisTicInterval.TotalMilliseconds / xAxisPixelDurationInMilliseconds);
             int halfInterval = xPixelInterval / 2;
             int halfheight = trackHeight / 3;
+            int cols = bmp.Width;
             for (int x = 0; x < cols - pixelStartOffset; x++)
             {
                 if (x % xPixelInterval == 0)
@@ -1236,12 +1194,12 @@ namespace AudioAnalysisTools.StandardSpectrograms
                         if (startDate.Year > 2000)
                         {
                             DateTime today = startDate + roundedTimeSpan;
-                            timeStr = string.Format("{0}", today.ToShortDateString());
+                            timeStr = $"{today.ToShortDateString()}";
                         }
                     }
                     else
                     {
-                        timeStr = string.Format("{0:d2}{1:d2}h", roundedTimeSpan.Hours, roundedTimeSpan.Minutes);
+                        timeStr = $"{roundedTimeSpan.Hours:d2}{roundedTimeSpan.Minutes:d2}h";
                     }
 
                     g.DrawString(timeStr, stringFont, Brushes.White, new PointF(tickPosition, 3)); //draw time
@@ -1249,8 +1207,6 @@ namespace AudioAnalysisTools.StandardSpectrograms
             }
 
             g.DrawLine(whitePen, 0, 0, trackWidth, 0); //draw upper boundary
-
-            //g.DrawLine(whitePen, 0, trackHeight - 1, trackWidth, trackHeight - 1);//draw lower boundary
             g.DrawLine(grayPen, 0, trackHeight - 1, trackWidth, trackHeight - 1); //draw lower boundary
             return bmp;
         }
@@ -1268,20 +1224,20 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             int hour;
             int min = (int)startOffset.TotalMinutes - 1;
-            var XaxisScale = gridInterval.TotalMinutes;
+            var xAxisScale = gridInterval.TotalMinutes;
             Pen whitePen = new Pen(Color.White);
             Font stringFont = new Font("Arial", 9);
 
-            for (int x = 0; x < trackWidth; x++) //for pixels in the line
+            for (int x = 0; x < trackWidth; x++)
             {
                 min++;
-                if (min % XaxisScale != 0)
+                if (min % xAxisScale != 0)
                 {
                     continue;
                 }
 
                 g.DrawLine(whitePen, x, 0, x, trackHeight);
-                hour = (int)Math.Round(min / XaxisScale);
+                hour = (int)Math.Round(min / xAxisScale);
                 if (hour >= 24)
                 {
                     min = 0;
@@ -1299,6 +1255,14 @@ namespace AudioAnalysisTools.StandardSpectrograms
             return bmp;
         }
 
+        /// <summary>
+        /// TODO: This relative time track should start at the time-span from start of recording.
+        ///       But this method implicitly assumes that zero time starts at beginning of recording.
+        ///       In practice, we always analyse from the beginning of a recording.
+        /// </summary>
+        /// <param name="fullDuration">full duration of the recording segment.</param>
+        /// <param name="trackWidth">Width of time scale in pixels.</param>
+        /// <param name="trackHeight">Height of time scale in pixels.</param>
         public static Bitmap DrawTimeRelativeTrack(TimeSpan fullDuration, int trackWidth, int trackHeight)
         {
             Bitmap bmp = new Bitmap(trackWidth, trackHeight);
@@ -1306,34 +1270,26 @@ namespace AudioAnalysisTools.StandardSpectrograms
             g.Clear(Color.Black);
 
             double xAxisPixelDurationInMilliseconds = fullDuration.TotalMilliseconds / trackWidth;
-
-            TimeSpan startTime = TimeSpan.Zero;
-
             TimeSpan xAxisTicInterval = CalculateGridInterval(fullDuration, trackWidth);
 
             Pen whitePen = new Pen(Color.White);
             Pen grayPen = new Pen(Color.Gray);
             Font stringFont = new Font("Arial", 8);
 
-            int rows = bmp.Height;
-            int cols = bmp.Width;
-
-            // draw first time entry
-            string time = "HHmm";
+            // label the time scale
             if (xAxisPixelDurationInMilliseconds < 60000)
             {
-                g.DrawString(time, stringFont, Brushes.White, new PointF(0, 3)); //draw time
+                g.DrawString("HHmm", stringFont, Brushes.White, new PointF(0, 3));
             }
             else
             {
-                g.DrawString("Hours", stringFont, Brushes.White, new PointF(0, 3)); //draw time
+                g.DrawString("Hours", stringFont, Brushes.White, new PointF(0, 3));
             }
 
-            // for columns, draw in X-axis lines
             int xPixelInterval = (int)Math.Round(xAxisTicInterval.TotalMilliseconds / xAxisPixelDurationInMilliseconds);
             int halfInterval = xPixelInterval / 2;
             int halfheight = trackHeight / 3;
-            for (int x = 1; x < cols; x++)
+            for (int x = 1; x < bmp.Width; x++)
             {
                 if (x % halfInterval == 0)
                 {
@@ -1344,7 +1300,10 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 {
                     int tickPosition = x;
                     g.DrawLine(whitePen, tickPosition, 0, tickPosition, trackHeight);
-                    TimeSpan elapsedTimeSpan = TimeSpan.FromMilliseconds(xAxisPixelDurationInMilliseconds * tickPosition);
+                    var elapsedTimeSpan = TimeSpan.FromMilliseconds(xAxisPixelDurationInMilliseconds * tickPosition);
+
+                    // for columns, draw in X-axis lines
+                    string time = string.Empty;
                     if (xAxisPixelDurationInMilliseconds <= 1000)
                     {
                         time = string.Format("{0}", elapsedTimeSpan);
@@ -1358,7 +1317,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                         time = string.Format("{0:f0}", elapsedTimeSpan.TotalHours);
                     }
 
-                    g.DrawString(time, stringFont, Brushes.White, new PointF(tickPosition, 2)); //draw time
+                    g.DrawString(time, stringFont, Brushes.White, new PointF(tickPosition, 2));
                 }
             }
 
@@ -1375,10 +1334,10 @@ namespace AudioAnalysisTools.StandardSpectrograms
             var whitePen = new Pen(Color.White);
             var grayPen = new Pen(Color.Gray);
             var stringFont = new Font("Arial", 7);
-            string message = "UTC time not available";
+            string message = "Date-time not available";
             g.DrawLine(whitePen, 0, 0, trackWidth, 0); //draw upper boundary
             g.DrawLine(grayPen, 0, trackHeight - 1, trackWidth, trackHeight - 1); //draw lower boundary
-            g.DrawString(message, stringFont, Brushes.White, new PointF(2, 2)); //draw time
+            g.DrawString(message, stringFont, Brushes.White, new PointF(0, 4));
             return bmp;
         }
 
@@ -1414,35 +1373,23 @@ namespace AudioAnalysisTools.StandardSpectrograms
             double interval = daysInYear / (double)12;
 
             string[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+            var whitePen = new Pen(Color.White);
+            var stringFont = new Font("Arial", 9);
 
-            Pen whitePen = new Pen(Color.White);
-
-            //Pen grayPen = new Pen(Color.Gray);
-            Font stringFont = new Font("Arial", 9);
-
-            for (int i = 0; i < 12; i++) //for pixels in the line
+            //for pixels in the line
+            for (int i = 0; i < 12; i++)
             {
-                int Y = (int)Math.Round(offset + (i * interval));
-
-                //if (offset % XaxisScale != 0) continue;
-                g.DrawLine(whitePen, Y, 0, Y, trackHeight);
-
-                //hour = offset / XaxisScale;
-                //if (hour >= 24)
-                //{
-                //    offset = 0;
-                //    hour = 0;
-                //}
-                g.DrawLine(whitePen, 0, Y, trackWidth, Y);
-                g.DrawString(months[i], stringFont, Brushes.White, new PointF(1, Y + 6)); //draw time
-            } // end over all pixels
-
-            g.DrawLine(whitePen, 0, daysInYear + offset, trackWidth, daysInYear + offset);
+                int y = (int)Math.Round(offset + (i * interval));
+                g.DrawLine(whitePen, y, 0, y, trackHeight);
+                g.DrawLine(whitePen, 0, y, trackWidth, y);
+                g.DrawString(months[i], stringFont, Brushes.White, new PointF(1, y + 6));
+            }
 
             //g.DrawLine(whitePen, 0, offset, trackWidth, offset);          //draw lower boundary
-            // g.DrawLine(whitePen, duration, 0, duration, trackHeight - 1);//draw right end boundary
+            //g.DrawLine(whitePen, duration, 0, duration, trackHeight - 1);//draw right end boundary
+            //g.DrawString(title, stringFont, Brushes.White, new PointF(duration + 4, 3));
+            g.DrawLine(whitePen, 0, daysInYear + offset, trackWidth, daysInYear + offset);
 
-            // g.DrawString(title, stringFont, Brushes.White, new PointF(duration + 4, 3));
             return bmp;
         }
 

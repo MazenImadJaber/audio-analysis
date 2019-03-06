@@ -139,25 +139,25 @@ namespace AudioAnalysisTools.Indices
             }
 
             var listOfBitmaps = bitmapList
-            //    .OrderBy(tuple => tuple.Item1.Order) // don't order because want to preserve alternating gray/white rows.
+            //  .OrderBy(tuple => tuple.Item1.Order) // don't order because want to preserve alternating gray/white rows.
                 .Select(tuple => tuple.Item2)
                 .Where(b => b != null).ToList();
 
             //set up the composite image parameters
-            int x_offset = 2;
-            int graphWidth = x_offset + scaleLength;
-            int imageWidth = x_offset + scaleLength + TrackEndPanelWidth;
+            int graphWidth = scaleLength;
+            int imageWidth = scaleLength + TrackEndPanelWidth;
             Bitmap titleBmp = ImageTrack.DrawTitleTrack(imageWidth, trackHeight, titleText);
 
             TimeSpan xAxisPixelDuration = indexCalculationDuration;
             TimeSpan fullDuration = TimeSpan.FromTicks(xAxisPixelDuration.Ticks * graphWidth);
             Bitmap timeBmp1 = ImageTrack.DrawTimeRelativeTrack(fullDuration, graphWidth, trackHeight);
-            Bitmap timeBmp2 = timeBmp1;
-            DateTimeOffset? dateTimeOffset = recordingStartDate;
-            if (dateTimeOffset.HasValue)
+
+            // draw an UTC time scale IFF a valid DateTimeOffset is available, i.e. was read from the file name.
+            var timeBmp2 = ImageTrack.DrawTimeTrack(fullDuration, recordingStartDate, graphWidth, trackHeight);
+            if (timeBmp2 == null)
             {
-                // draw extra time scale with absolute start time. AND THEN Do SOMETHING WITH IT.
-                timeBmp2 = ImageTrack.DrawTimeTrack(fullDuration, dateTimeOffset, graphWidth, trackHeight);
+                // Draw a default time track when UTC time start not available.
+                timeBmp2 = ImageTrack.DrawTimeTrackWarning(graphWidth, trackHeight);
             }
 
             //draw the composite bitmap
