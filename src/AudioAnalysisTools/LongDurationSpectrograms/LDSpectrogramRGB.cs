@@ -1563,11 +1563,18 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
         /// </summary>
         private static Image SpectrogramFraming(LDSpectrogramRGB cs, Image imageSansChrome)
         {
+            string dateString = "Date unknown.";
+            if (cs.RecordingStartDate.HasValue)
+            {
+                DateTime startDate = ((DateTimeOffset)cs.RecordingStartDate).DateTime.Date;
+                dateString = $"{startDate.Year:d2}-{startDate.Month:D2}-{startDate.Day:D2}";
+            }
+
             string startTime = $"{cs.StartOffset.Hours:d2}{cs.StartOffset.Minutes:d2}h";
 
             // then pass that image into chromer
             int nyquist = cs.SampleRate / 2;
-            string title = $"<{cs.ColorMap}> SPECTROGRAM  of \"{cs.FileName}\".   Starts at {startTime}; Nyquist={nyquist}";
+            string title = $"<{cs.ColorMap}> SPECTROGRAM  of \"{cs.FileName}\".   Starts: {dateString}--{startTime}; Nyquist={nyquist}";
             var titleBar = DrawTitleBarOfFalseColourSpectrogram(title, imageSansChrome.Width);
             var image = FrameLDSpectrogram(imageSansChrome, titleBar, cs);
             return image;

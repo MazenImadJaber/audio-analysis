@@ -202,7 +202,10 @@ namespace AnalysisPrograms
 
             // 1. PATTERN SEARCH FOR CORRECT SUBDIRECTORIES
             // Assumes that the required subdirectories have the given FILTER/SiteName somewhere in their path.
-            var subDirectories = LdSpectrogramStitching.GetSubDirectoriesForSiteData(inputDirs, arguments.DirectoryFilter);
+            var searchOption = SearchOption.TopDirectoryOnly;
+            //var searchOption = SearchOption.AllDirectories;
+
+            var subDirectories = LdSpectrogramStitching.GetSubDirectoriesForSiteData(inputDirs, arguments.DirectoryFilter, searchOption);
             if (subDirectories.Length == 0)
             {
                 LoggedConsole.WriteErrorLine("\n\n#WARNING from method ConcatenateIndexFiles.Execute():");
@@ -328,7 +331,7 @@ namespace AnalysisPrograms
                     LoggedConsole.WriteErrorLine("# WARNING: This is not a good idea!!!!!");
                 }
 
-                string dateString = $"{startDateTimeOffset.Year}{startDateTimeOffset.Month:D2}{startDateTimeOffset.Day:D2}";
+                string dateString = $"{startDateTimeOffset.Year}-{startDateTimeOffset.Month:D2}-{startDateTimeOffset.Day:D2}";
                 resultsDir = new DirectoryInfo(Path.Combine(opDir.FullName, arguments.FileStemName, dateString));
                 if (!resultsDir.Exists)
                 {
@@ -354,7 +357,7 @@ namespace AnalysisPrograms
                 {
                     TimeSpan start = ((DateTimeOffset)indexGenerationData.RecordingStartDate).TimeOfDay;
                     string startTime = $"{start.Hours:d2}{start.Minutes:d2}h";
-                    string imageTitle = $"SOURCE: \"{outputFileStem}\".     Starts at {startTime}                       {Meta.OrganizationTag}";
+                    string imageTitle = $"SOURCE: \"{outputFileStem}\".     Starts: {dateString}--{startTime}                    {Meta.OrganizationTag}";
                     Bitmap tracksImage = IndexDisplay.DrawImageOfSummaryIndices(
                             IndexProperties.GetIndexProperties(indexPropertiesConfig),
                             dictionaryOfSummaryIndices,

@@ -56,13 +56,13 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
         public const string SummaryIndicesStr = "SummaryIndices";
         public const string SpectralIndicesStr = "SpectralIndices";
 
-        public static DirectoryInfo[] GetSubDirectoriesForSiteData(IEnumerable<DirectoryInfo> topLevelDataDirectories, string site)
+        public static DirectoryInfo[] GetSubDirectoriesForSiteData(IEnumerable<DirectoryInfo> topLevelDataDirectories, string pattern, SearchOption searchOption)
         {
             //string dateString = String.Format("{0}{1:D2}{2:D2}", dto.Year, dto.Month, dto.Day);
-            string searchPattern = "*" + site + "*";
+            string searchPattern = "*" + pattern + "*";
 
             return topLevelDataDirectories
-                .SelectMany(dir => dir.GetDirectories(searchPattern, SearchOption.AllDirectories))
+                .SelectMany(dir => dir.GetDirectories(searchPattern, searchOption))
                 .ToArray();
         }
 
@@ -72,7 +72,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
         /// Read them into a dictionary
         /// MOST RECENT METHOD TO CONCATENATE Spectral INDEX.CSV FILES - Early September 2015.
         /// It is designed to deal with Yvonne's case where want to concatenate files distributed over arbitrary directories.
-        /// It only merges files for the passed fixed date. i.e only 24 hours
+        /// It only merges files for the passed fixed date. i.e only 24 hours.
         /// </summary>
         public static void DrawSpectralIndexFiles(
             Dictionary<string, double[,]> dictionary,
@@ -165,7 +165,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
         {
             var dto = (DateTimeOffset)indexGenerationData.RecordingStartDate;
 
-            string dateString = $"{dto.Year}{dto.Month:D2}{dto.Day:D2}";
+            string dateString = $"{dto.Year}-{dto.Month:D2}-{dto.Day:D2}";
             string opFileStem = $"{siteDescription.SiteName}_{dateString}";
 
             // Calculate the index distribution statistics and write to a json file. Also save as png image
@@ -179,7 +179,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             }
 
             string titletext =
-                $"SOURCE: \"{opFileStem}\".     Starts at {startTime}                       {Meta.OrganizationTag}";
+                $"SOURCE: \"{opFileStem}\".     Starts:{dateString}--{startTime}                       {Meta.OrganizationTag}";
             Bitmap tracksImage = IndexDisplay.DrawImageOfSummaryIndices(
                                  IndexProperties.GetIndexProperties(indexPropertiesConfigFileInfo),
                                  dictionaryOfCsvColumns,

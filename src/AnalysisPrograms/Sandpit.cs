@@ -62,7 +62,7 @@ namespace AnalysisPrograms
                 Log.WriteLine("# Start Time = " + tStart.ToString(CultureInfo.InvariantCulture));
 
                 //AnalyseFrogDataSet();
-                Audio2CsvOverOneFile();
+                //Audio2CsvOverOneFile();
                 //Audio2CsvOverMultipleFiles();
 
                 // used to get files from availae for Black rail and Least Bittern papers.
@@ -71,7 +71,7 @@ namespace AnalysisPrograms
                 //CodeToPlaceScoreTracksUnderLdfcSpectrograms();
                 //CodeToPlaceScoreTracksUnderSingleImage();
 
-                //ConcatenateIndexFilesAndSpectrograms();
+                ConcatenateIndexFilesAndSpectrograms();
                 //ConcatenateGreyScaleSpectrogramImages();
                 //ConcatenateMarineImages();
                 //ConcatenateImages();
@@ -682,6 +682,7 @@ namespace AnalysisPrograms
             // start and end dates INCLUSIVE
             DateTimeOffset? dtoStart = null;
             DateTimeOffset? dtoEnd = null;
+            bool concatenateEverythingYouCanLayYourHandsOn = false; // default is 24-hour blocks
 
             // files containing output from event recognizers.
             // Used only to get Event Recognizer files - set eventDirs=null if not used
@@ -693,11 +694,12 @@ namespace AnalysisPrograms
 
             // SET DEFAULT COLOUR MAPS
             string colorMap1 = SpectrogramConstants.RGBMap_ACI_ENT_EVN;
-            string colorMap2 = SpectrogramConstants.RGBMap_BGN_PMN_RHZ;
+            //string colorMap2 = SpectrogramConstants.RGBMap_BGN_PMN_RHZ;
+            string colorMap2 = SpectrogramConstants.RGBMap_BGN_PMN_SPT;
+            //string colorMap2 = SpectrogramConstants.RGBMap_BGN_PMN_OSC;
 
             // there are three options for rendering of gaps/missing data: NoGaps, TimedGaps and EchoGaps.
             string gapRendering = "TimedGaps"; // the default
-            bool concatenateEverythingYouCanLayYourHandsOn = false; // default is 24-hour blocks
 
             /*
             // ########################## CONCATENATION of Sarah Lowe's recordings
@@ -749,9 +751,11 @@ namespace AnalysisPrograms
             {
                 @"C:\Ecoacoustics\Output\Test\Test24HourRecording\TasmanIslandMez",
             };
-            string directoryFilter = "0*"; // this is a directory filter to locate only the required files
+
+            // NOTE: GetDirectories() does NOT recognise regEx syntax. 
+            string directoryFilter = "*"; // this is a directory filter to locate only the required files
             string opFileStem = "Testing";
-            string opPath = @"C:\Ecoacoustics\Output\Test\Test24HourRecording\TasmanIslandMez\Concat";
+            string opPath = @"C:\Ecoacoustics\Output\Test\Test24HourRecording\Concat4";
             var falseColourSpgConfig = $"C:\\Work\\GitHub\\audio-analysis\\src\\AnalysisConfigFiles\\SpectrogramFalseColourConfig.yml";
             concatenateEverythingYouCanLayYourHandsOn = true;
 
@@ -1143,9 +1147,9 @@ namespace AnalysisPrograms
         public static void ConcatenateGreyScaleSpectrogramImages()
         {
 
-            var ipDirInfo = new DirectoryInfo(@"C:\Ecoacoustics\Output\Test\Test24HourRecording\TasmanIslandMez\04\Towsey.Acoustic");
-            var opDirInfo = new DirectoryInfo(@"C:\Ecoacoustics\Output\Test\Test24HourRecording\TasmanIslandMez\04\Towsey.Acoustic");
-            var opFileName = "SM304256_0+1_20151114_031652";
+            var ipDirInfo = new DirectoryInfo(@"C:\Ecoacoustics\Output\Test\Test24HourRecording\Concat4\Testing\20151114");
+            var opDirInfo = new DirectoryInfo(@"C:\Ecoacoustics\Output\Test\Test24HourRecording\Concat4\Testing\20151114");
+            var opFileName = "Testing";
 
             //string[] keys = { "ACI", "BGN", "CVR", "ENT", "EVN", "OSC", "PMN", "R3D", "RHZ", "RNG", "RPS", "RVT", "SPT" };
             // the following line gets all current spectral indices, including DIF and SUM which we will want to exclude.

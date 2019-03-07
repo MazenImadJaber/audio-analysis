@@ -1177,7 +1177,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
                     TimeSpan absoluteTS = roundedStartTime + elapsedTimeSpan;
                     TimeSpan roundedTimeSpan = TimeSpan.FromSeconds(Math.Round(absoluteTS.TotalSeconds));
-                    string timeStr = "0000";
+                    string timeStr = "0000h";
                     if (xAxisPixelDurationInMilliseconds <= 1000)
                     {
                         timeStr = string.Format("{0}", roundedTimeSpan);
@@ -1191,11 +1191,12 @@ namespace AudioAnalysisTools.StandardSpectrograms
                             g.DrawLine(whitePen, tickPosition - 1, 0, tickPosition - 1, trackHeight);
                         }
 
-                        if (startDate.Year > 2000)
-                        {
-                            DateTime today = startDate + roundedTimeSpan;
-                            timeStr = $"{today.ToShortDateString()}";
-                        }
+                        //if (startDate.Year > 2000)
+                        //{
+                        //    DateTime today = startDate + roundedTimeSpan;
+                        //    //timeStr = $"{today.ToShortDateString()}";
+                        //    timeStr = $"{today.Hour:D2}{today.Minute:D2}h";
+                        //}
                     }
                     else
                     {
