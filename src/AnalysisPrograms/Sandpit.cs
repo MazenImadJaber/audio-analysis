@@ -62,7 +62,7 @@ namespace AnalysisPrograms
                 Log.WriteLine("# Start Time = " + tStart.ToString(CultureInfo.InvariantCulture));
 
                 //AnalyseFrogDataSet();
-                //Audio2CsvOverOneFile();
+                Audio2CsvOverOneFile();
                 //Audio2CsvOverMultipleFiles();
 
                 // used to get files from availae for Black rail and Least Bittern papers.
@@ -71,13 +71,13 @@ namespace AnalysisPrograms
                 //CodeToPlaceScoreTracksUnderLdfcSpectrograms();
                 //CodeToPlaceScoreTracksUnderSingleImage();
 
-                ConcatenateIndexFilesAndSpectrograms();
+                //ConcatenateIndexFilesAndSpectrograms();
                 //ConcatenateGreyScaleSpectrogramImages();
                 //ConcatenateMarineImages();
                 //ConcatenateImages();
                 //ConcatenateTwelveImages();
                 //CubeHelixDrawTestImage();
-                //DrawLongDurationSpectrogram();
+                //DrawLongDurationSpectrogram(); //for Liz Tasman Island
                 //DrawClusterSequence();
                 //DrawStandardSpectrograms();
 
@@ -323,9 +323,15 @@ namespace AnalysisPrograms
             //string outputPath = @"G:\SensorNetworks\Output\BradLaw\Pillaga24";
             //string configPath = @"C:\Work\GitHub\audio-analysis\AudioAnalysis\AnalysisConfigFiles\Towsey.Acoustic.yml";
 
-            string recordingPath = @"C:\Ecoacoustics\WavFiles\LizZnidersic\TasmanIsland2015_Unit2_Mez\SM304256_0+1_20151114_231652.wav";
-            string outputPath = @"C:\Ecoacoustics\Output\Test\Test24HourRecording\TasmanIslandMez\24";
-            string configPath = @"C:\Work\GitHub\audio-analysis\src\AnalysisConfigFiles\Towsey.Acoustic.yml";
+            //FLYING FOX RECORDING FROM BRAD LAW
+            string recordingPath = @"C:\Ecoacoustics\WavFiles\BradLawData\FlyingFox\20190127_Bellingen_Feeding_SM4.wav";
+            string outputPath = @"C:\Ecoacoustics\Output\Test\FlyingFox\20190127_Bellingen";
+            string configPath = @"C:\Ecoacoustics\WavFiles\BradLawData\FlyingFox\Towsey.Acoustic.yml";
+
+            //TASMAN ISLAND - TEST RECORDING
+            //string recordingPath = @"C:\Ecoacoustics\WavFiles\LizZnidersic\TasmanIsland2015_Unit2_Mez\SM304256_0+1_20151114_231652.wav";
+            //string outputPath = @"C:\Ecoacoustics\Output\Test\Test24HourRecording\TasmanIslandMez\24";
+            //string configPath = @"C:\Work\GitHub\audio-analysis\src\AnalysisConfigFiles\Towsey.Acoustic.yml";
 
             // Ivan Campos recordings
             //string recordingPath = @"G:\SensorNetworks\WavFiles\Ivancampos\INCIPO01_20161031_024006_898.wav";
@@ -542,12 +548,12 @@ namespace AnalysisPrograms
         public static void DrawLongDurationSpectrogram()
         {
             // the default ld fc spectrogram config file
-            var spectrogramConfigFile =
-                @"C:\Work\GitHub\audio-analysis\AudioAnalysis\AnalysisConfigFiles\SpectrogramFalseColourConfig.yml";
+            //var spectrogramConfigFile =
+            //    @"C:\Work\GitHub\audio-analysis\AudioAnalysis\AnalysisConfigFiles\SpectrogramFalseColourConfig.yml";
 
-            // the default index properties file
-            string indexPropertiesFile =
-                @"C:\Work\GitHub\audio-analysis\AudioAnalysis\AnalysisConfigFiles\IndexPropertiesConfig.yml";
+            //// the default index properties file
+            //string indexPropertiesFile =
+            //    @"C:\Work\GitHub\audio-analysis\AudioAnalysis\AnalysisConfigFiles\IndexPropertiesConfig.yml";
 
             // INPUT and OUTPUT DIRECTORIES
             //MARINE JASCO TEST
@@ -633,12 +639,18 @@ namespace AnalysisPrograms
             //string opdir = @"D:\SensorNetworks\Output\BradLawData\WilliWilliNP";
             //spectrogramConfigFile = @"C:\Work\GitHub\audio-analysis\AudioAnalysis\AnalysisConfigFiles\SpectrogramConfigHiRes.yml";
             //indexPropertiesFile = @"C:\Work\GitHub\audio-analysis\AudioAnalysis\AnalysisConfigFiles\IndexPropertiesConfigHiRes.yml";
-            string ipdir = @"D:\SensorNetworks\Output\BradLawData\WilliWilliNP\Towsey.Acoustic";
-            string opdir = @"D:\SensorNetworks\Output\BradLawData\WilliWilliNP";
-            spectrogramConfigFile =
-                @"C:\Work\GitHub\audio-analysis\AudioAnalysis\AnalysisConfigFiles\SpectrogramConfigHiRes.yml";
-            indexPropertiesFile =
-                @"C:\Work\GitHub\audio-analysis\AudioAnalysis\AnalysisConfigFiles\IndexPropertiesConfigHiRes.yml";
+            //string ipdir = @"D:\SensorNetworks\Output\BradLawData\WilliWilliNP\Towsey.Acoustic";
+            //string opdir = @"D:\SensorNetworks\Output\BradLawData\WilliWilliNP";
+            //spectrogramConfigFile =
+            //    @"C:\Work\GitHub\audio-analysis\AudioAnalysis\AnalysisConfigFiles\SpectrogramConfigHiRes.yml";
+            //indexPropertiesFile =
+            //    @"C:\Work\GitHub\audio-analysis\AudioAnalysis\AnalysisConfigFiles\IndexPropertiesConfigHiRes.yml";
+
+            // BRAD LAW FLHYING FOX RECORDINGS - High Resolution analysis
+            string ipdir = @"C:\Ecoacoustics\Output\Test\FlyingFox\20190127_Bellingen\Towsey.Acoustic";
+            string opdir = @"C:\Ecoacoustics\Output\Test\FlyingFox\20190127_Bellingen\Towsey.Acoustic";
+            var spectrogramConfigFile = @"C:\Work\GitHub\audio-analysis\src\AnalysisConfigFiles\SpectrogramFalseColourConfig.HighRes.yml";
+            var indexPropertiesFile = @"C:\Work\GitHub\audio-analysis\src\AnalysisConfigFiles\IndexPropertiesConfig.HiRes.yml";
 
             // USA WILD-LIFE ACOUSTICS TEST RECORDINGS OF LOSSY COMPRESSION - High Resolution analysis
             //string ipdir = @"D:\SensorNetworks\Output\WildLifeAcoustics\Towsey.Acoustic";
@@ -755,7 +767,7 @@ namespace AnalysisPrograms
             // NOTE: GetDirectories() does NOT recognise regEx syntax. 
             string directoryFilter = "*"; // this is a directory filter to locate only the required files
             string opFileStem = "Testing";
-            string opPath = @"C:\Ecoacoustics\Output\Test\Test24HourRecording\Concat4";
+            string opPath = @"C:\Ecoacoustics\Output\Test\Test24HourRecording\Concat5";
             var falseColourSpgConfig = $"C:\\Work\\GitHub\\audio-analysis\\src\\AnalysisConfigFiles\\SpectrogramFalseColourConfig.yml";
             concatenateEverythingYouCanLayYourHandsOn = true;
 
