@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('windows')) Or '$(OS)' == 'Windows_NT' ">
     <DefineConstants>$(DefineConstants);BUILD_PLATFORM_WINDOWS;BUILD_PLATFORM_NOT_LINUX;BUILD_PLATFORM_NOT_OSX</DefineConstants>
     <BuildPlatform>Windows</BuildPlatform>
   </PropertyGroup>
@@ -16,5 +16,17 @@
     <DefineConstants Condition="$(MSBuildRuntimeType) == 'Full'">$(DefineConstants);BUILD_RUNTIME_FULL;BUILD_RUNTIME_NOT_CORE;BUILD_RUNTIME_NOT_MONO</DefineConstants>
     <DefineConstants Condition="$(MSBuildRuntimeType) == 'Core'">$(DefineConstants);BUILD_RUNTIME_NOT_FULL;BUILD_RUNTIME_CORE;BUILD_RUNTIME_NOT_MONO</DefineConstants>
     <DefineConstants Condition="$(MSBuildRuntimeType) == 'Mono'">$(DefineConstants);BUILD_RUNTIME_NOT_FULL;BUILD_RUNTIME_NOT_CORE;BUILD_RUNTIME_MONO</DefineConstants>
+  </PropertyGroup>
+  <Target Name="APBuildConstants">
+    <ItemGroup>
+      <Message Text="[APBuildConstants] Platform: $(BuildPlatform)" Importance="High" />
+    </ItemGroup>
+  </Target>
+  <PropertyGroup>
+    <!-- Register our task that as something to run before standard targets -->
+    <BuildDependsOn>
+      APBuildConstants;
+      $(BuildDependsOn);
+    </BuildDependsOn>
   </PropertyGroup>
 </Project>
