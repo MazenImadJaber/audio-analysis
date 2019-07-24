@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AutoAttachVs.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
@@ -9,27 +9,22 @@
 
 #if DEBUG
 
-namespace Acoustics.Shared.Debugging
+namespace Acoustics.Shared.Platform
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Runtime.InteropServices.ComTypes;
-
     using EnvDTE;
-
     using DTEProcess = EnvDTE.Process;
     using Process = System.Diagnostics.Process;
 
     /// <summary>
     /// Example taken from <a href="https://gist.github.com/3813175">this gist</a>.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1305:FieldNamesMustNotUseHungarianNotation",
-        Justification = "Reviewed. Suppression is OK here.", Scope = "class")]
-    public static class VisualStudioAttacher
+    public static partial class VisualStudioAttacher
     {
         [DllImport("ole32.dll")]
         public static extern int CreateBindCtx(int reserved, out IBindCtx ppbc);
@@ -45,8 +40,7 @@ namespace Acoustics.Shared.Debugging
 
         public static string GetSolutionForVisualStudio(Process visualStudioProcess)
         {
-            _DTE visualStudioInstance;
-            if (TryGetVsInstance(visualStudioProcess.Id, out visualStudioInstance))
+            if (TryGetVsInstance(visualStudioProcess.Id, out var visualStudioInstance))
             {
                 try
                 {
@@ -62,12 +56,11 @@ namespace Acoustics.Shared.Debugging
 
         public static Process GetAttachedVisualStudio(Process applicationProcess)
         {
-            IEnumerable<Process> visualStudios = GetVisualStudioProcesses();
+            var visualStudios = GetVisualStudioProcesses();
 
-            foreach (Process visualStudio in visualStudios)
+            foreach (var visualStudio in visualStudios)
             {
-                _DTE visualStudioInstance;
-                if (TryGetVsInstance(visualStudio.Id, out visualStudioInstance))
+                if (TryGetVsInstance(visualStudio.Id, out var visualStudioInstance))
                 {
                     try
                     {
@@ -102,14 +95,12 @@ namespace Acoustics.Shared.Debugging
         /// </exception>
         public static void AttachVisualStudioToProcess(Process visualStudioProcess, Process applicationProcess)
         {
-            _DTE visualStudioInstance;
-
-            if (TryGetVsInstance(visualStudioProcess.Id, out visualStudioInstance))
+            if (TryGetVsInstance(visualStudioProcess.Id, out var visualStudioInstance))
             {
                 // Find the process you want the VS instance to attach to...
-                DTEProcess processToAttachTo =
+                var processToAttachTo =
                     visualStudioInstance.Debugger.LocalProcesses.Cast<DTEProcess>()
-                                        .FirstOrDefault(process => process.ProcessID == applicationProcess.Id);
+                        .FirstOrDefault(process => process.ProcessID == applicationProcess.Id);
 
                 // Attach to the process.
                 if (processToAttachTo != null)
@@ -128,61 +119,33 @@ namespace Acoustics.Shared.Debugging
         }
 
         /// <summary>
-        /// The get visual studio for solutions.
+        /// The get visual studio process that is running and has the specified solution loaded.
         /// </summary>
         /// <param name="solutionNames">
         /// The solution names.
         /// </param>
         /// <returns>
-        /// The <see cref="Process"/>.
+        /// The visual studio <see cref="Process"/> with the specified solution name.
         /// </returns>
         public static Process GetVisualStudioForSolutions(List<string> solutionNames)
         {
-            foreach (string solution in solutionNames)
+            var visualStudios = GetVisualStudioProcesses();
+
+            foreach (var visualStudio in visualStudios)
             {
-                Process visualStudioForSolution = GetVisualStudioForSolution(solution);
-                if (visualStudioForSolution != null)
+                if (TryGetVsInstance(visualStudio.Id, out var visualStudioInstance))
                 {
-                    return visualStudioForSolution;
-                }
-            }
+                    var actualSolutionName = Path.GetFileName(visualStudioInstance.Solution.FullName);
 
-            return null;
-        }
-
-        /// <summary>
-        /// The get visual studio process that is running and has the specified solution loaded.
-        /// </summary>
-        /// <param name="solutionName">
-        /// The solution name to look for.
-        /// </param>
-        /// <returns>
-        /// The visual studio <see cref="Process"/> with the specified solution name.
-        /// </returns>
-        public static Process GetVisualStudioForSolution(string solutionName)
-        {
-            IEnumerable<Process> visualStudios = GetVisualStudioProcesses();
-
-            foreach (Process visualStudio in visualStudios)
-            {
-                _DTE visualStudioInstance;
-                if (TryGetVsInstance(visualStudio.Id, out visualStudioInstance))
-                {
-                    try
+                    foreach (var solutionName in solutionNames)
                     {
-                        string actualSolutionName = Path.GetFileName(visualStudioInstance.Solution.FullName);
-
                         if (string.Compare(
-                            actualSolutionName,
-                            solutionName,
-                            StringComparison.InvariantCultureIgnoreCase) == 0)
+                                actualSolutionName,
+                                solutionName,
+                                StringComparison.InvariantCultureIgnoreCase) == 0)
                         {
                             return visualStudio;
                         }
-                    }
-                    catch (Exception)
-                    {
-                        throw;
                     }
                 }
             }
@@ -195,39 +158,34 @@ namespace Acoustics.Shared.Debugging
 
         private static IEnumerable<Process> GetVisualStudioProcesses()
         {
-            Process[] processes = Process.GetProcesses();
+            var processes = Process.GetProcesses();
             return processes.Where(o => o.ProcessName.Contains("devenv"));
         }
 
         private static bool TryGetVsInstance(int processId, out _DTE instance)
         {
-            IntPtr numFetched = IntPtr.Zero;
-            IRunningObjectTable runningObjectTable;
-            IEnumMoniker monikerEnumerator;
-            IMoniker[] monikers = new IMoniker[1];
+            var numFetched = IntPtr.Zero;
+            var monikers = new IMoniker[1];
 
-            GetRunningObjectTable(0, out runningObjectTable);
-            runningObjectTable.EnumRunning(out monikerEnumerator);
+            GetRunningObjectTable(0, out var runningObjectTable);
+            runningObjectTable.EnumRunning(out var monikerEnumerator);
             monikerEnumerator.Reset();
 
             while (monikerEnumerator.Next(1, monikers, numFetched) == 0)
             {
-                IBindCtx ctx;
-                CreateBindCtx(0, out ctx);
+                CreateBindCtx(0, out var ctx);
 
-                string runningObjectName;
-                monikers[0].GetDisplayName(ctx, null, out runningObjectName);
+                monikers[0].GetDisplayName(ctx, null, out var runningObjectName);
 
-                object runningObjectVal;
-                runningObjectTable.GetObject(monikers[0], out runningObjectVal);
+                runningObjectTable.GetObject(monikers[0], out var runningObjectVal);
 
-                if (runningObjectVal is _DTE && runningObjectName.StartsWith("!VisualStudio"))
+                if (runningObjectVal is _DTE dte && runningObjectName.StartsWith("!VisualStudio"))
                 {
-                    int currentProcessId = int.Parse(runningObjectName.Split(':')[1]);
+                    var currentProcessId = int.Parse(runningObjectName.Split(':')[1]);
 
                     if (currentProcessId == processId)
                     {
-                        instance = (_DTE)runningObjectVal;
+                        instance = dte;
                         return true;
                     }
                 }

@@ -1,10 +1,11 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2024
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29111.141
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A050BD53-DEE0-40F3-BEAB-1F7474533C40}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		src\AP.BuildConstants.props = src\AP.BuildConstants.props
 		src\AP.CopyFiles.targets = src\AP.CopyFiles.targets
 		src\AP.Settings.json = src\AP.Settings.json
 		src\AP.VersionBuild.targets = src\AP.VersionBuild.targets

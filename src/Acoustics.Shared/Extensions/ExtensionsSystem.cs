@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ExtensionsSystem.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
@@ -7,32 +7,29 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+// ReSharper disable once CheckNamespace
 namespace System
 {
-    using Collections.Generic;
-    using Collections.Specialized;
-    using ComponentModel;
-    using Data;
-    using Data.Linq;
-    using Diagnostics;
-    using IO;
-    using Linq;
-    using Linq.Expressions;
-    using Runtime.InteropServices;
-    using Runtime.Serialization;
-    using Runtime.Serialization.Formatters.Binary;
-    using Text;
-    using Text.RegularExpressions;
-    using Web;
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
+    using System.ComponentModel;
+    using System.Data.Linq;
+    using System.IO;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Runtime.Serialization;
+    using System.Runtime.Serialization.Formatters.Binary;
+    using System.Text;
+    using System.Text.RegularExpressions;
 
     public static class ExtensionsGeneral
     {
-        /// <summary>Deserialise byte array to object.
+        /// <summary>Deserialize byte array to object.
         /// </summary>
         /// <param name="bytes">
         /// The bytes.
         /// </param>
-        /// <returns>Deserialised object.
+        /// <returns>Deserialized object.
         /// </returns>
         public static object BinaryDeserialize(this byte[] bytes)
         {
@@ -49,7 +46,7 @@ namespace System
         }
 
         /// <summary>
-        /// Deserialise byte array to object.
+        /// Deserialize byte array to object.
         /// </summary>
         /// <param name="bytes">
         /// The bytes.
@@ -58,7 +55,7 @@ namespace System
         /// The binder.
         /// </param>
         /// <returns>
-        /// Deserialised object.
+        /// Deserialized object.
         /// </returns>
         public static object BinaryDeserialize(this byte[] bytes, SerializationBinder binder)
         {
@@ -459,86 +456,5 @@ namespace System
             var invokedExpr = Expression.Invoke(expr2, expr1.Parameters.Cast<Expression>());
             return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(expr1.Body, invokedExpr), expr1.Parameters);
         }
-    }
-
-    public static class ProcessExtensions
-    {
-#if DEBUG
-
-        /// <summary>
-        /// A utility class to determine a process parent.
-        /// http://stackoverflow.com/a/3346055
-        /// </summary>
-        [StructLayout(LayoutKind.Sequential)]
-        public struct ParentProcessUtilities
-        {
-            // These members must match PROCESS_BASIC_INFORMATION
-            internal IntPtr Reserved1;
-
-            internal IntPtr PebBaseAddress;
-
-            internal IntPtr Reserved2_0;
-
-            internal IntPtr Reserved2_1;
-
-            internal IntPtr UniqueProcessId;
-
-            internal IntPtr InheritedFromUniqueProcessId;
-
-            [DllImport("ntdll.dll")]
-            private static extern int NtQueryInformationProcess(
-                IntPtr processHandle,
-                int processInformationClass,
-                ref ParentProcessUtilities processInformation,
-                int processInformationLength,
-                out int returnLength);
-
-            /// <summary>
-            /// Gets the parent process of the current process.
-            /// </summary>
-            /// <returns>An instance of the Process class.</returns>
-            public static Process GetParentProcess()
-            {
-                return GetParentProcess(Process.GetCurrentProcess().Handle);
-            }
-
-            /// <summary>
-            /// Gets the parent process of specified process.
-            /// </summary>
-            /// <param name="id">The process id.</param>
-            /// <returns>An instance of the Process class.</returns>
-            public static Process GetParentProcess(int id)
-            {
-                Process process = Process.GetProcessById(id);
-                return GetParentProcess(process.Handle);
-            }
-
-            /// <summary>
-            /// Gets the parent process of a specified process.
-            /// </summary>
-            /// <param name="handle">The process handle.</param>
-            /// <returns>An instance of the Process class.</returns>
-            public static Process GetParentProcess(IntPtr handle)
-            {
-                ParentProcessUtilities pbi = new ParentProcessUtilities();
-                int returnLength;
-                int status = NtQueryInformationProcess(handle, 0, ref pbi, Marshal.SizeOf(pbi), out returnLength);
-                if (status != 0)
-                {
-                    throw new Win32Exception(status);
-                }
-
-                try
-                {
-                    return Process.GetProcessById(pbi.InheritedFromUniqueProcessId.ToInt32());
-                }
-                catch (ArgumentException)
-                {
-                    // not found
-                    return null;
-                }
-            }
-        }
-#endif
     }
 }

@@ -26,7 +26,7 @@ namespace AnalysisPrograms
     using log4net.Core;
     using log4net.Repository.Hierarchy;
 #if DEBUG
-    using Acoustics.Shared.Debugging;
+    using Acoustics.Shared.Platform;
 #endif
     using log4net;
     using McMaster.Extensions.CommandLineUtils;
@@ -34,6 +34,7 @@ namespace AnalysisPrograms
     using Production.Arguments;
     using Production.Parsers;
     using static System.Environment;
+    using VisualStudioAttacher = Acoustics.Shared.Platform.VisualStudioAttacher;
 
     public static partial class MainEntry
     {
@@ -235,6 +236,7 @@ and make sure you install the `mono-complete` package.
                 $@"{Meta.Description} - version {BuildMetadata.VersionString} ({(InDEBUG ? "DEBUG" : "RELEASE")} build, {BuildMetadata.BuildDate}){NewLine}" +
                 $@"Git branch-version: {BuildMetadata.GitBranch}-{BuildMetadata.GitCommit}, DirtyBuild:{BuildMetadata.IsDirty}, CI:{BuildMetadata.CiBuild}{NewLine}" +
                 $@"Copyright {Meta.NowYear} {Meta.Organization}");
+            NoConsole.Log.Info($"Built on platform: {BuildMetadata.BuildPlatform}; Built with runtime: {BuildMetadata.BuildRuntime}");
         }
 
         internal static void WarnIfDeveloperEntryUsed(string message = null)
@@ -271,9 +273,13 @@ and make sure you install the `mono-complete` package.
                 return;
             }
 
+            bool hang = false;
+
             // if Michael is debugging with visual studio, this will prevent the window closing.
-            Process parentProcess = ProcessExtensions.ParentProcessUtilities.GetParentProcess();
-            if (parentProcess.ProcessName == "devenv")
+            Process parentProcess = ProcessHelper.ParentProcessUtilities.GetParentProcess();
+            hang = parentProcess?.ProcessName == "devenv" || Debugger.IsAttached;
+
+            if (hang)
             {
                 LoggedConsole.WriteSuccessLine("FINISHED: Press RETURN key to exit.");
                 Console.ReadLine();

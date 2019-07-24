@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
+    <DefineConstants>$(DefineConstants);BUILD_PLATFORM_WINDOWS;BUILD_PLATFORM_NOT_LINUX;BUILD_PLATFORM_NOT_OSX</DefineConstants>
+    <BuildPlatform>Windows</BuildPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('linux'))">
+    <DefineConstants>$(DefineConstants);BUILD_PLATFORM_NOT_WINDOWS;BUILD_PLATFORM_LINUX;BUILD_PLATFORM_NOT_OSX</DefineConstants>
+    <BuildPlatform>Linux</BuildPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('osx'))">
+    <DefineConstants>$(DefineConstants);BUILD_PLATFORM_NOT_WINDOWS;BUILD_PLATFORM_NOT_LINUX;BUILD_PLATFORM_OSX</DefineConstants>
+    <BuildPlatform>OSX</BuildPlatform>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants Condition="$(MSBuildRuntimeType) == 'Full'">$(DefineConstants);BUILD_RUNTIME_FULL;BUILD_RUNTIME_NOT_CORE;BUILD_RUNTIME_NOT_MONO</DefineConstants>
+    <DefineConstants Condition="$(MSBuildRuntimeType) == 'Core'">$(DefineConstants);BUILD_RUNTIME_NOT_FULL;BUILD_RUNTIME_CORE;BUILD_RUNTIME_NOT_MONO</DefineConstants>
+    <DefineConstants Condition="$(MSBuildRuntimeType) == 'Mono'">$(DefineConstants);BUILD_RUNTIME_NOT_FULL;BUILD_RUNTIME_NOT_CORE;BUILD_RUNTIME_MONO</DefineConstants>
+  </PropertyGroup>
+</Project>
