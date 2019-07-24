@@ -269,7 +269,7 @@ namespace AnalysisPrograms.SourcePreparers
                 if ((newEnd - newStart) < minimumDuration)
                 {
                     Log.Warn(
-                        $"Omitting short segment {newStart}–{newEnd} because it is less than the minimum {minimumDuration}");
+                        $"Omitting short segment {newStart}ï¿½{newEnd} because it is less than the minimum {minimumDuration}");
                     newSegment = null;
                     return false;
                 }

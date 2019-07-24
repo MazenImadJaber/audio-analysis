@@ -106,7 +106,7 @@ namespace Acoustics.Test.AudioAnalysisTools.Indices
         public void TestOfSpectralIndices()
         {
             //var indexPropertiesConfig = PathHelper.ResolveConfigFile(@"IndexPropertiesConfig.yml");
-            var sourceRecording = PathHelper.ResolveAsset(@"Recordings\BAC2_20071008-085040.wav");
+            var sourceRecording = PathHelper.ResolveAsset(@"Recordings", "BAC2_20071008-085040.wav");
             var configFile = PathHelper.ResolveConfigFile(@"Towsey.Acoustic.yml");
 
             // var outputDir = this.outputDirectory;
