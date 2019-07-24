@@ -352,7 +352,7 @@ namespace Acoustics.Shared
                 throw new ConfigFileException($"An exe path for `{key}` was not found or it's value is empty in AP.Settings.json");
             }
 
-            Log.Debug($"No key found for `{key}` in the AP.Settings.config. This program may fail if this binary is needed.");
+            Log.Debug($"No key found for `{key}` in the AP.Settings.json. This program may fail if this binary is needed.");
             return null;
         }
     }
