@@ -1,4 +1,4 @@
-﻿// <copyright file="ProcessRunner.cs" company="QutEcoacoustics">
+// <copyright file="ProcessRunner.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
 
@@ -30,6 +30,7 @@ namespace Acoustics.Shared
         private StringBuilder errorOutput;
         private List<string> failedRuns;
         private Process process;
+        private bool started;
         private bool exitCodeSet;
         private int exitCode;
 
@@ -213,13 +214,23 @@ namespace Acoustics.Shared
         {
             if (this.process != null)
             {
-                if (!this.process.HasExited)
+                // if we create a process object, but this Dispose is called before
+                // the process has started it throws an exception because
+                // the dotnet process object has no reliable method for
+                // checking if it started the process (without throwing
+                // an exception!). We now manually track whether we start
+                // the process and don't query the process object if we haven't.
+                // This state is pretty hard to get to with our public API.
+                // We think we encountered this weirdness due to a race condition
+                // caused by some difference between Mono on OSX and Windows.
+                if (this.started && !this.process.HasExited)
                 {
                     this.KillProcess();
                 }
 
                 // https://github.com/QutBioacoustics/audio-analysis/issues/118
                 // Workaround for: https://bugzilla.xamarin.com/show_bug.cgi?id=43462#c14
+                // TODO CORE: remove possibly
                 this.process.Dispose();
 
                 GC.Collect();
@@ -244,6 +255,7 @@ namespace Acoustics.Shared
                 Log.Verbose(this.instanceId + ": Process runner arguments:" + arguments);
             }
 
+            this.started = false;
             this.process = new Process
             {
                 StartInfo = new ProcessStartInfo
@@ -326,17 +338,14 @@ namespace Acoustics.Shared
 
             if (!this.WaitForExit)
             {
-                this.process.Start();
+                Start();
             }
             else
             {
                 this.process.ErrorDataReceived += OnProcessOnErrorDataReceived;
                 this.process.OutputDataReceived += OnProcessOnOutputDataReceived;
 
-                if (!this.process.Start())
-                {
-                    throw new InvalidOperationException("Failed to start process");
-                }
+                Start();
 
                 // WARNING: can sometimes miss output if the program runs too fast for
                 // BeginOutputReadLine and BeginErrorReadLine to start receiving input
@@ -382,6 +391,19 @@ namespace Acoustics.Shared
                 }
 
                 this.ExitCode = this.process.ExitCode;
+            }
+
+            void Start()
+            {
+                lock (this)
+                {
+                    this.started = this.process.Start();
+                }
+
+                if (!this.started)
+                {
+                    throw new InvalidOperationException("Failed to start process");
+                }
             }
 
             void OnProcessOnErrorDataReceived(object sender, DataReceivedEventArgs e)

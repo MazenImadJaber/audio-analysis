@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DrawLongDurationSpectrograms.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
@@ -131,7 +131,7 @@ namespace AnalysisPrograms
 
             var indexGenerationData = Json.Deserialize<IndexGenerationData>(indexGenerationDataFile);
 
-            // spectral distribution statistics is required only when calcualting difference spectrograms.
+            // spectral distribution statistics is required only when calculating difference spectrograms.
             Dictionary<string, IndexDistributions.SpectralStats> indexDistributionsData = null;
             if (indexDistributionsFile != null && indexDistributionsFile.Exists)
             {

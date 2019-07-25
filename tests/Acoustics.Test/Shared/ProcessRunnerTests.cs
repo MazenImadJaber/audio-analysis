@@ -1,4 +1,4 @@
-﻿// <copyright file="ProcessRunnerTests.cs" company="QutEcoacoustics">
+// <copyright file="ProcessRunnerTests.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
 
@@ -6,12 +6,15 @@ namespace Acoustics.Test.Shared
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
     using Acoustics.Shared;
+    using Fasterflect;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using TestHelpers;
 
@@ -26,6 +29,31 @@ namespace Acoustics.Test.Shared
             var result = Enumerable.Range(0, 100).AsParallel().Select(this.RunFfprobe).ToArray();
 
             Assert.IsTrue(result.All());
+        }
+
+        [TestMethod]
+        public void ProcessRunnerCanDetectNotStartedProcess()
+        {
+            // if we create a process runner, but dispose of it before
+            // the process has started it throws an exception because
+            // the dotnet process object has no reliable method for
+            // checking if it started the process (without throwing
+            // an exception!). We now manually track whether we start
+            // the process and this test tests the tracking.
+            // This state is pretty hard to get to with our public API.
+            // We think we encountered this weirdness due to a race condition
+            // caused by some difference between Mono on OSX and Windows.
+            var runner = new ProcessRunner(AppConfigHelper.FfprobeExe);
+
+            // use magic to set internal state to an invalid state - which is
+            // only possible in a race condition, or exception unwinding.
+            runner.SetFieldValue("process", new Process());
+
+            // do not start the process, just wait a lil bit
+            Thread.Sleep(0);
+
+            // dispose would throw before bug was fixed
+            runner.Dispose();
         }
 
         [TestMethod]
