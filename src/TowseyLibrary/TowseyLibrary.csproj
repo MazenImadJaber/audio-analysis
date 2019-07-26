@@ -221,4 +221,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Import Project="..\AP.BuildConstants.props" />
 </Project>

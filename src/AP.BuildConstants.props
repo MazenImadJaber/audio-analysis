@@ -12,15 +12,31 @@
     <DefineConstants>$(DefineConstants);BUILD_PLATFORM_NOT_WINDOWS;BUILD_PLATFORM_NOT_LINUX;BUILD_PLATFORM_OSX</DefineConstants>
     <BuildPlatform>OSX</BuildPlatform>
   </PropertyGroup>
-  <PropertyGroup>
-    <DefineConstants Condition="$(MSBuildRuntimeType) == 'Full'">$(DefineConstants);BUILD_RUNTIME_FULL;BUILD_RUNTIME_NOT_CORE;BUILD_RUNTIME_NOT_MONO</DefineConstants>
-    <DefineConstants Condition="$(MSBuildRuntimeType) == 'Core'">$(DefineConstants);BUILD_RUNTIME_NOT_FULL;BUILD_RUNTIME_CORE;BUILD_RUNTIME_NOT_MONO</DefineConstants>
-    <DefineConstants Condition="$(MSBuildRuntimeType) == 'Mono'">$(DefineConstants);BUILD_RUNTIME_NOT_FULL;BUILD_RUNTIME_NOT_CORE;BUILD_RUNTIME_MONO</DefineConstants>
-  </PropertyGroup>
+  <UsingTask TaskName="GetRuntime"
+             TaskFactory="CodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" >
+    <ParameterGroup>
+      <IsMonoRuntime ParameterType="System.Boolean" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        IsMonoRuntime = System.Type.GetType("Mono.Runtime") != null;
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
   <Target Name="APBuildConstants">
-    <ItemGroup>
-      <Message Text="[APBuildConstants] Platform: $(BuildPlatform)" Importance="High" />
-    </ItemGroup>
+    <GetRuntime>
+      <Output PropertyName="IsMonoRuntime" TaskParameter="IsMonoRuntime" />
+    </GetRuntime>
+    <Message Text="[APBuildConstants] Platform: $(BuildPlatform); MSBuildRuntimeType: $(MSBuildRuntimeType); IsMonoRuntime: $(IsMonoRuntime)" Importance="High" />
+    <PropertyGroup>
+      <!-- MSBuildRuntimeType undefined prior to MSBUILD 15 -->
+      <DefineConstants Condition="$(MSBuildRuntimeType) == 'Full' Or ($(MSBuildRuntimeType) == '' And ! $(IsMonoRuntime))">$(DefineConstants);BUILD_RUNTIME_FULL;BUILD_RUNTIME_NOT_CORE;BUILD_RUNTIME_NOT_MONO</DefineConstants>
+      <DefineConstants Condition="$(MSBuildRuntimeType) == 'Core'">$(DefineConstants);BUILD_RUNTIME_NOT_FULL;BUILD_RUNTIME_CORE;BUILD_RUNTIME_NOT_MONO</DefineConstants>
+      <DefineConstants Condition="$(MSBuildRuntimeType) == 'Mono' Or $(__MonoCS__) != '' Or $(IsMonoRuntime)">$(DefineConstants);BUILD_RUNTIME_NOT_FULL;BUILD_RUNTIME_NOT_CORE;BUILD_RUNTIME_MONO</DefineConstants>
+    </PropertyGroup>
   </Target>
   <PropertyGroup>
     <!-- Register our task that as something to run before standard targets -->
