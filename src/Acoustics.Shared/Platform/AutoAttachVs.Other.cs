@@ -7,10 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-#if DEBUG
+
 
 namespace Acoustics.Shared.Platform
 {
+#if DEBUG
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -54,6 +55,5 @@ namespace Acoustics.Shared.Platform
         /// </returns>
         public static Process GetVisualStudioForSolutions(List<string> solutionNames) => null;
     }
-}
-
 #endif
+}

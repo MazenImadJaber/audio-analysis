@@ -10,10 +10,6 @@
 // ReSharper disable once CheckNamespace
 namespace AnalysisPrograms
 {
-    using Acoustics.Shared.Contracts;
-
-        #if DEBUG
-#endif
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -21,20 +17,18 @@ namespace AnalysisPrograms
     using System.Linq;
     using System.Reflection;
     using Acoustics.Shared;
+    using Acoustics.Shared.Contracts;
     using Acoustics.Shared.Logging;
     using log4net.Appender;
     using log4net.Core;
     using log4net.Repository.Hierarchy;
-#if DEBUG
     using Acoustics.Shared.Platform;
-#endif
+    using AnalysisPrograms.Production;
+    using AnalysisPrograms.Production.Arguments;
+    using AnalysisPrograms.Production.Parsers;
     using log4net;
     using McMaster.Extensions.CommandLineUtils;
-    using Production;
-    using Production.Arguments;
-    using Production.Parsers;
     using static System.Environment;
-    using VisualStudioAttacher = Acoustics.Shared.Platform.VisualStudioAttacher;
 
     public static partial class MainEntry
     {
