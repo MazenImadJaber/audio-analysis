@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Configuration;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -570,66 +569,6 @@ Hundredths (optional): Must be between 0 and 99. Use them for higher precision.
             var ext = Path.GetExtension(originalFileName);
 
             return audioFileName + ext;
-        }
-
-        /// <summary>
-        /// Get a segment from an mp3 file.
-        /// </summary>
-        /// <param name="audioFile">
-        /// The audio file.
-        /// </param>
-        /// <param name="start">
-        /// The start.
-        /// </param>
-        /// <param name="end">
-        /// The end.
-        /// </param>
-        /// <param name="requestMimeType">
-        /// The request Mime Type.
-        /// </param>
-        /// <returns>
-        /// Byte array of audio segment. Byte array will be null or 0 length if segmentation failed.
-        /// </returns>
-        public byte[] SegmentMp3(string audioFile, long? start, long? end, string requestMimeType)
-        {
-            try
-            {
-                const string Mp3SpltPathKey = "PathToMp3Splt";
-
-                var pathToMp3Split = ConfigurationManager.AppSettings.AllKeys.Contains(Mp3SpltPathKey)
-                                         ? ConfigurationManager.AppSettings[Mp3SpltPathKey]
-                                         : string.Empty;
-
-                const string ConversionfolderKey = "ConversionFolder";
-
-                var conversionPath = ConfigurationManager.AppSettings.AllKeys.Contains(ConversionfolderKey)
-                                         ? ConfigurationManager.AppSettings[ConversionfolderKey]
-                                         : string.Empty;
-
-                var mimeType = MediaTypes.GetMediaType(Path.GetExtension(audioFile));
-
-                if (mimeType == MediaTypes.MediaTypeMp3 && requestMimeType == MediaTypes.MediaTypeMp3 &&
-                    !string.IsNullOrEmpty(pathToMp3Split) && File.Exists(pathToMp3Split) &&
-                    !string.IsNullOrEmpty(conversionPath) && Directory.Exists(conversionPath))
-                {
-                    var tempFile = TempFileHelper.NewTempFile(this.TemporaryFilesDirectory, MediaTypes.ExtMp3);
-
-                    var segmentedFile = this.SingleSegment(
-                        tempFile.FullName, start.HasValue ? start.Value : 0, end.HasValue ? end.Value : long.MaxValue);
-
-                    byte[] bytes = File.ReadAllBytes(segmentedFile);
-
-                    tempFile.Delete();
-
-                    return bytes;
-                }
-            }
-            catch
-            {
-                return new byte[0];
-            }
-
-            return new byte[0];
         }
 
         /// <summary>

@@ -24,7 +24,7 @@ namespace Acoustics.Test.AnalysisBase
         private FileSegment preparedSegment;
 
         [TestInitialize]
-        public void Initialize()
+        protected override void ChildTestInitialize()
         {
             this.analysisSettings = new AnalysisSettings();
 

@@ -18,6 +18,13 @@ namespace Acoustics.Test.TestHelpers
         public void Setup()
         {
             this.outputDirectory = PathHelper.GetTempDir();
+            this.ChildTestInitialize();
+        }
+
+        /// <summary>
+        /// Allows a child class to use Initialize without requiring the attribute.
+        /// </summary>
+        protected virtual void ChildTestInitialize() {
         }
 
         [TestCleanup]

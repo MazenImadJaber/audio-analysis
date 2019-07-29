@@ -11,7 +11,6 @@ namespace Acoustics.Shared
 {
     using System;
     using System.Collections.Generic;
-    using System.Configuration;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -45,7 +44,7 @@ namespace Acoustics.Shared
             var settings = AppConfiguration.Value.GetSection("appSettings");
             if (!settings.AsEnumerable().Any())
             {
-                throw new ConfigurationErrorsException("Could not read AP.Settings.json - no values were found in the config file");
+                throw new ConfigFileException("Could not read AP.Settings.json - no values were found in the config file");
             }
 
             return settings;
@@ -97,6 +96,14 @@ namespace Acoustics.Shared
                 return dateFormat.IsNotWhitespace() ? dateFormat : StandardDateFormatSm2;
             }
         }
+
+        /// <summary>
+        /// Get the temp directory Audio analysis should use.
+        /// </summary>
+        /// <remarks>
+        /// DO NOT USE THIS VALUE. Rather use <see cref="TempFileHelper"/>
+        /// </remarks>
+        public static string TempDirectory { get; } =  SharedSettings.Value["TempDir"];
 
         /// <summary>
         /// Gets FfmpegExe.
@@ -175,7 +182,7 @@ namespace Acoustics.Shared
 
             if (string.IsNullOrEmpty(value))
             {
-                throw new ConfigurationErrorsException("Could not find appSettings key or it did not have a value: " + key);
+                throw new ConfigFileException("Could not find appSettings key or it did not have a value: " + key);
             }
 
             return value;
@@ -190,8 +197,8 @@ namespace Acoustics.Shared
                 return valueParsed;
             }
 
-            throw new ConfigurationErrorsException(
-                "Key " + key + " exists but could not be converted to a bool: " + value);
+            throw new ConfigFileException(
+                $"Key {key} exists but could not be converted to a bool: {value}");
         }
 
         public static int GetInt(string key)
@@ -203,8 +210,8 @@ namespace Acoustics.Shared
                 return valueParsed;
             }
 
-            throw new ConfigurationErrorsException(
-                "Key " + key + " exists but could not be converted to a int: " + value);
+            throw new ConfigFileException(
+                $"Key {key} exists but could not be converted to a int: {value}");
         }
 
         public static double GetDouble(string key)
@@ -216,8 +223,8 @@ namespace Acoustics.Shared
                 return valueParsed;
             }
 
-            throw new ConfigurationErrorsException(
-                "Key " + key + " exists but could not be converted to a double: " + value);
+            throw new ConfigFileException(
+                $"Key {key} exists but could not be converted to a double: {value}");
         }
 
         public static DirectoryInfo GetDir(string key, bool checkExists)
@@ -283,8 +290,8 @@ namespace Acoustics.Shared
                 return valueParsed;
             }
 
-            throw new ConfigurationErrorsException(
-                "Key " + key + " exists but could not be converted to a long: " + value);
+            throw new ConfigFileException(
+                $"Key {key} exists but could not be converted to a long: {value}");
         }
 
         /// <summary>
@@ -292,6 +299,7 @@ namespace Acoustics.Shared
         /// </summary>
         private static void CheckOs(ref bool isWindows, ref bool isLinux, ref bool isMacOsX)
         {
+            // TODO CORE: update this test; .NET Core has better platform runtime detection
             var windir = Environment.GetEnvironmentVariable("windir");
             if (!string.IsNullOrEmpty(windir) && windir.Contains(@"\") && Directory.Exists(windir))
             {
@@ -317,7 +325,7 @@ namespace Acoustics.Shared
             }
             else
             {
-                throw new PlatformNotSupportedException("Unkown platform");
+                throw new PlatformNotSupportedException("Unknown platform");
             }
         }
 

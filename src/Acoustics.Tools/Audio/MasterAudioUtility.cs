@@ -476,7 +476,7 @@ namespace Acoustics.Tools.Audio
         {
             if (this.mp3SpltUtility == null)
             {
-                throw new NotSupportedException($"MP3 conversion not supported because mp3splt utility has not been configured for this { nameof(MasterAudioUtility)}.");
+                throw new NotSupportedException($"MP3 conversion not supported because mp3splt utility has not been configured for this {nameof(MasterAudioUtility)}.");
             }
 
             // use a temp file to segment.

@@ -5,7 +5,6 @@
 namespace Acoustics.Shared
 {
     using System;
-    using System.Configuration;
     using System.IO;
     using System.Linq;
     using System.Security.Cryptography;
@@ -20,15 +19,7 @@ namespace Acoustics.Shared
         /// </summary>
         public static DirectoryInfo TempDir(bool ensureNew = false)
         {
-            var tempDirString = "TempDir";
-            var tempDirSet = ConfigurationManager.AppSettings.AllKeys.Any(i => i == tempDirString);
-
-            var tempDir = string.Empty;
-
-            if (tempDirSet)
-            {
-                tempDir = ConfigurationManager.AppSettings["TempDir"];
-            }
+            var tempDir = AppConfigHelper.TempDirectory;
 
             if (string.IsNullOrEmpty(tempDir))
             {

@@ -26,7 +26,7 @@ namespace Acoustics.Test.Shared
 
     [TestClass]
     [DoNotParallelize]
-    public class ConfigFileTests : OutputDirectoryTest
+    public class ConfigFileTests
     {
         private static FileInfo knownConfigFile;
         private static MemoryAppender memoryAppender;
