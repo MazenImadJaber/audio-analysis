@@ -1,4 +1,4 @@
-﻿namespace Acoustics.Tools.Audio
+namespace Acoustics.Tools.Audio
 {
     using System;
     using System.Collections.Generic;
@@ -54,8 +54,10 @@
         /// The wav Unpack.
         /// </param>
         /// <exception cref="FileNotFoundException">
+        /// If the `wvunpack` utility cannot be found at the path indicated by <paramref name="wavUnpack"/>.
         /// </exception>
         /// <exception cref="ArgumentNullException">
+        /// If <paramref name="wavUnpack"/> is null.
         /// </exception>
         /// <exception cref="ArgumentException">wavUnpack</exception>
         public WavPackAudioUtility(FileInfo wavUnpack)
@@ -73,9 +75,14 @@
         /// <param name="wavUnpack">
         /// The wav Unpack.
         /// </param>
+        /// <param name="temporaryFilesDirectory">
+        /// Where to store temporary files.
+        /// </param>
         /// <exception cref="FileNotFoundException">
+        /// If the `wvunpack` utility cannot be found at the path indicated by <paramref name="wavUnpack"/>.
         /// </exception>
         /// <exception cref="ArgumentNullException">
+        /// If <paramref name="wavUnpack"/> is null.
         /// </exception>
         /// <exception cref="ArgumentException">wavUnpack</exception>
         public WavPackAudioUtility(FileInfo wavUnpack, DirectoryInfo temporaryFilesDirectory)
@@ -153,7 +160,6 @@
             // only deals with start and end, does not do anything with sampling, channels or bit rate.
             if (request.OffsetStart.HasValue || request.OffsetEnd.HasValue)
             {
-              
                 if (request.OffsetStart.HasValue && request.OffsetStart.Value > TimeSpan.Zero)
                 {
                     sb.AppendFormat(ArgsSkip, FormatTimeSpan(request.OffsetStart.Value));
@@ -163,7 +169,9 @@
                 {
                     if (request.OffsetStart.HasValue && request.OffsetStart.Value > TimeSpan.Zero)
                     {
-                        sb.AppendFormat(ArgsUtil, "+",
+                        sb.AppendFormat(
+                            ArgsUtil,
+                            "+",
                             FormatTimeSpan(request.OffsetEnd.Value - request.OffsetStart.Value));
                     }
                     else
@@ -189,8 +197,7 @@
         /// </returns>
         protected override string ConstructInfoArgs(FileInfo source)
         {
-            string args = string.Format(" -s \"{0}\" ", source.FullName);
-            return args;
+            return $" -s \"{source.FullName}\" ";
         }
 
         /// <summary>
@@ -255,10 +262,9 @@
                             @"hh:mm:ss.ff",
                         };
 
-                TimeSpan tsresult;
-                if (TimeSpan.TryParseExact(stringDuration.Trim(), formats, CultureInfo.InvariantCulture, out tsresult))
+                if (TimeSpan.TryParseExact(stringDuration.Trim(), formats, CultureInfo.InvariantCulture, out var timeSpan))
                 {
-                    result.Duration = tsresult;
+                    result.Duration = timeSpan;
                 }
             }
 
