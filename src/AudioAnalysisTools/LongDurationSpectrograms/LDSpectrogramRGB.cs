@@ -49,6 +49,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
     using log4net;
     using StandardSpectrograms;
     using TowseyLibrary;
+    
 
     /// <summary>
     /// This class generates false-colour spectrograms of long duration audio recordings.
@@ -915,25 +916,90 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                         b = 0.5;
                     }
 
+                    // get HSL values
+                    var s = r;          // The saturation
+                    var l = g;    // The lighness 
+                    var h = b * 360;          // hue
+
+
                     // enhance blue color - it is difficult to see on a black background
                     // This is a hack - there should be a principled way to do this!
                     // The effect is to create a more visible cyan colour.
-                    if (r < 0.1 && g < 0.1 && b > 0.1)
-                    {
-                        g += 0.7 * b;
-                        b += 0.2;
+                    /*  if (r < 0.1 && g < 0.1 && b > 0.1)
+                      {
+                          g += 0.7 * b;
+                          b += 0.2;
 
-                        // check for values over 1.0
-                        g = Math.Min(1.0, g);
-                        b = Math.Min(1.0, b);
-                    }
+                          // check for values over 1.0
+                          g = Math.Min(1.0, g);
+                          b = Math.Min(1.0, b);
+                      }
+                      */
 
+                    // calculate the chroma
                     if (doReverseColour)
                     {
                         r = 1 - r;
                         g = 1 - g;
                         b = 1 - b;
                     }
+
+                    var chroma = (1 - Math.Abs((2 * l) - 1)) * s; // Chroma
+                    var m = l - (chroma / 2.0);
+
+                    /* find a point (R1, G1, B1) along the bottom three sides
+                     * of the RGB cube */
+
+                    var r1 = 0.0;
+                    var g1 = 0.0;
+                    var b1 = 0.0;
+                    var hDash = h / 60.0;
+                    var x = chroma * (1 - Math.Abs((hDash % 2) - 1));
+                    if (hDash >= 5)
+                    {
+                        r1 = chroma;
+                        b1 = x;
+                    }
+                    else if (hDash >= 4)
+                    {
+                        r1 = x;
+                        b1 = chroma;
+                    }
+                    else if (hDash >= 3)
+                    {
+                        g1 = x;
+                        b1 = chroma;
+                    }
+                    else if (hDash >= 2)
+                    {
+                        g1 = chroma;
+                        b1 = x;
+                    }
+                    else if (hDash >= 1)
+                    {
+                        r1 = x;
+                        g1 = chroma;
+                    }
+                    else if (hDash >= 0)
+                    {
+                        r1 = chroma;
+                        g1 = x;
+                    }
+                    else
+                    {
+                        r1 = 0.0;
+                        g1 = 0.0;
+                        b1 = 0.0;
+                    }
+
+                    r = r1 + m;
+                    g = g1 + m;
+                    b = b1 + m;
+
+                    // check for values over 1.0
+                    r = Math.Min(1.0, r);
+                    g = Math.Min(1.0, g);
+                    b = Math.Min(1.0, b);
 
                     var v1 = r.ScaleUnitToByte();
                     var v2 = g.ScaleUnitToByte();
