@@ -916,11 +916,10 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                         b = 0.5;
                     }
 
-                    // get HSL values
-                    var s = r;          // The saturation
-                    var l = g;    // The lighness 
-                    var h = b * 360;          // hue
-
+                    // get HSV values
+                    var v = r;
+                    var h = g * 360;
+                    var s = Math.Max(0.1,b);
 
                     // enhance blue color - it is difficult to see on a black background
                     // This is a hack - there should be a principled way to do this!
@@ -937,15 +936,9 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                       */
 
                     // calculate the chroma
-                    if (doReverseColour)
-                    {
-                        r = 1 - r;
-                        g = 1 - g;
-                        b = 1 - b;
-                    }
-
-                    var chroma = (1 - Math.Abs((2 * l) - 1)) * s; // Chroma
-                    var m = l - (chroma / 2.0);
+                    
+                    var chroma = v * s; // Chroma
+                    var m = v - chroma;
 
                     /* find a point (R1, G1, B1) along the bottom three sides
                      * of the RGB cube */
@@ -953,43 +946,38 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                     var r1 = 0.0;
                     var g1 = 0.0;
                     var b1 = 0.0;
-                    var hDash = h / 60.0;
-                    var x = chroma * (1 - Math.Abs((hDash % 2) - 1));
-                    if (hDash >= 5)
+
+                    var x = chroma * (1 - Math.Abs(((h / 60) % 2) - 1));
+
+                    if (h >= 0 && h <= 60)
                     {
                         r1 = chroma;
-                        b1 = x;
-                    }
-                    else if (hDash >= 4)
-                    {
-                        r1 = x;
-                        b1 = chroma;
-                    }
-                    else if (hDash >= 3)
-                    {
                         g1 = x;
-                        b1 = chroma;
                     }
-                    else if (hDash >= 2)
-                    {
-                        g1 = chroma;
-                        b1 = x;
-                    }
-                    else if (hDash >= 1)
+                    else if (h >= 60 && h < 120)
                     {
                         r1 = x;
                         g1 = chroma;
                     }
-                    else if (hDash >= 0)
+                    else if (h >= 120 && h < 180)
                     {
-                        r1 = chroma;
+                       g1 = chroma;
+                       b1 = x;
+                    }
+                    else if (h >= 180 && h < 240)
+                    {
                         g1 = x;
+                        b1 = chroma;
+                    }
+                    else if (h >= 240 && h < 300)
+                    {
+                        r1 = x;
+                        b1 = chroma;
                     }
                     else
                     {
-                        r1 = 0.0;
-                        g1 = 0.0;
-                        b1 = 0.0;
+                        r1 = chroma;
+                        b1 = x;
                     }
 
                     r = r1 + m;
@@ -1000,6 +988,18 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                     r = Math.Min(1.0, r);
                     g = Math.Min(1.0, g);
                     b = Math.Min(1.0, b);
+
+                    // check for values under 0
+                    r = Math.Max(0, r);
+                    g = Math.Max(0, g);
+                    b = Math.Max(0, b);
+
+                    if (doReverseColour)
+                    {
+                        r = 1 - r;
+                        g = 1 - g;
+                        b = 1 - b;
+                    }
 
                     var v1 = r.ScaleUnitToByte();
                     var v2 = g.ScaleUnitToByte();
