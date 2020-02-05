@@ -8,7 +8,7 @@ namespace Acoustics.Test.AudioAnalysisTools.TileImage
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.Linq;
     using global::AudioAnalysisTools.LongDurationSpectrograms;
@@ -175,7 +175,7 @@ namespace Acoustics.Test.AudioAnalysisTools.TileImage
         [TestMethod]
         public void Test60Resolution()
         {
-            var testBitmap = new Bitmap(PathHelper.ResolveAssetPath("1440px2.png"));
+            var testBitmap = new Image<Rgb24>(PathHelper.ResolveAssetPath("1440px2.png"));
             var superTile = new TimeOffsetSingleLayerSuperTile(
                 TimeSpan.Zero,
                 SpectrogramType.Index,
@@ -204,7 +204,7 @@ namespace Acoustics.Test.AudioAnalysisTools.TileImage
             for (int i = 0; i < loadedImages.Length; i++)
             {
                 var producedImage = Image.FromFile(producedFiles[i].FullName);
-                var areEqual = BitmapEquals((Bitmap)loadedImages[i], (Bitmap)producedImage);
+                var areEqual = BitmapEquals((Image<Rgb24>)loadedImages[i], (Image<Rgb24>)producedImage);
                 Assert.IsTrue(areEqual, "Bitmaps were not equal {0}, {1}", expectedImages[i], producedFiles[i].Name);
             }
         }
@@ -212,7 +212,7 @@ namespace Acoustics.Test.AudioAnalysisTools.TileImage
         [TestMethod]
         public void Test1Resolution()
         {
-            var testBitmap = new Bitmap(PathHelper.ResolveAssetPath("Farmstay_ECLIPSE3_201_scale-1.0_supertile-1.png"));
+            var testBitmap = new Image<Rgb24>(PathHelper.ResolveAssetPath("Farmstay_ECLIPSE3_201_scale-1.0_supertile-1.png"));
             var superTile = new TimeOffsetSingleLayerSuperTile(
                 TimeSpan.Zero,
                 SpectrogramType.Index,
@@ -244,12 +244,12 @@ namespace Acoustics.Test.AudioAnalysisTools.TileImage
             for (int i = 0; i < loadedImages.Length; i++)
             {
                 var producedImage = Image.FromFile(producedFiles[i].FullName);
-                var areEqual = BitmapEquals((Bitmap)loadedImages[i], (Bitmap)producedImage);
+                var areEqual = BitmapEquals((Image<Rgb24>)loadedImages[i], (Image<Rgb24>)producedImage);
                 Assert.IsTrue(areEqual, "Bitmaps were not equal {0}, {1}", expectedImages[i], producedFiles[i].Name);
             }
         }
 
-        public static bool BitmapEquals(Bitmap bmp1, Bitmap bmp2)
+        public static bool BitmapEquals(Image<Rgb24> bmp1, Image<Rgb24> bmp2)
         {
             if (!bmp1.Size.Equals(bmp2.Size))
             {
@@ -286,7 +286,7 @@ namespace Acoustics.Test.AudioAnalysisTools.TileImage
         [TestMethod]
         public void EnsureSameTileNotRenderedTwice()
         {
-            var testBitmap = new Bitmap(PathHelper.ResolveAssetPath("Farmstay_ECLIPSE3_201_scale-1.0_supertile-1.png"));
+            var testBitmap = new Image<Rgb24>(PathHelper.ResolveAssetPath("Farmstay_ECLIPSE3_201_scale-1.0_supertile-1.png"));
             var superTile = new TimeOffsetSingleLayerSuperTile(
                 TimeSpan.Zero,
                 SpectrogramType.Index,
@@ -310,13 +310,13 @@ namespace Acoustics.Test.AudioAnalysisTools.TileImage
                         TimeSpan.Zero,
                         SpectrogramType.Index,
                         0.16.Seconds(),
-                        new Bitmap(PathHelper.ResolveAssetPath("60s@0.16pxps_0.png")),
+                        new Image<Rgb24>(PathHelper.ResolveAssetPath("60s@0.16pxps_0.png")),
                         TimeSpan.FromMinutes(0)),
                     new TimeOffsetSingleLayerSuperTile(
                         TimeSpan.Zero,
                         SpectrogramType.Index,
                         0.16.Seconds(),
-                        new Bitmap(PathHelper.ResolveAssetPath("60s@0.16pxps_1.png")),
+                        new Image<Rgb24>(PathHelper.ResolveAssetPath("60s@0.16pxps_1.png")),
                         TimeSpan.FromMinutes(1)),
                 };
 
@@ -348,8 +348,8 @@ namespace Acoustics.Test.AudioAnalysisTools.TileImage
         {
             ISuperTile[] testCases =
                 {
-                    new TimeOffsetSingleLayerSuperTile(TimeSpan.Zero, SpectrogramType.Index, 0.16.Seconds(), new Bitmap(PathHelper.ResolveAssetPath("60s@0.16pxps_0.png")), TimeSpan.FromMinutes(0)),
-                    new TimeOffsetSingleLayerSuperTile(TimeSpan.Zero, SpectrogramType.Index, 0.16.Seconds(), new Bitmap(PathHelper.ResolveAssetPath("60s@0.16pxps_1.png")), TimeSpan.FromMinutes(1)),
+                    new TimeOffsetSingleLayerSuperTile(TimeSpan.Zero, SpectrogramType.Index, 0.16.Seconds(), new Image<Rgb24>(PathHelper.ResolveAssetPath("60s@0.16pxps_0.png")), TimeSpan.FromMinutes(0)),
+                    new TimeOffsetSingleLayerSuperTile(TimeSpan.Zero, SpectrogramType.Index, 0.16.Seconds(), new Image<Rgb24>(PathHelper.ResolveAssetPath("60s@0.16pxps_1.png")), TimeSpan.FromMinutes(1)),
                 };
 
             // scale size results in two images drawn
@@ -378,8 +378,8 @@ namespace Acoustics.Test.AudioAnalysisTools.TileImage
         {
             ISuperTile[] testCases =
                 {
-                    new TimeOffsetSingleLayerSuperTile(TimeSpan.Zero, SpectrogramType.Index, 0.16.Seconds(), new Bitmap(PathHelper.ResolveAssetPath("60s@0.16pxps_0.png")), TimeSpan.FromMinutes(0)),
-                    new TimeOffsetSingleLayerSuperTile(TimeSpan.Zero, SpectrogramType.Index, 0.16.Seconds(), new Bitmap(PathHelper.ResolveAssetPath("60s@0.16pxps_1.png")), TimeSpan.FromMinutes(1)),
+                    new TimeOffsetSingleLayerSuperTile(TimeSpan.Zero, SpectrogramType.Index, 0.16.Seconds(), new Image<Rgb24>(PathHelper.ResolveAssetPath("60s@0.16pxps_0.png")), TimeSpan.FromMinutes(0)),
+                    new TimeOffsetSingleLayerSuperTile(TimeSpan.Zero, SpectrogramType.Index, 0.16.Seconds(), new Image<Rgb24>(PathHelper.ResolveAssetPath("60s@0.16pxps_1.png")), TimeSpan.FromMinutes(1)),
                 };
 
             var singleScaleTiler = new Tiler(
@@ -416,7 +416,7 @@ namespace Acoustics.Test.AudioAnalysisTools.TileImage
             for (int i = 0; i < loadedImages.Length; i++)
             {
                 var producedImage = Image.FromFile(producedFiles[i].FullName);
-                var areEqual = BitmapEquals((Bitmap)loadedImages[i], (Bitmap)producedImage);
+                var areEqual = BitmapEquals((Image<Rgb24>)loadedImages[i], (Image<Rgb24>)producedImage);
                 Assert.IsTrue(areEqual, "Bitmaps were not equal {0}, {1}", expectedImages[i], producedFiles[i].Name);
             }
 
@@ -425,7 +425,7 @@ namespace Acoustics.Test.AudioAnalysisTools.TileImage
         [TestMethod]
         public void EnsureReallyShortRecordingsWork()
         {
-            var testBitmap = new Bitmap(2, 300);
+            var testBitmap = new Image<Rgb24>(2, 300);
             using (var graphics = Graphics.FromImage(testBitmap))
             {
                 var graphicsUnit = GraphicsUnit.Pixel;
@@ -440,7 +440,7 @@ namespace Acoustics.Test.AudioAnalysisTools.TileImage
             Assert.AreEqual(1, producedFiles.Length);
 
             // produced image should have 180px of transparency, 2px of color, and then 118px of transparency
-            var expected = new Bitmap(300, 300);
+            var expected = new Image<Rgb24>(300, 300);
             using (var graphics = Graphics.FromImage(expected))
             {
                 graphics.FillRectangle(Brushes.Red, new Rectangle(180, 0, 2, 300));
@@ -451,7 +451,7 @@ namespace Acoustics.Test.AudioAnalysisTools.TileImage
             for (int i = 0; i < expectedImages.Length; i++)
             {
                 var producedImage = Image.FromFile(producedFiles[i].FullName);
-                var areEqual = BitmapEquals(expectedImages[i], (Bitmap)producedImage);
+                var areEqual = BitmapEquals(expectedImages[i], (Image<Rgb24>)producedImage);
                 Assert.IsTrue(areEqual, "Bitmaps were not equal {0}, {1}", expectedImages[i], producedFiles[i].Name);
             }
         }

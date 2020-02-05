@@ -1,17 +1,18 @@
-﻿// <copyright file="AudioRecording.cs" company="QutEcoacoustics">
+// <copyright file="AudioRecording.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
 
 namespace AudioAnalysisTools.WavTools
 {
     using System;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Drawing.Imaging;
     using System.IO;
     using Acoustics.Tools;
     using Acoustics.Tools.Audio;
     using Acoustics.Tools.Wav;
     using DSP;
+    using SixLabors.ImageSharp.PixelFormats;
     using TowseyLibrary;
 
     public class AudioRecording : IDisposable
@@ -240,7 +241,7 @@ namespace AudioAnalysisTools.WavTools
             Color c = Color.FromArgb(10, 200, 255);
 
             //set up min, max, range for normalising of dB values
-            Bitmap bmp = new Bitmap(imageWidth, imageHeight, PixelFormat.Format24bppRgb);
+            Image<Rgb24> bmp = new Image<Rgb24>(imageWidth, imageHeight, PixelFormat.Format24bppRgb);
             for (int w = 0; w < imageWidth; w++)
             {
                 int minId = halfHeight + (int)Math.Round(envelope[0, w] * halfHeight);
@@ -283,7 +284,7 @@ namespace AudioAnalysisTools.WavTools
 
             //set up min, max, range for normalising of dB values
 
-            Bitmap bmp = new Bitmap(imageWidth, imageHeight, PixelFormat.Format24bppRgb);
+            Image<Rgb24> bmp = new Image<Rgb24>(imageWidth, imageHeight, PixelFormat.Format24bppRgb);
 
             for (int w = 0; w < imageWidth; w++)
             {

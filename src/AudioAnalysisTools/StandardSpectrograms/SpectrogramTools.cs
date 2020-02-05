@@ -11,13 +11,14 @@ namespace AudioAnalysisTools.StandardSpectrograms
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using Acoustics.Shared;
     using AudioAnalysisTools.WavTools;
     using ColorMine.ColorSpaces;
     using DSP;
     using LongDurationSpectrograms;
+    using SixLabors.ImageSharp.PixelFormats;
     using TowseyLibrary;
 
     public static class SpectrogramTools
@@ -310,7 +311,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             int width = dbSpectrogramData.GetLength(0);
             int height = dbSpectrogramData.GetLength(1);
-            Bitmap image = new Bitmap(width, height);
+            Image<Rgb24> image = new Image<Rgb24>(width, height);
             Color[] ridgeColours = { Color.Red, Color.DarkMagenta, Color.Black, Color.LightPink };
 
             // for all freq bins
@@ -394,7 +395,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         {
             int width = dbSpectrogramNorm.GetLength(0);
             int height = dbSpectrogramNorm.GetLength(1);
-            Bitmap image = new Bitmap(width, height);
+            Image<Rgb24> image = new Image<Rgb24>(width, height);
 
             // get red scale pallette
             var rsp = new CubeHelix("redscale");
@@ -449,7 +450,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             int width = spectrogramData.GetLength(0);
             int height = spectrogramData.GetLength(1);
-            Bitmap image = new Bitmap(width, height);
+            Image<Rgb24> image = new Image<Rgb24>(width, height);
             Color[] ridgeColours = { Color.Red, Color.Lime, Color.Blue, Color.Lime };
 
             //over all freq bins
@@ -854,7 +855,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// <param name="fullDuration">full Duration</param>
         /// <param name="xAxisTicInterval">xAxis Tic Interval</param>
         /// <param name="freqScale">freq Scale</param>
-        public static void DrawGridLinesOnImage(Bitmap bmp, TimeSpan startOffset, TimeSpan fullDuration, TimeSpan xAxisTicInterval, FrequencyScale freqScale)
+        public static void DrawGridLinesOnImage(Image<Rgb24> bmp, TimeSpan startOffset, TimeSpan fullDuration, TimeSpan xAxisTicInterval, FrequencyScale freqScale)
         {
             FrequencyScale.DrawFrequencyLinesOnImage(bmp, freqScale, includeLabels: true);
 
@@ -862,7 +863,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             //DrawTimeLinesOnImage(bmp, startOffset, fullDuration, xAxisTicInterval);
         }
 
-        public static void DrawTimeLinesOnImage(Bitmap bmp, TimeSpan startOffset, TimeSpan fullDuration, TimeSpan xAxisTicInterval)
+        public static void DrawTimeLinesOnImage(Image<Rgb24> bmp, TimeSpan startOffset, TimeSpan fullDuration, TimeSpan xAxisTicInterval)
         {
             int rows = bmp.Height;
             int cols = bmp.Width;
@@ -894,7 +895,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 throw new ArgumentNullException(nameof(image));
             }
 
-            FrequencyScale.DrawFrequencyLinesOnImage((Bitmap)image, gridLineLocations, includeLabels: true);
+            FrequencyScale.DrawFrequencyLinesOnImage((Image<Rgb24>)image, gridLineLocations, includeLabels: true);
 
             var titleBar = LDSpectrogramRGB.DrawTitleBarOfGrayScaleSpectrogram(title, image.Width);
             var timeBmp = ImageTrack.DrawTimeTrack(duration, image.Width);

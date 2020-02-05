@@ -6,12 +6,12 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Drawing.Imaging;
     using System.IO;
 
     using Acoustics.Shared.ConfigFile;
-
+    using SixLabors.ImageSharp.PixelFormats;
     using TowseyLibrary;
 
     public static class LdSpectrogramTStatistic
@@ -290,7 +290,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
             int rows = tStatMatrix.GetLength(0); //number of rows
             int cols = tStatMatrix.GetLength(1); //number
-            var bmp = new Bitmap(cols, rows, PixelFormat.Format24bppRgb);
+            var bmp = new Image<Rgb24>(cols, rows, PixelFormat.Format24bppRgb);
             for (int row = 0; row < rows; row++)
             {
                 for (int col = 0; col < cols; col++)
@@ -385,7 +385,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             int rows = m1.GetLength(0); //number of rows
             int cols = m2.GetLength(1); //number
 
-            Bitmap image = new Bitmap(cols, rows, PixelFormat.Format24bppRgb);
+            Image<Rgb24> image = new Image<Rgb24>(cols, rows, PixelFormat.Format24bppRgb);
             int maxRgbValue = 255;
 
             for (int row = 0; row < rows; row++)
@@ -456,8 +456,8 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             int rows = m1.GetLength(0); //number of rows
             int cols = m1.GetLength(1); //number
 
-            var spg1Image = new Bitmap(cols, rows, PixelFormat.Format24bppRgb);
-            var spg2Image = new Bitmap(cols, rows, PixelFormat.Format24bppRgb);
+            var spg1Image = new Image<Rgb24>(cols, rows, PixelFormat.Format24bppRgb);
+            var spg2Image = new Image<Rgb24>(cols, rows, PixelFormat.Format24bppRgb);
             int maxRgbValue = 255;
 
             for (int row = 0; row < rows; row++)

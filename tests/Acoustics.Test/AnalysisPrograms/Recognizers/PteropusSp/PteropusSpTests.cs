@@ -6,7 +6,7 @@ namespace Acoustics.Test.AnalysisPrograms.Recognizers.PteropusSp
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.Linq;
     using Acoustics.Shared;

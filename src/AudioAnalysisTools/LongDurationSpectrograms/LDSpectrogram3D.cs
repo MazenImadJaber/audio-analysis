@@ -19,7 +19,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.Reflection;
     using Acoustics.Shared;
@@ -27,6 +27,8 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
     using Indices;
     using log4net;
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.ImageSharp.Processing;
     using StandardSpectrograms;
     using TowseyLibrary;
 
@@ -222,17 +224,17 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
         public static Image GetImageSlice(string key, List<string> data, int rowId, int colId, int redId, int grnId, int bluId,
                                            IndexProperties ipRed, IndexProperties ipGrn, IndexProperties ipBlu, int freqBinCount)
         {
-            Bitmap image = null;
+            Image<Rgb24> image = null;
             switch (key)
             {
                 case KeyFreqBin:
-                    image = new Bitmap(TotalMinutesInDay, TotalDaysInYear);
+                    image = new Image<Rgb24>(TotalMinutesInDay, TotalDaysInYear);
                     break;
                 case KeyDayOfYear:
-                    image = new Bitmap(TotalMinutesInDay, freqBinCount);
+                    image = new Image<Rgb24>(TotalMinutesInDay, freqBinCount);
                     break;
                 case KeyMinOfDay:
-                    image = new Bitmap(TotalDaysInYear, freqBinCount);
+                    image = new Image<Rgb24>(TotalDaysInYear, freqBinCount);
                     break;
             }
 
@@ -293,7 +295,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             {
                 var title = string.Format("SPECTROGRAM (months x Herz): {0}={1}       (R-G-B={2})", key, value, colorMap, unitValue);
                 var titleBar = LDSpectrogramRGB.DrawTitleBarOfFalseColourSpectrogram(title, image.Width);
-                return FrameSliceOf3DSpectrogram_ConstantMin((Bitmap)image, titleBar, nyquistFreq, unitValue, sunriseSetData);
+                return FrameSliceOf3DSpectrogram_ConstantMin((Image<Rgb24>)image, titleBar, nyquistFreq, unitValue, sunriseSetData);
             }
 
             return null;
@@ -301,7 +303,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
         public static Image FrameSliceOf3DSpectrogram_DayOfYear(Image bmp1, Image titleBar, int year, int dayOfYear, TimeSpan xInterval, int herzValue, FileInfo sunriseSetData, int nyquistFreq)
         {
-            Bitmap suntrack = SunAndMoon.AddSunTrackToImage(bmp1.Width, sunriseSetData, year, dayOfYear);
+            Image<Rgb24> suntrack = SunAndMoon.AddSunTrackToImage(bmp1.Width, sunriseSetData, year, dayOfYear);
 
             Graphics g = Graphics.FromImage(bmp1);
             Pen pen = new Pen(Color.White);
@@ -323,7 +325,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             int frameSize = bmp1.Height;
             var freqScale = new DSP.FrequencyScale(nyquistFreq, frameSize, herzInterval);
 
-            SpectrogramTools.DrawGridLinesOnImage((Bitmap)bmp1, minuteOffset, fullDuration, xInterval, freqScale);
+            SpectrogramTools.DrawGridLinesOnImage((Image<Rgb24>)bmp1, minuteOffset, fullDuration, xInterval, freqScale);
 
             int trackHeight = 20;
             int imageHt = bmp1.Height + trackHeight + trackHeight + trackHeight;
@@ -339,8 +341,8 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             Image compositeBmp = ImageTools.CombineImagesVertically(imageList.ToArray());
 
             // trackHeight = compositeBmp.Height;
-            // Bitmap timeScale12Months = ImageTrack.DrawYearScaleVertical(40, trackHeight);
-            // Bitmap freqScale = DrawFreqScale_vertical(40, trackHeight, HerzValue, nyquistFreq);
+            // Image<Rgb24> timeScale12Months = ImageTrack.DrawYearScaleVertical(40, trackHeight);
+            // Image<Rgb24> freqScale = DrawFreqScale_vertical(40, trackHeight, HerzValue, nyquistFreq);
 
             imageList = new List<Image>();
 
@@ -355,7 +357,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
         public static Image FrameSliceOf3DSpectrogram_ConstantFreq(Image bmp1, Image titleBar, TimeSpan xInterval, int herzValue, FileInfo sunriseSetData, int nyquistFreq)
         {
-            SunAndMoon.AddSunRiseSetLinesToImage((Bitmap)bmp1, sunriseSetData, 0, 365, 1); // assume full year and 1px/day
+            SunAndMoon.AddSunRiseSetLinesToImage((Image<Rgb24>)bmp1, sunriseSetData, 0, 365, 1); // assume full year and 1px/day
 
             var g = Graphics.FromImage(bmp1);
             var pen = new Pen(Color.White);
@@ -373,7 +375,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             int frameSize = bmp1.Height;
             var freqScale = new DSP.FrequencyScale(nyquistFreq, frameSize, herzInterval);
 
-            SpectrogramTools.DrawGridLinesOnImage((Bitmap)bmp1, startOffset, fullDuration, xInterval, freqScale);
+            SpectrogramTools.DrawGridLinesOnImage((Image<Rgb24>)bmp1, startOffset, fullDuration, xInterval, freqScale);
 
             int trackHeight = 20;
             var xAxisTicInterval = TimeSpan.FromMinutes(60); // assume 60 pixels per hour
@@ -387,8 +389,8 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             }
 
             trackHeight = compositeBmp.Height;
-            Bitmap timeScale12Months = ImageTrack.DrawYearScaleVertical(40, trackHeight);
-            Bitmap freqScaleImage = DrawFreqScale_vertical(40, trackHeight, herzValue, nyquistFreq);
+            Image<Rgb24> timeScale12Months = ImageTrack.DrawYearScaleVertical(40, trackHeight);
+            Image<Rgb24> freqScaleImage = DrawFreqScale_vertical(40, trackHeight, herzValue, nyquistFreq);
 
             imageList = new List<Image> { timeScale12Months, compositeBmp, freqScaleImage };
             compositeBmp = ImageTools.CombineImagesInLine(imageList.ToArray());
@@ -397,7 +399,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
         }
 
         // mark off Y-axis frequency scale.
-        public static Bitmap DrawFreqScale_vertical(int yoffset, int trackHeight, int herzValue, int nyquistFreq)
+        public static Image<Rgb24> DrawFreqScale_vertical(int yoffset, int trackHeight, int herzValue, int nyquistFreq)
         {
             double herzPerPixel = nyquistFreq / (double)(trackHeight - yoffset);
             double gridInterval = 1000 / herzPerPixel;
@@ -406,7 +408,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
             int xoffset = 10;
             int trackWidth = 45;
-            Bitmap bmp = new Bitmap(trackWidth, trackHeight);
+            Image<Rgb24> bmp = new Image<Rgb24>(trackWidth, trackHeight);
             Graphics g = Graphics.FromImage(bmp);
             g.Clear(Color.LightGray);
             g.FillRectangle(Brushes.Black, xoffset, 0, bmp.Width - 1, bmp.Height - 1);
@@ -439,7 +441,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             return bmp;
         }
 
-        public static Image FrameSliceOf3DSpectrogram_ConstantMin(Bitmap bmp1, Image titleBar, int nyquistFreq, int minuteOfDay, FileInfo sunriseSetData)
+        public static Image FrameSliceOf3DSpectrogram_ConstantMin(Image<Rgb24> bmp1, Image titleBar, int nyquistFreq, int minuteOfDay, FileInfo sunriseSetData)
         {
             int imageWidth = bmp1.Width;
             int imageHeight = bmp1.Height;
@@ -476,7 +478,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
             //TimeSpan xAxisPixelDuration = TimeSpan.FromSeconds(60);
             //var minOffset = TimeSpan.Zero;
-            //SpectrogramTools.DrawGridLinesOnImage((Bitmap)bmp1, minOffset, X_interval, xAxisPixelDuration, 120, 10);
+            //SpectrogramTools.DrawGridLinesOnImage((Image<Rgb24>)bmp1, minOffset, X_interval, xAxisPixelDuration, 120, 10);
 
             const int trackHeight = 20;
             var timeScale12Months = ImageTrack.DrawYearScale_horizontal(imageWidth, trackHeight);
@@ -492,7 +494,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             return compositeBmp;
         }
 
-        public static void AddDaylightMinutesToImage(Bitmap image, FileInfo sunriseSetData, int minuteOfDay)
+        public static void AddDaylightMinutesToImage(Image<Rgb24> image, FileInfo sunriseSetData, int minuteOfDay)
         {
             if (minuteOfDay < 180)
             {

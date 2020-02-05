@@ -7,13 +7,15 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Drawing.Imaging;
     using System.IO;
     using Acoustics.Shared;
     using Acoustics.Shared.ConfigFile;
 
     using Indices;
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.ImageSharp.Processing;
     using TowseyLibrary;
 
     public static class LDSpectrogramDistance
@@ -317,7 +319,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             Dictionary<string, Color> colourChart = GetDifferenceColourChart();
             Color colour;
 
-            var bmp = new Bitmap(cols, rows, PixelFormat.Format24bppRgb);
+            var bmp = new Image<Rgb24>(cols, rows, PixelFormat.Format24bppRgb);
 
             for (int row = 0; row < rows; row++)
             {
@@ -433,7 +435,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
         {
             Image colourChart = ImageTools.DrawColourChart(width, height, colorArray);
 
-            var bmp = new Bitmap(width, height);
+            var bmp = new Image<Rgb24>(width, height);
             Graphics g = Graphics.FromImage(bmp);
             g.Clear(Color.Black);
             var pen = new Pen(Color.White);

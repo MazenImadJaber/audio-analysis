@@ -24,7 +24,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.Linq;
     using Acoustics.Shared;
@@ -32,6 +32,8 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
     using DSP;
     using Indices;
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.ImageSharp.Processing;
     using StandardSpectrograms;
     using TowseyLibrary;
     using Zooming;
@@ -294,7 +296,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                 herzInterval);
 
             // create the base canvas image on which to centre the focal image
-            Image image = new Bitmap(imageWidth, ldfcSpectrogram.Height);
+            Image image = new Image<Rgb24>(imageWidth, ldfcSpectrogram.Height);
             Graphics g1 = Graphics.FromImage(image);
             g1.Clear(Color.DarkGray);
 
@@ -391,7 +393,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             //if (null != imageX) imageX.Save(Path.Combine(outputDirectory.FullName, fileStem + ".ClipHiAmpl.png"));
 
             // create the base image
-            Image image = new Bitmap(imageWidth, spectrogramImage.Height);
+            Image image = new Image<Rgb24>(imageWidth, spectrogramImage.Height);
             Graphics g1 = Graphics.FromImage(image);
             g1.Clear(Color.DarkGray);
 
@@ -538,7 +540,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
         {
             //Image colourChart = LDSpectrogramRGB.DrawColourScale(width, SpectrogramConstants.HEIGHT_OF_TITLE_BAR - 2);
             int height = SpectrogramConstants.HEIGHT_OF_TITLE_BAR;
-            Bitmap bmp = new Bitmap(width, height);
+            Image<Rgb24> bmp = new Image<Rgb24>(width, height);
             Graphics g = Graphics.FromImage(bmp);
             g.Clear(Color.Black);
             Font stringFont = new Font("Arial", 9);
@@ -577,17 +579,17 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             // init frequency scale
             int frameSize = bmp1.Height * 2; // THIS MIGHT BECOME A BUG ONE DAY!!!!!
             var freqScale = new FrequencyScale(nyquist, frameSize, herzInterval);
-            SpectrogramTools.DrawGridLinesOnImage((Bitmap)bmp1, startOffset, fullDuration, xAxisTicInterval, freqScale);
+            SpectrogramTools.DrawGridLinesOnImage((Image<Rgb24>)bmp1, startOffset, fullDuration, xAxisTicInterval, freqScale);
             int trackHeight = 20;
 
             // put start offset into a datetime object.
             var dto = default(DateTimeOffset);
             dto = dto + startOffset;
 
-            Bitmap timeBmp = ImageTrack.DrawTimeTrack(fullDuration, dto, bmp1.Width, trackHeight);
+            Image<Rgb24> timeBmp = ImageTrack.DrawTimeTrack(fullDuration, dto, bmp1.Width, trackHeight);
             int imageHt = bmp1.Height + titleBar.Height + trackHeight + 1;
 
-            Bitmap compositeBmp = new Bitmap(bmp1.Width, imageHt); //get canvas for entire image
+            Image<Rgb24> compositeBmp = new Image<Rgb24>(bmp1.Width, imageHt); //get canvas for entire image
             Graphics gr = Graphics.FromImage(compositeBmp);
             gr.Clear(Color.Black);
             int offset = 0;

@@ -5,7 +5,7 @@
 namespace Acoustics.Test.AnalysisPrograms.Concatenation
 {
     using System;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.IO.Compression;
     using System.Linq;

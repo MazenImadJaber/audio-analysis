@@ -6,7 +6,7 @@ namespace AudioAnalysisTools.Indices
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -15,6 +15,8 @@ namespace AudioAnalysisTools.Indices
     using StandardSpectrograms;
     using log4net;
     using LongDurationSpectrograms;
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.ImageSharp.Processing;
     using TowseyLibrary;
 
     public static class IndexDisplay
@@ -35,7 +37,7 @@ namespace AudioAnalysisTools.Indices
         /// <param name="title">image title.</param>
         /// <param name="indexCalculationDuration"> The index Calculation Duration. </param>
         /// <param name="recordingStartDate"> The recording Start Date. </param>
-        public static Bitmap DrawImageOfSummaryIndexTracks(
+        public static Image<Rgb24> DrawImageOfSummaryIndexTracks(
             FileInfo csvFile,
             FileInfo indexPropertiesConfig,
             string title,
@@ -55,7 +57,7 @@ namespace AudioAnalysisTools.Indices
         /// <summary>
         /// Reads csv file containing summary indices and converts them to a tracks image.
         /// </summary>
-        public static Bitmap DrawImageOfSummaryIndices(
+        public static Image<Rgb24> DrawImageOfSummaryIndices(
             Dictionary<string, IndexProperties> listOfIndexProperties,
             FileInfo csvFile,
             string titleText,
@@ -79,7 +81,7 @@ namespace AudioAnalysisTools.Indices
         /// <summary>
         /// Converts summary indices to a tracks image, one track for each index.
         /// </summary>
-        public static Bitmap DrawImageOfSummaryIndices(
+        public static Image<Rgb24> DrawImageOfSummaryIndices(
             Dictionary<string, IndexProperties> listOfIndexProperties,
             Dictionary<string, double[]> dictionaryOfSummaryIndices,
             string titleText,
@@ -140,12 +142,12 @@ namespace AudioAnalysisTools.Indices
             int x_offset = 2;
             int graphWidth = x_offset + scaleLength;
             int imageWidth = x_offset + scaleLength + TrackEndPanelWidth;
-            Bitmap titleBmp = ImageTrack.DrawTitleTrack(imageWidth, trackHeight, titleText);
+            Image<Rgb24> titleBmp = ImageTrack.DrawTitleTrack(imageWidth, trackHeight, titleText);
 
             TimeSpan xAxisPixelDuration = indexCalculationDuration;
             TimeSpan fullDuration = TimeSpan.FromTicks(xAxisPixelDuration.Ticks * graphWidth);
-            Bitmap timeBmp1 = ImageTrack.DrawTimeRelativeTrack(fullDuration, graphWidth, trackHeight);
-            Bitmap timeBmp2 = timeBmp1;
+            Image<Rgb24> timeBmp1 = ImageTrack.DrawTimeRelativeTrack(fullDuration, graphWidth, trackHeight);
+            Image<Rgb24> timeBmp2 = timeBmp1;
             DateTimeOffset? dateTimeOffset = recordingStartDate;
             if (dateTimeOffset.HasValue)
             {
@@ -166,7 +168,7 @@ namespace AudioAnalysisTools.Indices
             }
 
             imageList.Add(timeBmp2);
-            var compositeBmp = (Bitmap)ImageTools.CombineImagesVertically(imageList);
+            var compositeBmp = (Image<Rgb24>)ImageTools.CombineImagesVertically(imageList);
             return compositeBmp;
         }
 
@@ -174,7 +176,7 @@ namespace AudioAnalysisTools.Indices
         /// Reads csv file containing summary indices and converts them to a tracks image.
         /// </summary>
         /// <returns>an image of two clipping tracks.</returns>
-        public static Bitmap DrawHighAmplitudeClippingTrack(FileInfo csvFile)
+        public static Image<Rgb24> DrawHighAmplitudeClippingTrack(FileInfo csvFile)
         {
             if (!csvFile.Exists)
             {
@@ -193,7 +195,7 @@ namespace AudioAnalysisTools.Indices
         /// Reads csv file containing summary indices and converts them to a tracks image.
         /// </summary>
         /// <returns>a bitmap image.</returns>
-        public static Bitmap DrawHighAmplitudeClippingTrack(double[] array1, double[] array2)
+        public static Image<Rgb24> DrawHighAmplitudeClippingTrack(double[] array1, double[] array2)
         {
             double[] values1 = DataTools.NormaliseInZeroOne(array1, 0, 1.0);
             double[] values2 = DataTools.NormaliseInZeroOne(array2, 0, 1.0);
@@ -202,7 +204,7 @@ namespace AudioAnalysisTools.Indices
             int trackWidth = dataLength;
             int trackHeight = DefaultTrackHeight;
 
-            var bmp = new Bitmap(trackWidth, trackHeight);
+            var bmp = new Image<Rgb24>(trackWidth, trackHeight);
             var g = Graphics.FromImage(bmp);
 
             //g.Clear(grayScale[240]);

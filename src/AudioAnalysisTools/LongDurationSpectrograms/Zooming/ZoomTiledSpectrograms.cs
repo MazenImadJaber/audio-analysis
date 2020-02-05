@@ -8,7 +8,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -17,6 +17,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
     using Acoustics.Shared.Contracts;
     using Indices;
     using log4net;
+    using SixLabors.ImageSharp.PixelFormats;
     using TileImage;
     using TowseyLibrary;
     using Zio;
@@ -558,7 +559,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
                 hertzInterval);
 
             // create the base image
-            Image image = new Bitmap(ldSpectrogram.Width, ldSpectrogram.Height);
+            Image image = new Image<Rgb24>(ldSpectrogram.Width, ldSpectrogram.Height);
             Graphics g1 = Graphics.FromImage(image);
             g1.Clear(Color.DarkGray);
 

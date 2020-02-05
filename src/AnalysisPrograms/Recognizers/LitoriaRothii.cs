@@ -15,7 +15,7 @@ namespace AnalysisPrograms.Recognizers
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using Acoustics.Shared;
     using Acoustics.Shared.ConfigFile;

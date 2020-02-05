@@ -17,7 +17,7 @@ namespace AnalysisPrograms.Recognizers.Base
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -196,7 +196,7 @@ namespace AnalysisPrograms.Recognizers.Base
             Brush brush = Brushes.Red;
             int trackHeight = 20;
 
-            var trackImage = new Bitmap(imageWidth, trackHeight);
+            var trackImage = new Image<Rgb24>(imageWidth, trackHeight);
             Graphics g2 = Graphics.FromImage(trackImage);
             g2.Clear(Color.LightGray);
             for (int x = 0; x < imageWidth; x++)

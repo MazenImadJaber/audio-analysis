@@ -6,7 +6,7 @@ namespace AnalysisPrograms.StandardizedFeatures
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Drawing.Imaging;
     using System.IO;
     using System.Linq;
@@ -182,7 +182,7 @@ namespace AnalysisPrograms.StandardizedFeatures
                     Font stringFont = new Font("Arial", 14);
                     int width = 250;
                     int height = image.Height;
-                    var label = new Bitmap(width, height);
+                    var label = new Image<Rgb24>(width, height);
                     var g1 = Graphics.FromImage(label);
                     g1.Clear(Color.Gray);
                     g1.DrawString(labelText, stringFont, Brushes.Black, new PointF(4, 30));

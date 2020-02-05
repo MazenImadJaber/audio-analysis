@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DrawEasyImage.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
@@ -11,7 +11,7 @@ namespace AnalysisPrograms
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
@@ -217,7 +217,7 @@ namespace AnalysisPrograms
             int dayPixelHeight = 4;
             int rowCount = (dayPixelHeight * dayCount) + 35; // +30 for grid lines
             int colCount = 1440;
-            var bitmap = new Bitmap(colCount, rowCount);
+            var bitmap = new Image<Rgb24>(colCount, rowCount);
             var colour = Color.Yellow;
             int currentRow = 0;
             var oneDay = TimeSpan.FromHours(24);
@@ -228,7 +228,7 @@ namespace AnalysisPrograms
 
             // for drawing the y-axis scale
             int scaleWidth = trackHeight + 7;
-            var yAxisScale = new Bitmap(scaleWidth, rowCount + (2 * trackHeight));
+            var yAxisScale = new Image<Rgb24>(scaleWidth, rowCount + (2 * trackHeight));
             Graphics g = Graphics.FromImage(yAxisScale);
             g.Clear(Color.Black);
 
@@ -350,21 +350,21 @@ namespace AnalysisPrograms
             SunAndMoon.AddSunRiseSetLinesToImage(bitmap, arguments.BrisbaneSunriseDatafile.ToFileInfo(), startdayOfYear, endDayOfYear, dayPixelHeight);
 
             // add the time scales
-            Bitmap timeBmp1 = ImageTrack.DrawTimeRelativeTrack(oneDay, graphWidth, trackHeight);
+            Image<Rgb24> timeBmp1 = ImageTrack.DrawTimeRelativeTrack(oneDay, graphWidth, trackHeight);
             var imageList = new List<Image> { timeBmp1, bitmap, timeBmp1 };
-            Bitmap compositeBmp1 = (Bitmap)ImageTools.CombineImagesVertically(imageList);
+            Image<Rgb24> compositeBmp1 = (Image<Rgb24>)ImageTools.CombineImagesVertically(imageList);
 
             imageList = new List<Image> { yAxisScale, compositeBmp1 };
-            Bitmap compositeBmp2 = (Bitmap)ImageTools.CombineImagesInLine(imageList);
+            Image<Rgb24> compositeBmp2 = (Image<Rgb24>)ImageTools.CombineImagesInLine(imageList);
 
             // indices used for image
             string indicesDescription = $"{redIndexProps.Name}|{grnIndexProps.Name}|{bluIndexProps.Name}";
             string startString = $"{startDate.Value.Year}/{startDate.Value.Month}/{startDate.Value.Day}";
             string endString = $"{endDate.Value.Year}/{endDate.Value.Month}/{endDate.Value.Day}";
             string title = $"EASY:   {arguments.FileStemName}    From {startString} to {endString}                          Indices: {indicesDescription}";
-            Bitmap titleBar = ImageTrack.DrawTitleTrack(compositeBmp2.Width, trackHeight, title);
+            Image<Rgb24> titleBar = ImageTrack.DrawTitleTrack(compositeBmp2.Width, trackHeight, title);
             imageList = new List<Image> { titleBar, compositeBmp2 };
-            compositeBmp2 = (Bitmap)ImageTools.CombineImagesVertically(imageList);
+            compositeBmp2 = (Image<Rgb24>)ImageTools.CombineImagesVertically(imageList);
             var outputFileName = Path.Combine(opDir.FullName, arguments.FileStemName + "." + rep + ".EASY.png");
             compositeBmp2.Save(outputFileName);
         } // Execute()

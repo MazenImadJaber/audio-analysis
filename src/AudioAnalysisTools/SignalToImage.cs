@@ -5,12 +5,13 @@
 namespace AudioAnalysisTools
 {
     using System;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Drawing.Imaging;
     using System.Linq;
     using Acoustics.Tools.Wav;
     using Acoustics.Unsafe;
     using MathNet.Numerics.IntegralTransforms;
+    using SixLabors.ImageSharp.PixelFormats;
     using StandardSpectrograms;
     using WavTools;
 
@@ -34,7 +35,7 @@ namespace AudioAnalysisTools
         /// <returns>
         /// Waveform image.
         /// </returns>
-        Bitmap Waveform(byte[] bytes, int width, int height);
+        Image<Rgb24> Waveform(byte[] bytes, int width, int height);
 
         /// <summary>
         /// Generate a Spectrogram.
@@ -45,7 +46,7 @@ namespace AudioAnalysisTools
         /// <returns>
         /// Spectrogram image.
         /// </returns>
-        Bitmap Spectrogram(byte[] bytes);
+        Image<Rgb24> Spectrogram(byte[] bytes);
     }
 
     /// <summary>
@@ -70,14 +71,14 @@ namespace AudioAnalysisTools
         /// <returns>
         /// Waveform image.
         /// </returns>
-        public Bitmap Waveform(byte[] bytes, int width, int height)
+        public Image<Rgb24> Waveform(byte[] bytes, int width, int height)
         {
-            Bitmap image;
+            Image<Rgb24> image;
 
             using (var recording = new AudioRecording(bytes))
             using (var img = recording.GetWaveFormInDecibels(width, height, WaveFormDbMin))
             {
-                image = new Bitmap(img);
+                image = new Image<Rgb24>(img);
             }
 
             return image;
@@ -93,7 +94,7 @@ namespace AudioAnalysisTools
         /// Spectrogram image.
         /// </returns>
         /// <exception cref="NotSupportedException"><c>NotSupportedException</c>.</exception>
-        public Bitmap Spectrogram(byte[] bytes)
+        public Image<Rgb24> Spectrogram(byte[] bytes)
         {
             /*
              * 80 pixels per second is too quick for Silverlight.
@@ -107,7 +108,7 @@ namespace AudioAnalysisTools
                 DoSnr = false, // might save us some time generating spectrograms.
             };
 
-            Bitmap image;
+            Image<Rgb24> image;
 
             using (var audiorecording = new AudioRecording(bytes))
             {
@@ -123,7 +124,7 @@ namespace AudioAnalysisTools
                 var sonogram = new SpectrogramStandard(sonogramConfig, audiorecording.WavReader);
                 using (var img = sonogram.GetImage())
                 {
-                    image = new Bitmap(img);
+                    image = new Image<Rgb24>(img);
                 }
             }
 
@@ -175,14 +176,14 @@ namespace AudioAnalysisTools
         /// <returns>
         /// Waveform image.
         /// </returns>
-        public Bitmap Waveform(byte[] bytes, int width, int height)
+        public Image<Rgb24> Waveform(byte[] bytes, int width, int height)
         {
-            Bitmap image;
+            Image<Rgb24> image;
 
             using (var recording = new AudioRecording(bytes))
             using (var img = recording.GetWaveFormInDecibels(width, height, WaveFormDbMin))
             {
-                image = new Bitmap(img);
+                image = new Image<Rgb24>(img);
             }
 
             return image;
@@ -197,11 +198,11 @@ namespace AudioAnalysisTools
         /// <returns>
         /// Spectrogram image.
         /// </returns>
-        public Bitmap Spectrogram(byte[] bytes)
+        public Image<Rgb24> Spectrogram(byte[] bytes)
         {
             IWavReader wavReader = new WavStreamReader(bytes);
 
-            return new Bitmap(GetSpectrogram(wavReader, 1));
+            return new Image<Rgb24>(GetSpectrogram(wavReader, 1));
         }
 
         /// <summary>

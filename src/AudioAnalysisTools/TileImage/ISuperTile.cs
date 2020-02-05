@@ -10,7 +10,7 @@
 namespace AudioAnalysisTools.TileImage
 {
     using System;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
 
     public interface ISuperTile
     {

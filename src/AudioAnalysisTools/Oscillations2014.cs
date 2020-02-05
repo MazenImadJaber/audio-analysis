@@ -6,7 +6,7 @@ namespace AudioAnalysisTools
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Drawing.Imaging;
     using System.Globalization;
     using System.IO;
@@ -16,6 +16,8 @@ namespace AudioAnalysisTools
     using MathNet.Numerics;
     using MathNet.Numerics.LinearAlgebra;
     using MathNet.Numerics.LinearAlgebra.Double;
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.ImageSharp.Processing;
     using StandardSpectrograms;
     using TowseyLibrary;
     using WavTools;
@@ -433,7 +435,7 @@ namespace AudioAnalysisTools
 
             var titleBar = DrawTitleBarOfOscillationSpectrogram(algorithmName, image.Width);
             var imageList = new List<Image> { titleBar, image };
-            var compositeBmp = (Bitmap)ImageTools.CombineImagesVertically(imageList);
+            var compositeBmp = (Image<Rgb24>)ImageTools.CombineImagesVertically(imageList);
             return compositeBmp;
         }
 
@@ -967,7 +969,7 @@ namespace AudioAnalysisTools
         {
             var longTitle = "Hz * Cycle/s (" + algorithmName + ")";
 
-            var bmp = new Bitmap(width, 20);
+            var bmp = new Image<Rgb24>(width, 20);
             var g = Graphics.FromImage(bmp);
             g.Clear(Color.Black);
             var stringFont = new Font("Arial", 9);

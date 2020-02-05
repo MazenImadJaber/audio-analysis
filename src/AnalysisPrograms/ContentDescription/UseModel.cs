@@ -6,7 +6,7 @@ namespace AnalysisPrograms.ContentDescription
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -349,7 +349,7 @@ namespace AnalysisPrograms.ContentDescription
             // create two false-color spectrogram images
             var image1NoChrome = cs1.DrawFalseColourSpectrogramChromeless(cs1.ColorMode, colorMap1);
             var image2NoChrome = cs1.DrawFalseColourSpectrogramChromeless(cs1.ColorMode, colorMap2);
-            var spacer = new Bitmap(image1NoChrome.Width, 10);
+            var spacer = new Image<Rgb24>(image1NoChrome.Width, 10);
             var imageList = new[] { image1NoChrome, spacer, image2NoChrome, spacer };
             Image image3 = ImageTools.CombineImagesVertically(imageList);
             var outputPath = FilenameHelpers.AnalysisResultPath(outputDirectory, fileStem, "2Maps", "png");

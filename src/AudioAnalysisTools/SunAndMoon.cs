@@ -1,4 +1,4 @@
-﻿// <copyright file="SunAndMoon.cs" company="QutEcoacoustics">
+// <copyright file="SunAndMoon.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
 
@@ -6,10 +6,12 @@ namespace AudioAnalysisTools
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.Linq;
     using System.Text;
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.ImageSharp.Processing;
     using TowseyLibrary;
 
     [Obsolete("This class is not generalizeable and shouldn't be used until it can be made so.")]
@@ -118,7 +120,7 @@ namespace AudioAnalysisTools
         /// <param name="dateTimeOffset"></param>
         /// <param name="sunriseDatafile"></param>
         /// <returns></returns>
-        public static Bitmap AddSunTrackToImage(int width, DateTimeOffset? dateTimeOffset, FileInfo sunriseDatafile)
+        public static Image<Rgb24> AddSunTrackToImage(int width, DateTimeOffset? dateTimeOffset, FileInfo sunriseDatafile)
         {
             // AT: I DON'T UNDERSTAND THIS CODE! I CAN'T FIX IT
             LoggedConsole.WriteWarnLine("\t\tERROR: Sun track generation disabled - broken in long ago merge");
@@ -135,14 +137,14 @@ namespace AudioAnalysisTools
             //                double moonPhase = SunAndMoon.GetPhaseOfMoon((DateTimeOffset)dateTimeOffset);
             //                string strMoonPhase = SunAndMoon.ConvertMoonPhaseToString(moonPhase);
             //                throw new NotSupportedException("THE FOLLOWING FAILS IN PRODUCTION");
-            //                Bitmap suntrack = SunAndMoon.AddSunTrackToImage(width, SunAndMoon.BrisbaneSunriseDatafile, dayOfYear, strMoonPhase);
+            //                Image<Rgb24> suntrack = SunAndMoon.AddSunTrackToImage(width, SunAndMoon.BrisbaneSunriseDatafile, dayOfYear, strMoonPhase);
             //                return suntrack;
             //            }
             //
             //            return null;
             //        }
             //
-            //        public static Bitmap AddSunTrackToImage(int width, DateTimeOffset? dateTimeOffset, SiteDescription siteDescription)
+            //        public static Image<Rgb24> AddSunTrackToImage(int width, DateTimeOffset? dateTimeOffset, SiteDescription siteDescription)
             //        {
             //            return AddSunTrackToImage(width, dateTimeOffset, siteDescription.SiteName, siteDescription.Latitude, siteDescription.Longitude);
             //=======
@@ -150,7 +152,7 @@ namespace AudioAnalysisTools
             //            int dayOfYear = ((DateTimeOffset)dateTimeOffset).DayOfYear;
             //            double moonPhase = SunAndMoon.GetPhaseOfMoon((DateTimeOffset)dateTimeOffset);
             //            string strMoonPhase = SunAndMoon.ConvertMoonPhaseToString(moonPhase);
-            //            Bitmap suntrack = SunAndMoon.AddSunTrackToImage(width, sunriseDatafile, year, dayOfYear, strMoonPhase);
+            //            Image<Rgb24> suntrack = SunAndMoon.AddSunTrackToImage(width, sunriseDatafile, year, dayOfYear, strMoonPhase);
             //            return suntrack;
             //>>>>>>> master
         }
@@ -162,10 +164,10 @@ namespace AudioAnalysisTools
         /// <param name="sunriseSetData"></param>
         /// <param name="dayValue"></param>
         /// <returns></returns>
-        public static Bitmap AddSunTrackToImage(int width, FileInfo sunriseSetData, int year, int dayValue, string moonPhase = null)
+        public static Image<Rgb24> AddSunTrackToImage(int width, FileInfo sunriseSetData, int year, int dayValue, string moonPhase = null)
         {
             int trackHeight = 18;
-            Bitmap image = new Bitmap(width, trackHeight);
+            Image<Rgb24> image = new Image<Rgb24>(width, trackHeight);
 
             bool leapYear = false;
             if (year % 4 == 0)
@@ -247,7 +249,7 @@ namespace AudioAnalysisTools
             return image;
         }
 
-        public static void AddSunRiseSetLinesToImage(Bitmap image, FileInfo sunriseSetData, int startdayOfYear, int endDayOfYear, int pixelStep)
+        public static void AddSunRiseSetLinesToImage(Image<Rgb24> image, FileInfo sunriseSetData, int startdayOfYear, int endDayOfYear, int pixelStep)
         {
             List<string> lines = FileTools.ReadTextFile(sunriseSetData.FullName);
             int imageRow = 0;

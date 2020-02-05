@@ -6,10 +6,12 @@ namespace AudioAnalysisTools.Indices
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.Linq;
     using Acoustics.Shared;
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.ImageSharp.Processing;
     using TowseyLibrary;
 
     /// <summary>
@@ -507,10 +509,10 @@ namespace AudioAnalysisTools.Indices
         /// </summary>
         /// <param name="height">height in pixels of the error patch.</param>
         /// <param name="textInVerticalOrientation">orientation of error text should match orientation of the patch.</param>
-        public Bitmap DrawErrorPatch(int height, bool textInVerticalOrientation)
+        public Image<Rgb24> DrawErrorPatch(int height, bool textInVerticalOrientation)
         {
             int width = this.EndPosition - this.StartPosition + 1;
-            var bmp = new Bitmap(width, height);
+            var bmp = new Image<Rgb24>(width, height);
             int fontVerticalPosition = (height / 2) - 10;
             var g = Graphics.FromImage(bmp);
             g.Clear(this.GapDescription == gapDescriptionMissingData ? Color.LightGray : Color.HotPink);
@@ -550,7 +552,7 @@ namespace AudioAnalysisTools.Indices
             int gapWidth = error.EndPosition - error.StartPosition + 1;
 
             // create new image
-            Bitmap newBmp = new Bitmap(width - gapWidth, ht);
+            Image<Rgb24> newBmp = new Image<Rgb24>(width - gapWidth, ht);
             using (Graphics g = Graphics.FromImage(newBmp))
             {
                 Rectangle srcRect = new Rectangle(0, 0, gapStart, ht);

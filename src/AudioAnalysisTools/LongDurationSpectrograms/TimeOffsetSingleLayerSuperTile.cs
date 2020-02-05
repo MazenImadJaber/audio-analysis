@@ -10,7 +10,7 @@
 namespace AudioAnalysisTools.LongDurationSpectrograms
 {
     using System;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
 
     using TileImage;
 

@@ -6,7 +6,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Drawing.Imaging;
     using System.Linq;
 
@@ -16,7 +16,8 @@ namespace AudioAnalysisTools.StandardSpectrograms
     using AudioAnalysisTools.DSP;
     using AudioAnalysisTools.LongDurationSpectrograms;
     using AudioAnalysisTools.WavTools;
-
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.ImageSharp.Processing;
     using TowseyLibrary;
 
     /// <summary>
@@ -281,7 +282,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 throw new ArgumentNullException(nameof(image));
             }
 
-            FrequencyScale.DrawFrequencyLinesOnImage((Bitmap)image, gridLineLocations, includeLabels: true);
+            FrequencyScale.DrawFrequencyLinesOnImage((Image<Rgb24>)image, gridLineLocations, includeLabels: true);
 
             var titleBar = LDSpectrogramRGB.DrawTitleBarOfGrayScaleSpectrogram(title, image.Width);
             var timeBmp = ImageTrack.DrawTimeTrack(this.Duration, image.Width);
@@ -337,7 +338,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                     gridLineLocations = FrequencyScale.GetLinearGridLineLocations(this.NyquistFrequency, kHzInterval, image.Height);
                 }
 
-                FrequencyScale.DrawFrequencyLinesOnImage((Bitmap)image, gridLineLocations, includeLabels: true);
+                FrequencyScale.DrawFrequencyLinesOnImage((Image<Rgb24>)image, gridLineLocations, includeLabels: true);
             }
 
             return image;
@@ -376,7 +377,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             //set up the 1000kHz scale
             int herzInterval = 1000;
             int[] vScale = FrequencyScale.CreateLinearYaxis(herzInterval, this.NyquistFrequency, imageHeight); //calculate location of 1000Hz grid lines
-            var bmp = new Bitmap(imageWidth, imageHeight, PixelFormat.Format24bppRgb);
+            var bmp = new Image<Rgb24>(imageWidth, imageHeight, PixelFormat.Format24bppRgb);
             for (int w = 0; w < imageWidth; w++)
             {
                 int start = w * subSample;
@@ -524,7 +525,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             Color[] grayScale = ImageTools.GrayScale();
 
-            var bmp = new Bitmap(width, imageHeight, PixelFormat.Format24bppRgb);
+            var bmp = new Image<Rgb24>(width, imageHeight, PixelFormat.Format24bppRgb);
             int yOffset = imageHeight;
 
             // for all freq bins
@@ -585,7 +586,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             double range = max - min;
             Color[] grayScale = ImageTools.GrayScale();
 
-            var bmp = new Bitmap(width, imageHeight, PixelFormat.Format24bppRgb);
+            var bmp = new Image<Rgb24>(width, imageHeight, PixelFormat.Format24bppRgb);
             int yOffset = imageHeight;
             for (int y = 0; y < binCount; y++)
             {
@@ -685,7 +686,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             // init frequency scale
             int frameSize = image.Height;
             var freqScale = new FrequencyScale(nyquist, frameSize, herzInterval);
-            SpectrogramTools.DrawGridLinesOnImage((Bitmap)image, minuteOffset, fullDuration, xAxisTicInterval, freqScale);
+            SpectrogramTools.DrawGridLinesOnImage((Image<Rgb24>)image, minuteOffset, fullDuration, xAxisTicInterval, freqScale);
 
             int imageWidth = image.Width;
             int trackHeight = 20;
@@ -693,7 +694,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             var timeBmp = DrawTimeTrack(minuteOffset, xAxisPixelDuration, xAxisTicInterval, labelInterval, imageWidth, trackHeight, "Seconds");
 
-            var compositeBmp = new Bitmap(imageWidth, imageHt); //get canvas for entire image
+            var compositeBmp = new Image<Rgb24>(imageWidth, imageHt); //get canvas for entire image
             var gr = Graphics.FromImage(compositeBmp);
             gr.Clear(Color.Black);
             int offset = 0;
@@ -709,7 +710,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
         public static Image DrawTitleBarOfGrayScaleSpectrogram(string title, int width)
         {
-            var bmp = new Bitmap(width, SpectrogramConstants.HEIGHT_OF_TITLE_BAR);
+            var bmp = new Image<Rgb24>(width, SpectrogramConstants.HEIGHT_OF_TITLE_BAR);
             var g = Graphics.FromImage(bmp);
             g.Clear(Color.Black);
 
@@ -736,9 +737,9 @@ namespace AudioAnalysisTools.StandardSpectrograms
         }
 
         // mark of time scale according to scale.
-        public static Bitmap DrawTimeTrack(TimeSpan offsetMinute, TimeSpan xAxisPixelDuration, TimeSpan xAxisTicInterval, TimeSpan labelInterval, int trackWidth, int trackHeight, string title)
+        public static Image<Rgb24> DrawTimeTrack(TimeSpan offsetMinute, TimeSpan xAxisPixelDuration, TimeSpan xAxisTicInterval, TimeSpan labelInterval, int trackWidth, int trackHeight, string title)
         {
-            var bmp = new Bitmap(trackWidth, trackHeight);
+            var bmp = new Image<Rgb24>(trackWidth, trackHeight);
             var g = Graphics.FromImage(bmp);
             g.Clear(Color.Black);
 

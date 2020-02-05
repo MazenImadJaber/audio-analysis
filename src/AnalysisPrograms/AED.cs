@@ -12,7 +12,7 @@ namespace AnalysisPrograms
     using System.Collections.Generic;
     using System.Data;
     using System.Diagnostics.CodeAnalysis;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Drawing.Imaging;
     using System.IO;
     using System.Linq;

@@ -1,16 +1,16 @@
-﻿// <copyright file="LDSpectrogramDifference.cs" company="QutEcoacoustics">
+// <copyright file="LDSpectrogramDifference.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
 
 namespace AudioAnalysisTools.LongDurationSpectrograms
 {
     using System;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Drawing.Imaging;
     using System.IO;
 
     using Acoustics.Shared.ConfigFile;
-
+    using SixLabors.ImageSharp.PixelFormats;
     using TowseyLibrary;
 
     public static class LdSpectrogramDifference
@@ -129,7 +129,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             int rows = tgtRedM.GetLength(0); //number of rows
             int cols = tgtRedM.GetLength(1); //number
 
-            Bitmap bmp = new Bitmap(cols, rows, PixelFormat.Format24bppRgb);
+            Image<Rgb24> bmp = new Image<Rgb24>(cols, rows, PixelFormat.Format24bppRgb);
 
             int maxRGBValue = 255;
             for (int row = 0; row < rows; row++)
@@ -174,8 +174,8 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             int rows = tgtRedM.GetLength(0); //number of rows
             int cols = tgtRedM.GetLength(1); //number
 
-            var spg1Image = new Bitmap(cols, rows, PixelFormat.Format24bppRgb);
-            var spg2Image = new Bitmap(cols, rows, PixelFormat.Format24bppRgb);
+            var spg1Image = new Image<Rgb24>(cols, rows, PixelFormat.Format24bppRgb);
+            var spg2Image = new Image<Rgb24>(cols, rows, PixelFormat.Format24bppRgb);
             int maxRgbValue = 255;
 
             for (int row = 0; row < rows; row++)

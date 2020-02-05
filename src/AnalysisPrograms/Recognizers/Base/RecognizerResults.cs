@@ -11,7 +11,7 @@ namespace AnalysisPrograms.Recognizers.Base
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
 
     using AnalysisBase.ResultBases;
 

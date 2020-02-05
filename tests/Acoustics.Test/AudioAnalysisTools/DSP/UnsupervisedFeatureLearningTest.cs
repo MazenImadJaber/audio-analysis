@@ -6,7 +6,7 @@ namespace Acoustics.Test.AudioAnalysisTools.DSP
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Drawing.Imaging;
     using System.IO;
     using System.Linq;
@@ -259,7 +259,7 @@ namespace Acoustics.Test.AudioAnalysisTools.DSP
                 var outputClusteringImage = Path.Combine(resultDir, "ClustersWithGrid" + i.ToString() + ".bmp");
 
                 // Image bmp = ImageTools.ReadImage2Bitmap(filename);
-                FrequencyScale.DrawFrequencyLinesOnImage((Bitmap)clusterImage, freqScale, includeLabels: false);
+                FrequencyScale.DrawFrequencyLinesOnImage((Image<Rgb24>)clusterImage, freqScale, includeLabels: false);
                 clusterImage.Save(outputClusteringImage);
             }
 

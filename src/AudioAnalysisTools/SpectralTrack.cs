@@ -6,12 +6,12 @@ namespace AudioAnalysisTools
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Linq;
     using System.Text;
 
     using AudioAnalysisTools.StandardSpectrograms;
-
+    using SixLabors.ImageSharp.Processing;
     using TowseyLibrary;
 
     public class SpectralTrack
@@ -192,7 +192,7 @@ namespace AudioAnalysisTools
             return (int)Math.Round((this.track[t] * this.herzPerBin) + this.herzOffset);
         }
 
-        public void DrawTrack(Graphics g, double sonogramFramesPerSecond, double sonogramFreqBinWidth, int sonogramHeight)
+        public void DrawTrack(IImageProcessingContext g, double sonogramFramesPerSecond, double sonogramFreqBinWidth, int sonogramHeight)
         {
             Pen p1 = new Pen(AcousticEvent.DefaultBorderColor, 2); // default colour
             double secondsPerTrackFrame = 1 / this.framesPerSecond;

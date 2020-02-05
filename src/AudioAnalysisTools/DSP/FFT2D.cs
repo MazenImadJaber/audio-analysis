@@ -1,4 +1,4 @@
-﻿// <copyright file="FFT2D.cs" company="QutEcoacoustics">
+// <copyright file="FFT2D.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
 
@@ -6,12 +6,14 @@ namespace AudioAnalysisTools.DSP
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Linq;
     using System.Numerics;
     using System.Text;
     using MathNet.Numerics; // this is needed for the class ComplexExtensions which does the calculation of the magnitude of a complex number.
     using MathNet.Numerics.IntegralTransforms;
+    using SixLabors.ImageSharp.PixelFormats;
+
     //using MathNet.Numerics.ComplexExtensions;
     using TowseyLibrary;
 
@@ -215,7 +217,7 @@ namespace AudioAnalysisTools.DSP
         /// <returns></returns>
         public static double[,] GetImageDataAsGrayIntensity(string imageFilePath, bool reversed)
         {
-            Bitmap image = (Bitmap)Image.FromFile(imageFilePath, true);
+            Image<Rgb24> image = (Image<Rgb24>)Image.FromFile(imageFilePath, true);
             var rowCount = image.Height;
             var colCount = image.Width;
             var result = new double[rowCount, colCount];

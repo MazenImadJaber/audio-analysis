@@ -1,4 +1,4 @@
-﻿// <copyright file="HoughTransform.cs" company="QutEcoacoustics">
+// <copyright file="HoughTransform.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
 
@@ -6,8 +6,6 @@ namespace TowseyLibrary
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
-    using System.Drawing.Imaging;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -15,6 +13,9 @@ namespace TowseyLibrary
     using AForge.Imaging;
     using AForge.Imaging.Filters;
 
+    // AT: The following code was disabled in 2020-02 in the port to .NET Core
+
+    /*
     public static class HoughTransform
     {
         /// <summary>
@@ -25,9 +26,9 @@ namespace TowseyLibrary
             //string path = @"C:\SensorNetworks\Output\Human\DM420036_min465Speech_0min.png";
             string path = @"C:\SensorNetworks\Output\Sonograms\TestForHoughTransform.png";
             FileInfo file = new FileInfo(path);
-            Bitmap sourceImage = ImageTools.ReadImage2Bitmap(file.FullName);
+            Image<Rgb24> sourceImage = ImageTools.ReadImage2Bitmap(file.FullName);
 
-            //Bitmap sourceImage = HoughTransform.CreateLargeImageWithLines();
+            //Image<Rgb24> sourceImage = HoughTransform.CreateLargeImageWithLines();
             sourceImage = TileWiseHoughTransform(sourceImage);
             string path1 = @"C:\SensorNetworks\Output\Sonograms\opMatrix.png";
             sourceImage.Save(path1, ImageFormat.Png);
@@ -35,21 +36,21 @@ namespace TowseyLibrary
 
         public static void Test2HoughTransform()
         {
-            Bitmap bmp = CreateToyTestImageWithLines();
+            Image<Rgb24> bmp = CreateToyTestImageWithLines();
 
             //int numberOfDirections = (2 * rowCount) + (2 * colCount) - 4;
             int numberOfDirections = 32;
             bool saveTranformImage = true;
             double[,] rtMatrix = DoHoughTransform(bmp, numberOfDirections, saveTranformImage);
             double thresholdIntensity = 2.0;
-            Bitmap opImage = ConvertRTmatrix2Image(rtMatrix, thresholdIntensity, bmp.Width);
+            Image<Rgb24> opImage = ConvertRTmatrix2Image(rtMatrix, thresholdIntensity, bmp.Width);
 
             var list = new List<HoughLine>();
             string path1 = @"C:\SensorNetworks\Output\Sonograms\opMatrix.png";
             opImage.Save(path1, ImageFormat.Png);
         }
 
-        public static double[,] DoHoughTransform(Bitmap sourceImage, int directionsCount, bool saveTransformImage)
+        public static double[,] DoHoughTransform(Image<Rgb24> sourceImage, int directionsCount, bool saveTransformImage)
         {
             int rowCount = sourceImage.Height;
             int colCount = sourceImage.Width;
@@ -66,7 +67,7 @@ namespace TowseyLibrary
 
             if (saveTransformImage)
             {
-                Bitmap houghLineImage = lineTransform.ToBitmap();
+                Image<Rgb24> houghLineImage = lineTransform.ToBitmap();
                 string path = @"C:\SensorNetworks\Output\Sonograms\hough.png";
                 houghLineImage.Save(path, ImageFormat.Png);
             }
@@ -109,21 +110,21 @@ namespace TowseyLibrary
             return rtSpace;
         }
 
-        public static Bitmap ConvertRTmatrix2Image(double[,] rtSpace, double thresholdIntensity, int imageWidth)
+        public static Image<Rgb24> ConvertRTmatrix2Image(double[,] rtSpace, double thresholdIntensity, int imageWidth)
         {
              int colCount = imageWidth;
 
             // assume row count = col count
              int rowCount = colCount;
-             Bitmap opImage = new Bitmap(colCount, rowCount);
+             Image<Rgb24> opImage = new Image<Rgb24>(colCount, rowCount);
              Graphics g = Graphics.FromImage(opImage);
              g.Clear(Color.White);
-             Bitmap opImage1 = AddRTmatrix2Image(rtSpace, thresholdIntensity, opImage);
+             Image<Rgb24> opImage1 = AddRTmatrix2Image(rtSpace, thresholdIntensity, opImage);
 
              return opImage1;
         }
 
-        public static Bitmap AddRTmatrix2Image(double[,] rtSpace, double thresholdIntensity, Bitmap inputImage)
+        public static Image<Rgb24> AddRTmatrix2Image(double[,] rtSpace, double thresholdIntensity, Image<Rgb24> inputImage)
         {
             int maxRadius = rtSpace.GetLength(0) - 1;
             int angleCount = rtSpace.GetLength(1);
@@ -206,7 +207,7 @@ namespace TowseyLibrary
                         }
 
                     // draw line on the image
-                    //Bitmap opImage = AForge.Imaging.Image.CreateGrayscaleImage(11, 11);
+                    //Image<Rgb24> opImage = AForge.Imaging.Image.CreateGrayscaleImage(11, 11);
                     //Drawing.Line((UnmanagedImage)opImage,
                     //    new IntPoint((int)x0 + w2, h2 - (int)y0),
                     //    new IntPoint((int)x1 + w2, h2 - (int)y1),
@@ -218,7 +219,7 @@ namespace TowseyLibrary
             return inputImage;
         }
 
-        public static Bitmap TileWiseHoughTransform(Bitmap sourceImage)
+        public static Image<Rgb24> TileWiseHoughTransform(Image<Rgb24> sourceImage)
         {
             sourceImage = ImageTools.ApplyInvert(sourceImage);
             sourceImage.Save(@"C:\SensorNetworks\Output\Sonograms\TestSourceImage.png");
@@ -236,7 +237,7 @@ namespace TowseyLibrary
             int xDirectionTileCount = colCount / tileWidth;
             int yDirectionTileCount = rowCount / tileHeight;
 
-            Bitmap returnBmp = new Bitmap(sourceImage);
+            Image<Rgb24> returnBmp = new Image<Rgb24>(sourceImage);
             Graphics g = Graphics.FromImage(returnBmp);
 
             for (int r = 0; r < yDirectionTileCount; r++)
@@ -247,26 +248,26 @@ namespace TowseyLibrary
                     int y = r * tileHeight;
 
                     Rectangle cropArea = new Rectangle(x, y, tileWidth, tileHeight);
-                    Bitmap tile = sourceImage.Clone(cropArea, sourceImage.PixelFormat);
+                    Image<Rgb24> tile = sourceImage.Clone(cropArea, sourceImage.PixelFormat);
                     tile.Save(@"C:\SensorNetworks\Output\Sonograms\TestTile.png");
                     ImageTools.ApplyInvert(tile);
 
                     // create and apply filter to convert to indexed color format.
                     double[,] rtMatrix = DoHoughTransform(filter.Apply(tile), numberOfDirections, saveTranformImage);
-                    Bitmap tile2 = AddRTmatrix2Image(rtMatrix, thresholdIntensity, tile);
+                    Image<Rgb24> tile2 = AddRTmatrix2Image(rtMatrix, thresholdIntensity, tile);
 
-                    //Bitmap tile2 = HoughTransform.ConvertRTmatrix2Image(rtMatrix, thresholdIntensity, tileWidth);
+                    //Image<Rgb24> tile2 = HoughTransform.ConvertRTmatrix2Image(rtMatrix, thresholdIntensity, tileWidth);
                     g.DrawImage(tile2, x, y);
                     tile2.Save(@"C:\SensorNetworks\Output\Sonograms\TestTile2.png");
                 }
             }
 
             return returnBmp;
-        } // TileWiseHoughTransform(Bitmap sourceImage)
+        } // TileWiseHoughTransform(Image<Rgb24> sourceImage)
 
-        public static Bitmap CreateToyTestImageWithLines()
+        public static Image<Rgb24> CreateToyTestImageWithLines()
         {
-            Bitmap image = new Bitmap(11, 11);
+            Image<Rgb24> image = new Image<Rgb24>(11, 11);
             Graphics g = Graphics.FromImage(image);
             g.Clear(Color.Black);
             Pen pen = new Pen(Color.White);
@@ -278,17 +279,17 @@ namespace TowseyLibrary
 
             // create and apply filter to convert to indexed color format.
             var filter = Grayscale.CommonAlgorithms.BT709;
-            Bitmap image1 = filter.Apply(image);
+            Image<Rgb24> image1 = filter.Apply(image);
 
             string path = @"C:\SensorNetworks\Output\Sonograms\matrix.png";
             image1.Save(path, ImageFormat.Png);
             return image1;
         }
 
-        public static Bitmap CreateLargeImageWithLines()
+        public static Image<Rgb24> CreateLargeImageWithLines()
         {
             int dim = 11 * 4;
-            Bitmap image = new Bitmap(dim, dim);
+            Image<Rgb24> image = new Image<Rgb24>(dim, dim);
             Graphics g = Graphics.FromImage(image);
             g.Clear(Color.Black);
             Pen pen = new Pen(Color.White);
@@ -302,5 +303,6 @@ namespace TowseyLibrary
             image.Save(path, ImageFormat.Png);
             return image;
         }
-    }
+    }*/
 }
+

@@ -7,7 +7,7 @@ namespace Acoustics.Test.AudioAnalysisTools.LongDurationSpectrograms
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Drawing.Imaging;
     using System.IO;
     using System.Linq;
@@ -71,7 +71,7 @@ namespace Acoustics.Test.AudioAnalysisTools.LongDurationSpectrograms
             foreach (var (image, key) in images)
             {
                 Assert.That.ImageIsSize(60, 256, image);
-                Assert.That.ImageRegionIsColor(Rectangle.FromLTRB(0, 0, 60, 256), Color.Black, (Bitmap)image);
+                Assert.That.ImageRegionIsColor(Rectangle.FromLTRB(0, 0, 60, 256), Color.Black, (Image<Rgb24>)image);
             }
         }
 
@@ -96,7 +96,7 @@ namespace Acoustics.Test.AudioAnalysisTools.LongDurationSpectrograms
             grnM[3, 3] = 0.01;
             bluM[3, 3] = 0.11;
 
-            var image = (Bitmap)LDSpectrogramRGB.DrawRgbColourMatrix(redM, grnM, bluM, doReverseColour: true);
+            var image = (Image<Rgb24>)LDSpectrogramRGB.DrawRgbColourMatrix(redM, grnM, bluM, doReverseColour: true);
 
             Assert.That.PixelIsColor(new Point(1, 1), Color.FromArgb(128, 128, 128), image);
             Assert.That.PixelIsColor(new Point(2, 2), Color.FromArgb(128, 128, 128), image);

@@ -6,7 +6,7 @@ namespace AudioAnalysisTools.Indices
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Linq;
     using Acoustics.Shared;
     using AnalysisBase.ResultBases;

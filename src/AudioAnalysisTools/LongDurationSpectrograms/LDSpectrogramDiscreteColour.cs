@@ -6,9 +6,10 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Linq;
     using System.Text;
+    using SixLabors.ImageSharp.PixelFormats;
     using TowseyLibrary;
 
     public class LDSpectrogramDiscreteColour
@@ -68,7 +69,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             }
 
             // read in the image
-            Bitmap image = ImageTools.ReadImage2Bitmap(inputPath);
+            Image<Rgb24> image = ImageTools.ReadImage2Bitmap(inputPath);
             for (int x = 0; x < image.Width; x++)
             {
                 for (int y = 0; y < image.Height; y++)

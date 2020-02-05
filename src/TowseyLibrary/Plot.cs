@@ -6,7 +6,11 @@ namespace TowseyLibrary
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.Fonts;
+    using SixLabors.ImageSharp;
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.ImageSharp.Processing;
+    using SixLabors.Primitives;
 
     /// <summary>
     /// Represents a single array of data with X and Y scales and other info useful for plotting a graph.
@@ -46,11 +50,12 @@ namespace TowseyLibrary
         /// Assumes that the data has been normalised by a call to plot.NormalizeData(double min, double max) or equivalent.
         /// </summary>
         /// <param name="height">height of the plot.</param>
-        public Image DrawPlot(int height)
+        public Image<Rgb24> DrawPlot(int height)
         {
-            var image = new Bitmap(this.data.Length, height);
-            Graphics g = Graphics.FromImage(image);
-            g.Clear(Color.LightGray);
+            var image = new Image<Rgb24>(this.data.Length, height);
+            image.Mutate(g => {
+                g.Clear(Color.LightGray);
+            });
 
             if (this.data == null)
             {
@@ -101,10 +106,10 @@ namespace TowseyLibrary
 
                 for (int z = id; z < height; z++)
                 {
-                    image.SetPixel(w, z, Color.Black); // draw the score bar
+                    image[w, z] = Color.Black; // draw the score bar
                 }
 
-                image.SetPixel(w, height - 1, Color.Black); // draw base line
+                image[w, height - 1] = Color.Black; // draw base line
             }
 
             // Add in horizontal threshold significance line
@@ -122,7 +127,7 @@ namespace TowseyLibrary
 
             for (int x = 0; x < image.Width; x++)
             {
-                image.SetPixel(x, lineId, Color.Lime);
+                image[x, lineId] = Color.Lime;
             }
 
             return image;
@@ -135,20 +140,22 @@ namespace TowseyLibrary
 
             // var family = new FontFamily("Arial");
             // var font = new Font(family, 10, FontStyle.Regular, GraphicsUnit.Pixel);
-            var font = new Font("Tahoma", 9);
-            var g = Graphics.FromImage(image);
-            g.DrawString(this.title, font, Brushes.Red, new PointF(8, 0));
-
-            if (this.data.Length > 500)
+            var font = SystemFonts.CreateFont("Tahoma", 9);
+            image.Mutate(g =>
             {
-                g.DrawString(this.title, font, Brushes.Red, new PointF(length - 80, 0));
-            }
+                g.DrawText(this.title, font, Color.Red, new PointF(8, 0));
 
-            if (this.data.Length > 1200)
-            {
-                // ReSharper disable once PossibleLossOfFraction
-                g.DrawString(this.title, font, Brushes.Red, new PointF(length / 2, 0));
-            }
+                if (this.data.Length > 500)
+                {
+                    g.DrawText(this.title, font, Color.Red, new PointF(length - 80, 0));
+                }
+
+                if (this.data.Length > 1200)
+                {
+                    // ReSharper disable once PossibleLossOfFraction
+                    g.DrawText(this.title, font, Color.Red, new PointF(length / 2, 0));
+                }
+            });
             return image;
         }
 

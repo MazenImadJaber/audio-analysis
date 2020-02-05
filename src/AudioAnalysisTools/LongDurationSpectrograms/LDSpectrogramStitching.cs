@@ -6,7 +6,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.Linq;
     using Acoustics.Shared;
@@ -14,6 +14,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
     using AnalysisBase.ResultBases;
     using AudioAnalysisTools.StandardSpectrograms;
     using Indices;
+    using SixLabors.ImageSharp.PixelFormats;
     using TowseyLibrary;
 
     /// <summary>
@@ -179,7 +180,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
             string titletext =
                 $"SOURCE: \"{opFileStem}\".     Starts at {startTime}                       {Meta.OrganizationTag}";
-            Bitmap tracksImage = IndexDisplay.DrawImageOfSummaryIndices(
+            Image<Rgb24> tracksImage = IndexDisplay.DrawImageOfSummaryIndices(
                                  IndexProperties.GetIndexProperties(indexPropertiesConfigFileInfo),
                                  dictionaryOfCsvColumns,
                                  titletext,
@@ -300,15 +301,15 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                     continue;
                 }
 
-                var image = new Bitmap(path);
+                var image = new Image<Rgb24>(path);
                 int spacerWidth = minutesBetweenRecordingStarts - image.Width;
 
                 if (interpolateSpacer)
                 {
-                    var spacer = new Bitmap(spacerWidth, image.Height);
+                    var spacer = new Image<Rgb24>(spacerWidth, image.Height);
                     imagePair[0] = image;
                     imagePair[1] = spacer;
-                    image = (Bitmap)ImageTools.CombineImagesInLine(imagePair);
+                    image = (Image<Rgb24>)ImageTools.CombineImagesInLine(imagePair);
                 }
 
                 images.Add(image);

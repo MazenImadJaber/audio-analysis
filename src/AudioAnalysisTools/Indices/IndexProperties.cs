@@ -15,11 +15,13 @@ namespace AudioAnalysisTools.Indices
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using Acoustics.Shared.ConfigFile;
     using AnalysisBase;
     using Newtonsoft.Json;
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.ImageSharp.Processing;
     using TowseyLibrary;
     using YamlDotNet.Serialization;
     using Zio;
@@ -236,7 +238,7 @@ namespace AudioAnalysisTools.Indices
             int trackWidth = dataLength + IndexDisplay.TrackEndPanelWidth;
             int trackHeight = IndexDisplay.DefaultTrackHeight;
 
-            Bitmap bmp = new Bitmap(trackWidth, trackHeight);
+            Image<Rgb24> bmp = new Image<Rgb24>(trackWidth, trackHeight);
             Graphics g = Graphics.FromImage(bmp);
             g.Clear(backgroundColour);
 
@@ -280,7 +282,7 @@ namespace AudioAnalysisTools.Indices
             bool errorsExist = errors != null && errors.Count > 0;
             if (errorsExist)
             {
-                bmp = (Bitmap)GapsAndJoins.DrawErrorSegments(bmp, errors, false);
+                bmp = (Image<Rgb24>)GapsAndJoins.DrawErrorSegments(bmp, errors, false);
             }
 
             return bmp;

@@ -5,7 +5,7 @@
 namespace AudioAnalysisTools.DSP
 {
     using System;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
 
     using StandardSpectrograms;
 

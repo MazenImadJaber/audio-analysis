@@ -6,13 +6,15 @@ namespace AudioAnalysisTools
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
     using Acoustics.Shared;
     using Indices;
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.ImageSharp.Processing;
     using TowseyLibrary;
 
     public static class FrommoltProject
@@ -81,7 +83,7 @@ namespace AudioAnalysisTools
                 FileInfo[] files = IndexMatrices.GetFilesInDirectories(subDirectories, fileMatch);
                 if (files.Length == 0)
                 {
-                    Bitmap gapImage = new Bitmap(defaultDayWidth, defaultDayHeight);
+                    Image<Rgb24> gapImage = new Image<Rgb24>(defaultDayWidth, defaultDayHeight);
                     Graphics g5 = Graphics.FromImage(gapImage);
                     g5.Clear(Color.Gray);
                     g5.DrawString("Day", stringFont, brush, new PointF(2, 5));
@@ -102,7 +104,7 @@ namespace AudioAnalysisTools
 
             Image combinedImage = ImageTools.CombineImagesInLine(list);
 
-            Bitmap labelImage1 = new Bitmap(combinedImage.Width, 24);
+            Image<Rgb24> labelImage1 = new Image<Rgb24>(combinedImage.Width, 24);
             Graphics g1 = Graphics.FromImage(labelImage1);
             g1.Clear(Color.Black);
             g1.DrawString(fileSuffix, stringFont, brush, new PointF(2, 2));
@@ -126,7 +128,7 @@ namespace AudioAnalysisTools
             //create spacer image
             int width = 1;
             int height = image.Height;
-            Bitmap spacerImage = new Bitmap(width, height);
+            Image<Rgb24> spacerImage = new Image<Rgb24>(width, height);
             Graphics g = Graphics.FromImage(spacerImage);
             g.Clear(Color.DarkGray);
 

@@ -27,7 +27,7 @@ namespace AnalysisPrograms
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
@@ -254,7 +254,7 @@ namespace AnalysisPrograms
 
                 int width = 70;
                 int height = image.Height;
-                var label = new Bitmap(width, height);
+                var label = new Image<Rgb24>(width, height);
                 var g1 = Graphics.FromImage(label);
                 g1.Clear(Color.Gray);
                 g1.DrawString(key, stringFont, Brushes.Black, new PointF(4, 30));
@@ -405,18 +405,18 @@ namespace AnalysisPrograms
             Color[] color = { Color.Blue, Color.Green, Color.Red, Color.Orange, Color.Purple };
             int labelYvalue = 3;
             int labelIndex = 0;
-            Bitmap ridges = null;
+            Image<Rgb24> ridges = null;
             Graphics g2 = null;
 
             foreach (string key in keys)
             {
-                Bitmap greyScaleImage = (Bitmap)cs1.DrawGreyscaleSpectrogramOfIndex(key);
+                Image<Rgb24> greyScaleImage = (Image<Rgb24>)cs1.DrawGreyscaleSpectrogramOfIndex(key);
                 var pixelWidth = greyScaleImage.Width;
 
                 int height = greyScaleImage.Height;
                 if (ridges == null)
                 {
-                    ridges = new Bitmap(pixelWidth, height);
+                    ridges = new Image<Rgb24>(pixelWidth, height);
                     g2 = Graphics.FromImage(ridges);
                     g2.Clear(Color.White);
                 }

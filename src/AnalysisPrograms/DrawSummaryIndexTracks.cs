@@ -8,7 +8,7 @@ namespace AnalysisPrograms
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.Data;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -93,7 +93,7 @@ namespace AnalysisPrograms
             // Convert summary indices to image
             string fileName = input.BaseName();
             string title = $"SOURCE:{fileName},   {Meta.OrganizationTag};  ";
-            Bitmap tracksImage = IndexDisplay.DrawImageOfSummaryIndexTracks(
+            Image<Rgb24> tracksImage = IndexDisplay.DrawImageOfSummaryIndexTracks(
                 input,
                 arguments.IndexPropertiesConfig.ToFileInfo(),
                 title,

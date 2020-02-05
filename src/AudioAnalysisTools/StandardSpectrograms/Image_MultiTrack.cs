@@ -1,4 +1,4 @@
-﻿// <copyright file="Image_MultiTrack.cs" company="QutEcoacoustics">
+// <copyright file="Image_MultiTrack.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
 
@@ -6,11 +6,12 @@ namespace AudioAnalysisTools.StandardSpectrograms
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Drawing.Imaging;
 
     using Acoustics.Shared;
-
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.ImageSharp.Processing;
     using TowseyLibrary;
 
     public class Image_MultiTrack : IDisposable
@@ -145,7 +146,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 return;
             }
 
-            image.Save(path, ImageFormat.Png);
+            image.Save(path);
         }
 
         /// <summary>
@@ -160,17 +161,17 @@ namespace AudioAnalysisTools.StandardSpectrograms
             var height = this.CalculateImageHeight();
 
             // set up a new image having the correct dimensions
-            var imageToReturn = new Bitmap(this.SonogramImage.Width, height, PixelFormat.Format32bppArgb);
+            var imageToReturn = new Image<Rgba32>(this.SonogramImage.Width, height, PixelFormat.Format32bppArgb);
 
             // need to do this before get Graphics because cannot PutPixels into Graphics object.
             if (this.SuperimposedRedTransparency != null)
             {
-                this.SonogramImage = this.OverlayRedTransparency((Bitmap)this.SonogramImage);
+                this.SonogramImage = this.OverlayRedTransparency((Image<Rgb24>)this.SonogramImage);
             }
 
             if (this.SuperimposedMatrix != null)
             {
-                this.SonogramImage = this.OverlayMatrix((Bitmap)this.SonogramImage);
+                this.SonogramImage = this.OverlayMatrix((Image<Rgb24>)this.SonogramImage);
             }
 
             // create new graphics canvas and add in the sonogram image
@@ -182,7 +183,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 // draw events first because their rectangles can cover other features
                 if (this.eventList != null)
                 {
-                    var hitImage = new Bitmap(imageToReturn.Width, height, PixelFormat.Format32bppArgb);
+                    var hitImage = new Image<Rgba32>(imageToReturn.Width, height, PixelFormat.Format32bppArgb);
 
                     //hitImage.MakeTransparent();
                     foreach (AcousticEvent e in this.eventList)
@@ -222,12 +223,12 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
                 if (this.SuperimposedRainbowTransparency != null)
                 {
-                    this.OverlayRainbowTransparency(g, (Bitmap)this.SonogramImage);
+                    this.OverlayRainbowTransparency(g, (Image<Rgb24>)this.SonogramImage);
                 }
 
                 if (this.SuperimposedDiscreteColorMatrix != null)
                 {
-                    this.OverlayDiscreteColorMatrix(g, (Bitmap)this.SonogramImage);
+                    this.OverlayDiscreteColorMatrix(g, (Image<Rgb24>)this.SonogramImage);
                 }
             }
 
@@ -255,10 +256,10 @@ namespace AudioAnalysisTools.StandardSpectrograms
             return totalHeight;
         }
 
-        public void DrawFreqHits(Graphics g)
+        public void DrawFreqHits(IImageProcessingContext g)
         {
             int L = this.FreqHits.Length;
-            Pen p1 = new Pen(Color.Red);
+            Pen p1 = new Pen(Color.Red, 1);
 
             for (int x = 0; x < L; x++)
             {
@@ -280,7 +281,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// superimposes a matrix of scores on top of a sonogram.
         /// Only draws lines on every second row so that the underling sonogram can be discerned
         /// </summary>
-        public void OverlayMatrix(Graphics g)
+        public void OverlayMatrix(IImageProcessingContext g)
         {
             //int paletteSize = 256;
             var pens = ImageTools.GetRedGradientPalette(); //size = 256
@@ -316,9 +317,9 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// superimposes a matrix of scores on top of a sonogram.
         /// Only draws lines on every second row so that the underling sonogram can be discerned
         /// </summary>
-        public Bitmap OverlayMatrix(Bitmap bmp)
+        public Image<Rgb24> OverlayMatrix(Image<Rgb24> bmp)
         {
-            Bitmap newBmp = (Bitmap)bmp.Clone();
+            Image<Rgb24> newBmp = (Image<Rgb24>)bmp.Clone();
 
             //int paletteSize = 256;
             var pens = ImageTools.GetRedGradientPalette(); //size = 256
@@ -353,9 +354,9 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// <summary>
         /// superimposes a matrix of scores on top of a sonogram.
         /// </summary>
-        public Bitmap OverlayRedTransparency(Bitmap bmp)
+        public Image<Rgb24> OverlayRedTransparency(Image<Rgb24> bmp)
         {
-            Bitmap newBmp = (Bitmap)bmp.Clone();
+            Image<Rgb24> newBmp = (Image<Rgb24>)bmp.Clone();
             int rows = this.SuperimposedRedTransparency.GetLength(0);
             int cols = this.SuperimposedRedTransparency.GetLength(1);
             int imageHt = this.SonogramImage.Height - 1; //subtract 1 because indices start at zero
@@ -387,7 +388,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// superimposes a matrix of scores on top of a sonogram. USES RAINBOW PALLETTE
         /// ASSUME MATRIX NORMALIZED IN [0,1]
         /// </summary>
-        public void OverlayRainbowTransparency(Graphics g, Bitmap bmp)
+        public void OverlayRainbowTransparency(IImageProcessingContext g, Image<Rgb24> bmp)
         {
             Color[] palette = { Color.Crimson, Color.Red, Color.Orange, Color.Yellow, Color.Lime, Color.Green, Color.Blue, Color.Indigo, Color.Violet, Color.Purple };
             int rows = this.SuperimposedRainbowTransparency.GetLength(0);
@@ -432,7 +433,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// superimposes a matrix of scores on top of a sonogram. USES RAINBOW PALLETTE
         /// ASSUME MATRIX consists of integers >=0;
         /// </summary>
-        private void OverlayDiscreteColorMatrix(Graphics g, Bitmap bmp)
+        private void OverlayDiscreteColorMatrix(Graphics g, Image<Rgb24> bmp)
         {
             int rows = this.SuperimposedDiscreteColorMatrix.GetLength(0);
             int cols = this.SuperimposedDiscreteColorMatrix.GetLength(1);

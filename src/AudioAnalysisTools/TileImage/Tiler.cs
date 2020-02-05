@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Tiler.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
@@ -9,7 +9,7 @@ namespace AudioAnalysisTools.TileImage
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Drawing;
+    using SixLabors.ImageSharp;
     using System.Drawing.Imaging;
     using System.IO;
     using System.Linq;
@@ -17,6 +17,9 @@ namespace AudioAnalysisTools.TileImage
     using Acoustics.Shared;
     using Acoustics.Shared.Contracts;
     using log4net;
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.ImageSharp.Processing;
+    using SixLabors.Primitives;
     using TowseyLibrary;
     using Zio;
 
@@ -206,13 +209,11 @@ namespace AudioAnalysisTools.TileImage
                         new Point(layerLeft, layerTop));
 
                     // make destination image
-                    var tileImage = new Bitmap(
+                    var tileImage = new Image<Rgba32>(
                         this.profile.TileWidth,
-                        this.profile.TileHeight,
-                        PixelFormat.Format32bppArgb);
+                        this.profile.TileHeight);
 
-                    using (Graphics tileGraphics = Graphics.FromImage(tileImage))
-                    {
+
                         var subsection = new Rectangle
                                              {
                                                  X = superTileLeft,
@@ -298,7 +299,7 @@ namespace AudioAnalysisTools.TileImage
                                     // paint a fraction from the previous image
                                     // here, we shift the co-ordinate system one-super-tile's width right
                                     sourceRect.X = sourceRect.X + width;
-                                    tileGraphics.DrawImage(previous.Image, destinationRect, sourceRect, GraphicsUnit.Pixel);
+                                    tileImage.DrawImage(previous.Image, destinationRect, sourceRect);
                                 }
                             }
                             else if (imageComponent.XBias == TileBias.Positive)
@@ -316,16 +317,16 @@ namespace AudioAnalysisTools.TileImage
                                     // paint a fraction from the next image
                                     // here, we shift the co-ordinate system one-super-tile's width left
                                     sourceRect.X = sourceRect.X - width;
-                                    tileGraphics.DrawImage(next.Image, destinationRect, sourceRect, GraphicsUnit.Pixel);
+                                    tileImage.DrawImage(next.Image, destinationRect, sourceRect);
                                 }
                             }
                             else
                             {
                                 // neutral
-                                tileGraphics.DrawImage(current.Image, destinationRect, sourceRect, GraphicsUnit.Pixel);
+                                tileImage.DrawImage(current.Image, destinationRect, sourceRect);
                             }
                         }
-                    }
+                    
 
                     // write tile to disk
                     UPath outputTilePath = this.output.Path / (name + "." + MediaTypes.ExtPng);
