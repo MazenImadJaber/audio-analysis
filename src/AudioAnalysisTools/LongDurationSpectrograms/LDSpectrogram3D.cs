@@ -27,8 +27,10 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
     using Indices;
     using log4net;
+    using SixLabors.Fonts;
     using SixLabors.ImageSharp.PixelFormats;
     using SixLabors.ImageSharp.Processing;
+    using SixLabors.Primitives;
     using StandardSpectrograms;
     using TowseyLibrary;
 
@@ -263,19 +265,21 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                 // de-demphasize the background small values
                 //MatrixTools.FilterBackgroundValues(matrix, this.BackgroundFilter);
 
-                var r = Convert.ToInt32(Math.Max(0, redValue * maxRgbValue));
-                var g = Convert.ToInt32(Math.Max(0, grnValue * maxRgbValue));
-                var b = Convert.ToInt32(Math.Max(0, bluValue * maxRgbValue));
-                var colour = Color.FromArgb(r, g, b);
-                image.SetPixel(col, row, colour);
+                var r = Convert.ToByte(Math.Max(0, redValue * maxRgbValue));
+                var g = Convert.ToByte(Math.Max(0, grnValue * maxRgbValue));
+                var b = Convert.ToByte(Math.Max(0, bluValue * maxRgbValue));
+                var colour = Color.FromRgb(r, g, b);
+                image[col, row] = colour;
             }
 
-            Graphics gr = Graphics.FromImage(image);
-            gr.DrawRectangle(new Pen(Color.DarkGray), 0, 0, image.Width - 1, image.Height - 1);
+            image.Mutate(gr =>
+            {
+                gr.DrawRectangle(new Pen(Color.DarkGray, 1), 0, 0, image.Width - 1, image.Height - 1);
+            });
             return image;
         }
 
-        public static Image Frame3DSpectrogram(Image image, string key, int value, int year, string colorMap, TimeSpan xInterval, int nyquistFreq, int unitValue, FileInfo sunriseSetData)
+        public static Image Frame3DSpectrogram(Image<Rgb24> image, string key, int value, int year, string colorMap, TimeSpan xInterval, int nyquistFreq, int unitValue, FileInfo sunriseSetData)
         {
             if (key == KeyDayOfYear)
             {
@@ -301,19 +305,21 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             return null;
         }
 
-        public static Image FrameSliceOf3DSpectrogram_DayOfYear(Image bmp1, Image titleBar, int year, int dayOfYear, TimeSpan xInterval, int herzValue, FileInfo sunriseSetData, int nyquistFreq)
+        public static Image FrameSliceOf3DSpectrogram_DayOfYear(Image<Rgb24> bmp1, Image<Rgb24> titleBar, int year, int dayOfYear, TimeSpan xInterval, int herzValue, FileInfo sunriseSetData, int nyquistFreq)
         {
             Image<Rgb24> suntrack = SunAndMoon.AddSunTrackToImage(bmp1.Width, sunriseSetData, year, dayOfYear);
 
-            Graphics g = Graphics.FromImage(bmp1);
-            Pen pen = new Pen(Color.White);
-            Font stringFont = new Font("Arial", 12);
+            bmp1.Mutate(g =>
+            {
+                Pen pen = new Pen(Color.White, 1);
+                var stringFont = SystemFonts.CreateFont("Arial", 12);
 
-            //Font stringFont = new Font("Tahoma", 9);
+                //Font stringFont = new Font("Tahoma", 9);
 
-            DateTime theDate = new DateTime(year, 1, 1).AddDays(dayOfYear - 1);
-            string dateString = $"{year} {DataTools.MonthNames[theDate.Month - 1]} {theDate.Day:d2}";
-            g.DrawString(dateString, stringFont, Brushes.Wheat, new PointF(10, 3));
+                DateTime theDate = new DateTime(year, 1, 1).AddDays(dayOfYear - 1);
+                string dateString = $"{year} {DataTools.MonthNames[theDate.Month - 1]} {theDate.Day:d2}";
+                g.DrawText(dateString, stringFont, Color.Wheat, new PointF(10, 3));
+            });
 
             TimeSpan xAxisPixelDuration = TimeSpan.FromSeconds(60);
             var minuteOffset = TimeSpan.Zero;
@@ -332,13 +338,15 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             var xAxisTicInterval = TimeSpan.FromMinutes(60); // assume 60 pixels per hour
             var timeScale24Hour = ImageTrack.DrawTimeTrack(fullDuration, minuteOffset, xAxisTicInterval, bmp1.Width, trackHeight, "hours");
 
-            var imageList = new List<Image>();
-            imageList.Add(titleBar);
-            imageList.Add(timeScale24Hour);
-            imageList.Add(suntrack);
-            imageList.Add(bmp1);
-            imageList.Add(timeScale24Hour);
-            Image compositeBmp = ImageTools.CombineImagesVertically(imageList.ToArray());
+            var imageList = new List<Image<Rgb24>>
+            {
+                titleBar,
+                timeScale24Hour,
+                suntrack,
+                bmp1,
+                timeScale24Hour
+            };
+            var compositeBmp = ImageTools.CombineImagesVertically(imageList);
 
             // trackHeight = compositeBmp.Height;
             // Image<Rgb24> timeScale12Months = ImageTrack.DrawYearScaleVertical(40, trackHeight);

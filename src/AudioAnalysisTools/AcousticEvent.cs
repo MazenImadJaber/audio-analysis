@@ -392,7 +392,7 @@ namespace AudioAnalysisTools
         /// Draws an event on the image. Uses the fields already set on the audio event to determine correct placement.
         /// Fields requireed to be set include: `FramesPerSecond`, `FreqBinWidth`.
         /// </summary>
-        public void DrawEvent(Image<Rgb24> sonogram)
+        public void DrawEvent(Image<Rgba32> sonogram)
         {
             this.DrawEvent(sonogram, this.FramesPerSecond, this.FreqBinWidth, sonogram.Height);
         }
@@ -400,7 +400,7 @@ namespace AudioAnalysisTools
         /// <summary>
         /// Draws an event on the image. Allows for custom specification of variables.
         /// </summary>
-        public void DrawEvent(Image<Rgb24> imageToReturn, double framesPerSecond, double freqBinWidth, int sonogramHeight)
+        public void DrawEvent(Image<Rgba32> imageToReturn, double framesPerSecond, double freqBinWidth, int sonogramHeight)
         {
             Contract.Requires(this.BorderColour != null);
             Contract.Requires(this.HitElements == null || (this.HitElements != null && this.HitColour != null));
@@ -476,7 +476,7 @@ namespace AudioAnalysisTools
                 row = bmp.Height - 1;
             }
 
-            bmp.SetPixel(col, row, colour);
+            bmp[col, row] = colour;
         }
 
         /// <summary>

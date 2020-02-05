@@ -62,5 +62,7 @@
     <PackageReference Include="Accord" Version="3.8.2-alpha" />
     <PackageReference Include="Accord.MachineLearning" Version="3.8.2-alpha" />
     <PackageReference Include="Accord.Math" Version="3.8.2-alpha" />
+    <PackageReference Include="Equ" Version="2.2.0" />
+    <PackageReference Include="morelinq" Version="3.3.2" />
   </ItemGroup>
 </Project>

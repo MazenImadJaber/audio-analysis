@@ -47,8 +47,10 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
     using DSP;
     using Indices;
     using log4net;
+    using SixLabors.Fonts;
     using SixLabors.ImageSharp.PixelFormats;
     using SixLabors.ImageSharp.Processing;
+    using SixLabors.Primitives;
     using StandardSpectrograms;
     using TowseyLibrary;
 
@@ -843,10 +845,10 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             int x2 = width - stringSize.ToSize().Width - 2;
             if (x2 > x)
             {
-                g.DrawString(text, stringFont, Brushes.Wheat, new PointF(x2, 3));
+                g.DrawString(text, stringFont, Color.Wheat, new PointF(x2, 3));
             }
 
-            g.DrawLine(new Pen(Color.Gray), 0, 0, width, 0); //draw upper boundary
+            g.DrawLine(new Pen(Color.Gray, 1), 0, 0, width, 0); //draw upper boundary
 
             // g.DrawLine(pen, duration + 1, 0, trackWidth, 0);
             return bmp;
@@ -867,44 +869,47 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             const int trackHeight = 20;
             var recordingStartDate = default(DateTimeOffset);
             var timeBmp = ImageTrack.DrawTimeTrack(fullDuration, recordingStartDate, bmp.Width, trackHeight);
-            var array = new Image[2];
+            var array = new Image<Rgb24>[2];
             array[0] = bmp;
             array[1] = timeBmp;
             var returnImage = ImageTools.CombineImagesVertically(array);
             return returnImage;
         }
 
-        public static Image DrawTitleBarOfFalseColourSpectrogram(string title, int width)
+        public static Image<Rgb24> DrawTitleBarOfFalseColourSpectrogram(string title, int width)
         {
             var bmp = new Image<Rgb24>(width, SpectrogramConstants.HEIGHT_OF_TITLE_BAR);
-            var g = Graphics.FromImage(bmp);
-            g.Clear(Color.Black);
-
-            // Font stringFont = new Font("Tahoma", 9);
-            var stringFont = new Font("Arial", 9, FontStyle.Bold);
-
-            int x = 2;
-            g.DrawString(title, stringFont, Brushes.White, new PointF(x, 3));
-
-            var stringSize = g.MeasureString(title, stringFont);
-            x += stringSize.ToSize().Width + 300;
-
-            //g.DrawString(text, stringFont, Brushes.Wheat, new PointF(X, 3));
-
-            // Draw colour chart on title bar. Discontinued this because not helpful.
-            //var colourChart = LDSpectrogramRGB.DrawColourScale(width, SpectrogramConstants.HEIGHT_OF_TITLE_BAR - 2);
-            //g.DrawImage(colourChart, X, 1);
-
-            var text = $"SCALE:(time x kHz)        {Meta.OrganizationTag}";
-            stringSize = g.MeasureString(text, stringFont);
-            int x2 = width - stringSize.ToSize().Width - 2;
-            if (x2 > x)
+            bmp.Mutate(g =>
             {
-                g.DrawString(text, stringFont, Brushes.Wheat, new PointF(x2, 3));
-            }
+                g.Clear(Color.Black);
 
-            // g.DrawLine(pen, duration + 1, 0, trackWidth, 0);
-            g.DrawLine(new Pen(Color.Gray), 0, 0, width, 0); //draw upper boundary
+                // Font stringFont = new Font("Tahoma", 9);
+                var stringFont = SystemFonts.CreateFont("Arial", 9, FontStyle.Bold);
+
+                int x = 2;
+                g.DrawText(title, stringFont, Color.White, new PointF(x, 3));
+
+                var stringSize = TextMeasurer.Measure(title, new RendererOptions(stringFont));
+                x += stringSize.Width + 300;
+
+                //g.DrawString(text, stringFont, Brushes.Wheat, new PointF(X, 3));
+
+                // Draw colour chart on title bar. Discontinued this because not helpful.
+                //var colourChart = LDSpectrogramRGB.DrawColourScale(width, SpectrogramConstants.HEIGHT_OF_TITLE_BAR - 2);
+                //g.DrawImage(colourChart, X, 1);
+
+                var text = $"SCALE:(time x kHz)        {Meta.OrganizationTag}";
+                stringSize = g.MeasureString(text, stringFont);
+                int x2 = width - stringSize.ToSize().Width - 2;
+                if (x2 > x)
+                {
+                    g.DrawString(text, stringFont, Brushes.Wheat, new PointF(x2, 3));
+                }
+
+                // g.DrawLine(pen, duration + 1, 0, trackWidth, 0);
+                g.DrawLine(new Pen(Color.Gray), 0, 0, width, 0); //draw upper boundary
+            });
+
             return bmp;
         }
 

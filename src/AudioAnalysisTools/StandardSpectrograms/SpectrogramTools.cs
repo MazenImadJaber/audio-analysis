@@ -15,7 +15,6 @@ namespace AudioAnalysisTools.StandardSpectrograms
     using System.IO;
     using Acoustics.Shared;
     using AudioAnalysisTools.WavTools;
-    using ColorMine.ColorSpaces;
     using DSP;
     using LongDurationSpectrograms;
     using SixLabors.ImageSharp.PixelFormats;

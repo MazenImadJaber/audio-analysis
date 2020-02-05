@@ -161,7 +161,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             var height = this.CalculateImageHeight();
 
             // set up a new image having the correct dimensions
-            var imageToReturn = new Image<Rgba32>(this.SonogramImage.Width, height, PixelFormat.Format32bppArgb);
+            var imageToReturn = new Image<Rgba32>(this.SonogramImage.Width, height);
 
             // need to do this before get Graphics because cannot PutPixels into Graphics object.
             if (this.SuperimposedRedTransparency != null)
@@ -175,20 +175,19 @@ namespace AudioAnalysisTools.StandardSpectrograms
             }
 
             // create new graphics canvas and add in the sonogram image
-            using (var g = Graphics.FromImage(imageToReturn))
+            imageToReturn.Mutate(g =>
             {
-                ////g.DrawImage(this.SonoImage, 0, 0);          // WARNING ### THIS CALL DID NOT WORK THEREFORE
-                GraphicsSegmented.Draw(g, this.SonogramImage);  // USE THIS CALL INSTEAD.
+                g.DrawImage(this.SonogramImage, 1f);
 
                 // draw events first because their rectangles can cover other features
                 if (this.eventList != null)
                 {
-                    var hitImage = new Image<Rgba32>(imageToReturn.Width, height, PixelFormat.Format32bppArgb);
+                    var hitImage = new Image<Rgba32>(imageToReturn.Width, height);
 
                     //hitImage.MakeTransparent();
                     foreach (AcousticEvent e in this.eventList)
                     {
-                        e.DrawEvent(g, hitImage, this.framesPerSecond, this.freqBinWidth, this.SonogramImage.Height);
+                        e.DrawEvent(hitImage, this.framesPerSecond, this.freqBinWidth, this.SonogramImage.Height);
                     }
 
                     g.DrawImage(hitImage, 0, 0);
@@ -228,9 +227,9 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
                 if (this.SuperimposedDiscreteColorMatrix != null)
                 {
-                    this.OverlayDiscreteColorMatrix(g, (Image<Rgb24>)this.SonogramImage);
+                    this.OverlayDiscreteColorMatrix(g);
                 }
-            }
+            });
 
             // now add tracks to the image
             int offset = this.SonogramImage.Height;
@@ -344,7 +343,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                     //if (penID >= paletteSize) penID = paletteSize - 1;
                     //g.DrawLine(pens[penID], r, imageHt - c, r + 1, imageHt - c);
                     //g.DrawLine(new Pen(Color.Red), r, imageHt - c, r + 1, imageHt - c);
-                    newBmp.SetPixel(r, imageHt - c, Color.Red);
+                    newBmp[r, imageHt - c] = Color.Red;
                 }
             }
 
@@ -371,13 +370,13 @@ namespace AudioAnalysisTools.StandardSpectrograms
                         continue;
                     }
 
-                    Color pixel = bmp.GetPixel(r, imageHt - c);
+                    var pixel = bmp[r, imageHt - c];
                     if (pixel.R == 255)
                     {
                         continue; // white
                     }
 
-                    newBmp.SetPixel(r, imageHt - c, Color.FromArgb(255, pixel.G, pixel.B));
+                    newBmp[r, imageHt - c] = Color.FromRgb(255, pixel.G, pixel.B);
                 }
             }
 
@@ -406,7 +405,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                         continue; //nothing to show
                     }
 
-                    Color pixel = bmp.GetPixel(r, imageHt - c);
+                    var pixel = bmp[r, imageHt - c];
                     if (pixel.R > 250)
                     {
                         continue; //by-pass white
@@ -418,12 +417,12 @@ namespace AudioAnalysisTools.StandardSpectrograms
                         index = 9;
                     }
 
-                    var newColor = palette[index];
+                    var newColor = palette[index].ToPixel<Rgb24>();
                     double factor = pixel.R / (255 * 1.2);  // 1.2 is a color intensity adjustment
-                    int red = (int)Math.Floor(newColor.R + ((255 - newColor.R) * factor));
-                    int grn = (int)Math.Floor(newColor.G + ((255 - newColor.G) * factor));
-                    int blu = (int)Math.Floor(newColor.B + ((255 - newColor.B) * factor));
-                    g.DrawLine(new Pen(Color.FromArgb(red, grn, blu)), r, imageHt - c, r + 1, imageHt - c);
+                    var red = (byte)Math.Floor(newColor.R + ((255 - newColor.R) * factor));
+                    var grn = (byte)Math.Floor(newColor.G + ((255 - newColor.G) * factor));
+                    var blu = (byte)Math.Floor(newColor.B + ((255 - newColor.B) * factor));
+                    g.DrawLine(new Pen(Color.FromRgb(red, grn, blu), 1), r, imageHt - c, r + 1, imageHt - c);
                     c++; //every second column
                 }
             }
@@ -433,7 +432,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// superimposes a matrix of scores on top of a sonogram. USES RAINBOW PALLETTE
         /// ASSUME MATRIX consists of integers >=0;
         /// </summary>
-        private void OverlayDiscreteColorMatrix(Graphics g, Image<Rgb24> bmp)
+        private void OverlayDiscreteColorMatrix(IImageProcessingContext g)
         {
             int rows = this.SuperimposedDiscreteColorMatrix.GetLength(0);
             int cols = this.SuperimposedDiscreteColorMatrix.GetLength(1);
@@ -470,7 +469,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                     //int grn = (int)Math.Floor(newColor.G + ((255 - newColor.G) * factor));
                     //int blu = (int)Math.Floor(newColor.B + ((255 - newColor.B) * factor));
                     //g.DrawLine(new Pen(Color.FromArgb(red, grn, blu)), r, imageHt - c, r + 1, imageHt - c);
-                    g.DrawLine(new Pen(newColor), r, imageHt - c, r + 1, imageHt - c);
+                    g.DrawLine(new Pen(newColor, 1), r, imageHt - c, r + 1, imageHt - c);
                 }
             }
         } //OverlayDiscreteColorMatrix()

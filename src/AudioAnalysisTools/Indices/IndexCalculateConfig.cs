@@ -12,6 +12,7 @@ namespace AudioAnalysisTools.Indices
     using Fasterflect;
     using log4net;
     using Newtonsoft.Json;
+    using ObjectCloner.Extensions;
     using YamlDotNet.Serialization;
 
     /// <summary>

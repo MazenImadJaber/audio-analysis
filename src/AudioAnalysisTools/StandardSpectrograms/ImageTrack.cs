@@ -9,8 +9,10 @@ namespace AudioAnalysisTools.StandardSpectrograms
     using System.Linq;
     using AudioAnalysisTools.Indices;
     using AudioAnalysisTools.WavTools;
+    using SixLabors.Fonts;
     using SixLabors.ImageSharp.PixelFormats;
     using SixLabors.ImageSharp.Processing;
+    using SixLabors.Primitives;
     using TowseyLibrary;
 
     public enum TrackType
@@ -259,8 +261,10 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// adds title to bottom of bmp which is assume to be a track.
         public Image<Rgb24> DrawTrackTitle(Image<Rgb24> bmp, string title)
         {
-            Graphics g = Graphics.FromImage(bmp);
-            g.DrawString(title, new Font("Tahoma", 8), Brushes.Black, new PointF(10, bmp.Height - 2));
+            bmp.Mutate(g =>
+            {
+                g.DrawText(title, SystemFonts.CreateFont("Tahoma", 8), Color.Black, new PointF(10, bmp.Height - 2));
+            });
             return bmp;
         }
 
@@ -298,10 +302,10 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
                 for (int z = 0; z < this.height; z++)
                 {
-                    bmp.SetPixel(x, this.topOffset + z, col);  //add in hits
+                    bmp[x, this.topOffset + z] = col;  //add in hits
                 }
 
-                bmp.SetPixel(x, bottom, Color.Black);
+                bmp[x, bottom] = Color.Black;
             }
 
             return bmp;
@@ -311,14 +315,14 @@ namespace AudioAnalysisTools.StandardSpectrograms
         {
             this.DrawScoreArrayTrack(bmp);
             int length = bmp.Width;
-            Graphics g = Graphics.FromImage(bmp);
+            bmp.Mutate(g =>
+            {
+                var font = SystemFonts.CreateFont("Arial", 10);
+                g.DrawText(this.Name, font, Color.Red, new PointF(10, this.topOffset));
+                g.DrawText(this.Name, font, Color.Red, new PointF(length / 2, this.topOffset));
+                g.DrawText(this.Name, font, Color.Red, new PointF(length - 80, this.topOffset));
+            });
 
-            //var font = new Font("Tahoma", 8);
-            var family = new FontFamily("Arial");
-            var font = new Font(family, 10, FontStyle.Regular, GraphicsUnit.Pixel);
-            g.DrawString(this.Name, font, Brushes.Red, new PointF(10, this.topOffset));
-            g.DrawString(this.Name, font, Brushes.Red, new PointF(length / 2, this.topOffset));
-            g.DrawString(this.Name, font, Brushes.Red, new PointF(length - 80, this.topOffset));
             return bmp;
         }
 
@@ -343,7 +347,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 subSample = 1;
             }
 
-            Color gray = Color.FromArgb(235, 235, 235); // use as background
+            Color gray = Color.FromRgb(235, 235, 235); // use as background
             int baseLine = this.topOffset + this.height - 2;
 
             //int length = (bmpWidth <= doubleData.Length) ? bmpWidth : doubleData.Length;
@@ -390,10 +394,10 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
                 for (int z = id; z < this.height; z++)
                 {
-                    bmp.SetPixel(w, this.topOffset + z, Color.Black); // draw the score bar
+                    bmp[w, this.topOffset + z] = Color.Black; // draw the score bar
                 }
 
-                bmp.SetPixel(w, baseLine, Color.Black); // draw base line
+                bmp[w, baseLine] = Color.Black; // draw base line
             }
 
             //add in horizontal threshold significance line
@@ -411,7 +415,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             for (int x = 0; x < bmp.Width; x++)
             {
-                bmp.SetPixel(x, this.topOffset + lineID, Color.Lime);
+                bmp[x, this.topOffset + lineID] = Color.Lime;
             }
 
             return bmp;
@@ -440,7 +444,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 subSample = 13;
             }
 
-            Color gray = Color.FromArgb(235, 235, 235); // use as background
+            Color gray = Color.FromRgb(235, 235, 235); // use as background
             int baseLine = this.topOffset + this.height - 2;
 
             //int length = (bmpWidth <= doubleData.Length) ? bmpWidth : doubleData.Length;
@@ -472,15 +476,15 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 //paint white and leave a black vertical histogram bar
                 for (int z = 0; z < id; z++)
                 {
-                    bmp.SetPixel(w, this.topOffset + z, gray); // background
+                    bmp[w, this.topOffset + z] = gray; // background
                 }
 
                 for (int z = id; z < this.height; z++)
                 {
-                    bmp.SetPixel(w, this.topOffset + z, Color.Black); // draw the score bar
+                    bmp[w, this.topOffset + z] = Color.Black; // draw the score bar
                 }
 
-                bmp.SetPixel(w, baseLine, Color.Black); // draw base line
+                bmp[w, baseLine] = Color.Black; // draw base line
             }
 
             //add in horizontal threshold significance line
@@ -498,7 +502,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             for (int x = 0; x < bmp.Width; x++)
             {
-                bmp.SetPixel(x, this.topOffset + lineID, Color.Lime);
+                bmp[x, this.topOffset + lineID] = Color.Lime;
             }
 
             return bmp;
@@ -546,12 +550,12 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 //paint white and leave a black vertical histogram bar
                 for (int z = 0; z < id; z++)
                 {
-                    bmp.SetPixel(x, this.topOffset + z, white);
+                    bmp[x, this.topOffset + z]  = white;
                 }
 
                 for (int z = id; z < this.Height; z++)
                 {
-                    bmp.SetPixel(x, this.topOffset + z, TrackColors[maxIndex + 15]);
+                    bmp[x, this.topOffset + z] = TrackColors[maxIndex + 15];
                 }
             }
 
@@ -565,7 +569,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             int lineID = (int)(this.Height * (1 - (this.ScoreThreshold / max)));
             for (int x = 0; x < bmpWidth; x++)
             {
-                bmp.SetPixel(x, this.topOffset + lineID, gray);
+                bmp[x, this.topOffset + lineID] = gray;
             }
 
             return bmp;
@@ -579,7 +583,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         public Image<Rgb24> DrawWaveEnvelopeTrack(Image<Rgb24> bmp)
         {
             int halfHeight = this.height / 2;
-            Color c = Color.FromArgb(10, 200, 255);
+            Color c = Color.FromRgb(10, 200, 255);
 
             for (int w = 0; w < bmp.Width; w++)
             {
@@ -589,22 +593,22 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 int maxID = halfHeight + (int)Math.Round(this.doubleMatrix[1, w] * halfHeight) - 1;
                 for (int z = minID; z <= maxID; z++)
                 {
-                    bmp.SetPixel(w, this.bottomOffset - z, c);
+                    bmp[w, this.bottomOffset - z] = c;
                 }
 
-                bmp.SetPixel(w, this.topOffset + halfHeight, c); //set zero line in case it was missed
+                bmp[w, this.topOffset + halfHeight] = c; //set zero line in case it was missed
                 if (this.doubleMatrix[0, w] < -0.99)
                 {
-                    bmp.SetPixel(w, this.bottomOffset - 1, Color.OrangeRed);
-                    bmp.SetPixel(w, this.bottomOffset - 2, Color.OrangeRed);
-                    bmp.SetPixel(w, this.bottomOffset - 3, Color.OrangeRed);
+                    bmp[w, this.bottomOffset - 1] = Color.OrangeRed;
+                    bmp[w, this.bottomOffset - 2] = Color.OrangeRed;
+                    bmp[w, this.bottomOffset - 3] = Color.OrangeRed;
                 }
                 else
                     if (this.doubleMatrix[1, w] > 0.99)
                     {
-                        bmp.SetPixel(w, this.topOffset, Color.OrangeRed);
-                        bmp.SetPixel(w, this.topOffset + 1, Color.OrangeRed);
-                        bmp.SetPixel(w, this.topOffset + 2, Color.OrangeRed);
+                        bmp[w, this.topOffset] = Color.OrangeRed;
+                        bmp[w, this.topOffset + 1] = Color.OrangeRed;
+                        bmp[w, this.topOffset + 2] = Color.OrangeRed;
                     }
 
                 //bmp.SetPixel(w, this.topOffset, Color.OrangeRed);
@@ -625,8 +629,8 @@ namespace AudioAnalysisTools.StandardSpectrograms
             int width = bmp.Width;
 
             var timeTrack = DrawTimeTrack(this.timeSpan, width);
-            Graphics g = Graphics.FromImage(bmp);
-            g.DrawImage(timeTrack, 0, this.topOffset);
+            bmp.Mutate(g => { g.DrawImage(timeTrack, 0, this.topOffset); });
+
             return bmp;
         }
 
@@ -643,16 +647,16 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 return bmp;
             }
 
-            Graphics g = Graphics.FromImage(bmp);
-            g.DrawImage(track, 0, this.topOffset);
+            bmp.Mutate(g => { g.DrawImage(track, 0, this.topOffset); });
+
             return bmp;
         }
 
         public Image<Rgb24> DrawDecibelTrack(Image<Rgb24> bmp)
         {
             Image<Rgb24> track = DrawDecibelTrack(this.doubleData, bmp.Width, this.SegmentationThreshold_k1, this.SegmentationThreshold_k2);
-            Graphics g = Graphics.FromImage(bmp);
-            g.DrawImage(track, 0, this.topOffset);
+            bmp.Mutate(g => { g.DrawImage(track, 0, this.topOffset); });
+
             return bmp;
         }
 
@@ -678,7 +682,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         {
             int height = DefaultHeight;
             int halfHeight = DefaultHeight / 2;
-            Color colour = Color.FromArgb(10, 200, 255); // pale blue
+            Color colour = Color.FromRgb(10, 200, 255); // pale blue
             int width = envelope.GetLength(1);
             var bmp = new Image<Rgb24>(width, height);
 
@@ -690,29 +694,29 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 int maxID = halfHeight + (int)Math.Round(envelope[1, w] * halfHeight) - 1;
                 for (int z = minID; z <= maxID; z++)
                 {
-                    bmp.SetPixel(w, height - z - 1, colour);
+                    bmp[w, height - z - 1] = colour;
                 }
 
                 // set zero line in case it was missed
-                bmp.SetPixel(w, halfHeight, colour);
+                bmp[w, halfHeight] = colour;
 
                 // if clipped values
                 if (envelope[0, w] < -0.99)
                 {
-                    bmp.SetPixel(w, height - 1, Color.OrangeRed);
-                    bmp.SetPixel(w, height - 2, Color.OrangeRed);
-                    bmp.SetPixel(w, height - 3, Color.OrangeRed);
+                    bmp[w, height - 1] = Color.OrangeRed;
+                    bmp[w, height - 2] = Color.OrangeRed;
+                    bmp[w, height - 3] = Color.OrangeRed;
                 }
                 else
                     if (envelope[1, w] > 0.99)
                     {
-                        bmp.SetPixel(w, 0, Color.OrangeRed);
-                        bmp.SetPixel(w, 1, Color.OrangeRed);
-                        bmp.SetPixel(w, 2, Color.OrangeRed);
+                        bmp[w, 0] = Color.OrangeRed;
+                        bmp[w, 1] = Color.OrangeRed;
+                        bmp[w, 2] = Color.OrangeRed;
                     }
 
-                //bmp.SetPixel(w, this.topOffset, Color.OrangeRed);
-                //bmp.SetPixel(w, this.bottomOffset - 1, Color.OrangeRed);
+                //bmp[w, this.topOffset, Color.OrangeRed);
+                //bmp[w, this.bottomOffset - 1, Color.OrangeRed);
             }
 
             return bmp;
@@ -731,8 +735,9 @@ namespace AudioAnalysisTools.StandardSpectrograms
             }
 
             var bmp = new Image<Rgb24>(imageWidth, DefaultHeight);
-            Graphics g = Graphics.FromImage(bmp);
-            g.FillRectangle(new SolidBrush(Color.White), 0, 0, imageWidth, DefaultHeight);
+            bmp.Mutate(g => {
+                g.FillRectangle(new SolidBrush(Color.White), 0, 0, imageWidth, DefaultHeight);
+            });
 
             for (int w = 0; w < imageWidth; w++)
             {
@@ -765,7 +770,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 //for (int z = 0; z < id; z++) bmp.SetPixel(w, z, Color.White); // draw bar by drawing in white backgorund
                 for (int z = id; z < DefaultHeight; z++)
                 {
-                    bmp.SetPixel(w, z, Color.Black);
+                    bmp[w, z] = Color.Black;
                 }
             }
 
@@ -798,11 +803,14 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 y2 = bmp.Height - 1;
             }
 
-            Pen orangePen = new Pen(Color.Orange);
-            Pen limePen = new Pen(Color.Lime);
+            Pen orangePen = new Pen(Color.Orange, 1);
+            Pen limePen = new Pen(Color.Lime, 1);
 
-            g.DrawLine(orangePen, 0, y1, imageWidth, y1); //threshold lines
-            g.DrawLine(limePen,  0, y2, imageWidth, y2); //threshold lines
+            bmp.Mutate(g =>
+            {
+                g.DrawLine(orangePen, 0, y1, imageWidth, y1); //threshold lines
+                g.DrawLine(limePen, 0, y2, imageWidth, y2); //threshold lines
+            });
 
             return bmp;
         }
@@ -842,16 +850,18 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 }
 
                 Color col = stateColors[stateData[location]];
-                stateBmp.SetPixel(x, 0, col);
-                stateBmp.SetPixel(x, 1, col);
-                stateBmp.SetPixel(x, 2, col);
-                stateBmp.SetPixel(x, 3, col);
+                stateBmp[x, 0] = col;
+                stateBmp[x, 1] = col;
+                stateBmp[x, 2] = col;
+                stateBmp[x, 3] = col;
             }
 
             // surround the whole by a frame
-            var g = Graphics.FromImage(segmentBmp);
-            g.DrawImage(stateBmp, 0, 1);
-            g.DrawRectangle(new Pen(Color.Black), 0, 0, imageWidth, DefaultHeight);
+            segmentBmp.Mutate(g => {
+                g.DrawImage(stateBmp, 0, 1);
+                g.DrawRectangle(new Pen(Color.Black, 1), 0, 0, imageWidth, DefaultHeight);
+            });
+
             return segmentBmp;
         }
 
@@ -980,14 +990,16 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 Color col = grayScale[c];
                 for (int y = 0; y < trackHeight; y++)
                 {
-                    bmp.SetPixel(x, yOffset + y, col);
+                    bmp[x, yOffset + y] = col;
                 }
 
-                bmp.SetPixel(x, yOffset, grayScale[0]); //draw upper boundary
+                bmp[x, yOffset] = grayScale[0]; //draw upper boundary
             }//end over all pixels
 
-            Graphics g = Graphics.FromImage(bmp);
-            g.DrawString(title, new Font("Tahoma", 8), Brushes.White, new PointF(imageWidth + 5, yOffset));
+            bmp.Mutate(g =>
+            {
+                g.DrawText(title, SystemFonts.CreateFont("Arial", 10), Color.White, new PointF(imageWidth + 5, yOffset));
+            });
         }
 
         /// <summary>
@@ -1024,14 +1036,17 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 Color col = grayScale[c];
                 for (int y = 0; y < trackHeight; y++)
                 {
-                    bmp.SetPixel(x, y, col);
+                    bmp[x, y] = col;
                 }
 
-                bmp.SetPixel(x, 0, grayScale[0]); //draw upper boundary
+                bmp[x, 0] = grayScale[0]; //draw upper boundary
             }//end over all pixels
 
-            Graphics g = Graphics.FromImage(bmp);
-            g.DrawString(title, new Font("Tahoma", 8), Brushes.White, new PointF(imageWidth + 5, 0));
+            bmp.Mutate(g =>
+            {
+                g.DrawText(title, SystemFonts.CreateFont("Tahoma", 8), Color.White, new PointF(imageWidth + 5, 0));
+            });
+
             return bmp;
         }
 
@@ -1052,8 +1067,10 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             //int imageWidth = array.Length;
             Image<Rgb24> bmp = new Image<Rgb24>(trackWidth, trackHeight);
-            Graphics g = Graphics.FromImage(bmp);
-            g.Clear(grayScale[240]);
+            bmp.Mutate(g => {
+                g.Clear(grayScale[240]);
+            });
+
             for (int i = 0; i < array.Length; i++) //for pixels in the line
             {
                 int x = (int)order[i];
@@ -1066,16 +1083,19 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 int barHeight = (int)Math.Round(value * trackHeight);
                 for (int y = 0; y < barHeight; y++)
                 {
-                    bmp.SetPixel(x, trackHeight - y - 1, Color.Black);
+                    bmp[x, trackHeight - y - 1] = Color.Black;
                 }
 
-                bmp.SetPixel(x, 0, Color.Gray); //draw upper boundary
+                bmp[x, 0] = Color.Gray; //draw upper boundary
             }//end over all pixels
 
             int endWidth = trackWidth - array.Length;
-            var font = new Font("Arial", 9.0f, FontStyle.Regular);
-            g.FillRectangle(Brushes.Black, array.Length + 1, 0, endWidth, trackHeight);
-            g.DrawString(title, font, Brushes.White, new PointF(array.Length + 5, 2));
+            var font = SystemFonts.CreateFont("Arial", 9);
+            bmp.Mutate(g =>
+            {
+                g.FillRectangle(new SolidBrush(Color.Black), array.Length + 1, 0, endWidth, trackHeight);
+                g.DrawText(title, font, Color.White, new PointF(array.Length + 5, 2));
+            });
             return bmp;
         }
 
@@ -1091,8 +1111,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         {
             Color[] colorScale = { Color.LightGray, Color.Gray, Color.Orange, Color.Red, Color.Purple };
             Image<Rgb24> bmp = new Image<Rgb24>(trackWidth, trackHeight);
-            Graphics g = Graphics.FromImage(bmp);
-            g.Clear(Color.FromArgb(240, 240, 240));
+            bmp.Mutate(g => { g.Clear(Color.FromRgb(240, 240, 240)); });
 
             //double range = maxVal - minVal;
             for (int i = 0; i < array.Length; i++) //for pixels in the line
@@ -1106,16 +1125,20 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 int colourIndex = (int)Math.Floor(value * colorScale.Length * 0.99);
                 for (int y = 0; y < barHeight; y++)
                 {
-                    bmp.SetPixel(x, trackHeight - y - 1, colorScale[colourIndex]);
+                    bmp[x, trackHeight - y - 1] = colorScale[colourIndex];
                 }
 
-                bmp.SetPixel(x, 0, Color.Gray); //draw upper boundary
+                bmp[x, 0] = Color.Gray; //draw upper boundary
             }//end over all pixels
 
             int endWidth = trackWidth - array.Length;
-            var font = new Font("Arial", 9.0f, FontStyle.Regular);
-            g.FillRectangle(Brushes.Black, array.Length + 1, 0, endWidth, trackHeight);
-            g.DrawString(title, font, Brushes.White, new PointF(array.Length + 5, 2));
+            var font = SystemFonts.CreateFont("Arial", 9);
+            bmp.Mutate(g =>
+            {
+                g.FillRectangle(Brushes.Solid(Color.Black), array.Length + 1, 0, endWidth, trackHeight);
+                g.DrawText(title, font, Color.White, new PointF(array.Length + 5, 2));
+            });
+
             return bmp;
         }
 
@@ -1140,15 +1163,17 @@ namespace AudioAnalysisTools.StandardSpectrograms
         public static Image<Rgb24> DrawTitleTrack(int trackWidth, int trackHeight, string title)
         {
             Image<Rgb24> bmp = new Image<Rgb24>(trackWidth, trackHeight);
-            Graphics g = Graphics.FromImage(bmp);
-            g.Clear(Color.Black);
-            Pen pen = new Pen(Color.White);
+            bmp.Mutate(g =>
+            {
+                g.Clear(Color.Black);
+                Pen pen = new Pen(Color.White, 1);
 
-            g.DrawLine(new Pen(Color.Gray), 0, 0, trackWidth, 0); //draw upper boundary
+                g.DrawLine(new Pen(Color.Gray, 1), 0, 0, trackWidth, 0); //draw upper boundary
 
-            //g.DrawLine(pen, duration + 1, 0, trackWidth, 0);
-
-            g.DrawString(title, new Font("Tahoma", 9), Brushes.Wheat, new PointF(4, 3));
+                //g.DrawLine(pen, duration + 1, 0, trackWidth, 0);
+                
+                g.DrawText(title, SystemFonts.CreateFont("Tahoma", 9), Color.Wheat, new PointF(4, 3));
+            });
             return bmp;
         }
 
@@ -1178,8 +1203,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             DateTime startDate = ((DateTimeOffset)dateTime).DateTime.Date;
 
             Image<Rgb24> bmp = new Image<Rgb24>(trackWidth, trackHeight);
-            Graphics g = Graphics.FromImage(bmp);
-            g.Clear(Color.Black);
+            bmp.Mutate(g => { g.Clear(Color.Black); });
 
             double xAxisPixelDurationInMilliseconds = fullDuration.TotalMilliseconds / trackWidth;
 
@@ -1204,62 +1228,67 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             TimeSpan xAxisTicInterval = CalculateGridInterval(fullDuration, trackWidth);
 
-            Pen whitePen = new Pen(Color.White);
-            Pen grayPen = new Pen(Color.Gray);
-            Font stringFont = new Font("Arial", 8);
+            Pen whitePen = new Pen(Color.White, 1);
+            Pen grayPen = new Pen(Color.Gray, 1);
+            Font stringFont = SystemFonts.CreateFont("Arial", 10);
 
             int rows = bmp.Height;
             int cols = bmp.Width;
 
             // for columns, draw in X-axis lines
-            int xPixelInterval = (int)Math.Round(xAxisTicInterval.TotalMilliseconds / xAxisPixelDurationInMilliseconds);
-            int halfInterval = xPixelInterval / 2;
-            int halfheight = trackHeight / 3;
-            for (int x = 0; x < cols - pixelStartOffset; x++)
+            bmp.Mutate(g =>
             {
-                if (x % xPixelInterval == 0)
+                int xPixelInterval =
+                    (int)Math.Round(xAxisTicInterval.TotalMilliseconds / xAxisPixelDurationInMilliseconds);
+                int halfInterval = xPixelInterval / 2;
+                int halfheight = trackHeight / 3;
+                for (int x = 0; x < cols - pixelStartOffset; x++)
                 {
-                    int tickPosition = x + pixelStartOffset;
-                    g.DrawLine(whitePen, tickPosition, 0, tickPosition, trackHeight);
-                    g.DrawLine(whitePen, tickPosition + halfInterval, 0, tickPosition + halfInterval, halfheight);
-
-                    TimeSpan elapsedTimeSpan = TimeSpan.FromMilliseconds(xAxisPixelDurationInMilliseconds * tickPosition);
-
-                    TimeSpan absoluteTS = roundedStartTime + elapsedTimeSpan;
-                    TimeSpan roundedTimeSpan = TimeSpan.FromSeconds(Math.Round(absoluteTS.TotalSeconds));
-                    string timeStr = "0000";
-                    if (xAxisPixelDurationInMilliseconds <= 1000)
+                    if (x % xPixelInterval == 0)
                     {
-                        timeStr = $"{roundedTimeSpan}";
-                    }
-                    else
-                    if (roundedTimeSpan.Hours == 0.0 && roundedTimeSpan.Minutes == 0.0)
-                    {
-                        g.DrawLine(whitePen, tickPosition + 1, 0, tickPosition + 1, trackHeight);
-                        if (tickPosition > 0)
+                        int tickPosition = x + pixelStartOffset;
+                        g.DrawLine(whitePen, tickPosition, 0, tickPosition, trackHeight);
+                        g.DrawLine(whitePen, tickPosition + halfInterval, 0, tickPosition + halfInterval, halfheight);
+
+                        TimeSpan elapsedTimeSpan =
+                            TimeSpan.FromMilliseconds(xAxisPixelDurationInMilliseconds * tickPosition);
+
+                        TimeSpan absoluteTS = roundedStartTime + elapsedTimeSpan;
+                        TimeSpan roundedTimeSpan = TimeSpan.FromSeconds(Math.Round(absoluteTS.TotalSeconds));
+                        string timeStr = "0000";
+                        if (xAxisPixelDurationInMilliseconds <= 1000)
                         {
-                            g.DrawLine(whitePen, tickPosition - 1, 0, tickPosition - 1, trackHeight);
+                            timeStr = $"{roundedTimeSpan}";
+                        }
+                        else if (roundedTimeSpan.Hours == 0.0 && roundedTimeSpan.Minutes == 0.0)
+                        {
+                            g.DrawLine(whitePen, tickPosition + 1, 0, tickPosition + 1, trackHeight);
+                            if (tickPosition > 0)
+                            {
+                                g.DrawLine(whitePen, tickPosition - 1, 0, tickPosition - 1, trackHeight);
+                            }
+
+                            if (startDate.Year > 2000)
+                            {
+                                DateTime today = startDate + roundedTimeSpan;
+                                timeStr = $"{today.ToShortDateString()}";
+                            }
+                        }
+                        else
+                        {
+                            timeStr = $"{roundedTimeSpan.Hours:d2}{roundedTimeSpan.Minutes:d2}h";
                         }
 
-                        if (startDate.Year > 2000)
-                        {
-                            DateTime today = startDate + roundedTimeSpan;
-                            timeStr = $"{today.ToShortDateString()}";
-                        }
+                        g.DrawText(timeStr, stringFont, Color.White, new PointF(tickPosition, 3)); //draw time
                     }
-                    else
-                    {
-                        timeStr = $"{roundedTimeSpan.Hours:d2}{roundedTimeSpan.Minutes:d2}h";
-                    }
-
-                    g.DrawString(timeStr, stringFont, Brushes.White, new PointF(tickPosition, 3)); //draw time
                 }
-            }
 
-            g.DrawLine(whitePen, 0, 0, trackWidth, 0); //draw upper boundary
+                g.DrawLine(whitePen, 0, 0, trackWidth, 0); //draw upper boundary
 
-            //g.DrawLine(whitePen, 0, trackHeight - 1, trackWidth, trackHeight - 1);//draw lower boundary
-            g.DrawLine(grayPen, 0, trackHeight - 1, trackWidth, trackHeight - 1); //draw lower boundary
+                //g.DrawLine(whitePen, 0, trackHeight - 1, trackWidth, trackHeight - 1);//draw lower boundary
+                g.DrawLine(grayPen, 0, trackHeight - 1, trackWidth, trackHeight - 1); //draw lower boundary
+            });
+
             return bmp;
         }
 
@@ -1269,109 +1298,118 @@ namespace AudioAnalysisTools.StandardSpectrograms
         public static Image<Rgb24> DrawTimeTrack(TimeSpan fullDuration, TimeSpan startOffset, TimeSpan ticInterval, int trackWidth, int trackHeight, string title)
         {
             Image<Rgb24> bmp = new Image<Rgb24>(trackWidth, trackHeight);
-            Graphics g = Graphics.FromImage(bmp);
-            g.Clear(Color.Black);
-
-            TimeSpan gridInterval = CalculateGridInterval(fullDuration, trackWidth);
-
-            int hour;
-            int min = (int)startOffset.TotalMinutes - 1;
-            var XaxisScale = gridInterval.TotalMinutes;
-            Pen whitePen = new Pen(Color.White);
-            Font stringFont = new Font("Arial", 9);
-
-            for (int x = 0; x < trackWidth; x++) //for pixels in the line
+            bmp.Mutate(g =>
             {
-                min++;
-                if (min % XaxisScale != 0)
+                g.Clear(Color.Black);
+
+                TimeSpan gridInterval = CalculateGridInterval(fullDuration, trackWidth);
+
+                int hour;
+                int min = (int)startOffset.TotalMinutes - 1;
+                var XaxisScale = gridInterval.TotalMinutes;
+                Pen whitePen = new Pen(Color.White, 1);
+                Font stringFont = SystemFonts.CreateFont("Arial", 9);
+
+                for (int x = 0; x < trackWidth; x++) //for pixels in the line
                 {
-                    continue;
-                }
+                    min++;
+                    if (min % XaxisScale != 0)
+                    {
+                        continue;
+                    }
 
-                g.DrawLine(whitePen, x, 0, x, trackHeight);
-                hour = (int)Math.Round(min / XaxisScale);
-                if (hour >= 24)
-                {
-                    min = 0;
-                    hour = 0;
-                }
+                    g.DrawLine(whitePen, x, 0, x, trackHeight);
+                    hour = (int)Math.Round(min / XaxisScale);
+                    if (hour >= 24)
+                    {
+                        min = 0;
+                        hour = 0;
+                    }
 
-                g.DrawString(hour.ToString(), stringFont, Brushes.White, new PointF(x + 2, 1)); //draw time
-            }//end over all pixels
+                    g.DrawText(hour.ToString(), stringFont, Color.White, new PointF(x + 2, 1)); //draw time
+                } //end over all pixels
 
-            g.DrawLine(whitePen, 0, 0, trackWidth, 0); //draw upper boundary
-            g.DrawLine(whitePen, 0, trackHeight - 1, trackWidth, trackHeight - 1); //draw lower boundary
-            g.DrawLine(whitePen, trackWidth, 0, trackWidth, trackHeight - 1); //draw right end boundary
+                g.DrawLine(whitePen, 0, 0, trackWidth, 0); //draw upper boundary
+                g.DrawLine(whitePen, 0, trackHeight - 1, trackWidth, trackHeight - 1); //draw lower boundary
+                g.DrawLine(whitePen, trackWidth, 0, trackWidth, trackHeight - 1); //draw right end boundary
 
-            g.DrawString(title, stringFont, Brushes.White, new PointF(trackWidth - 30, 2));
+                g.DrawText(title, stringFont, Color.White, new PointF(trackWidth - 30, 2));
+
+            });
+
             return bmp;
         }
 
         public static Image<Rgb24> DrawTimeRelativeTrack(TimeSpan fullDuration, int trackWidth, int trackHeight)
         {
             Image<Rgb24> bmp = new Image<Rgb24>(trackWidth, trackHeight);
-            Graphics g = Graphics.FromImage(bmp);
-            g.Clear(Color.Black);
-
-            double xAxisPixelDurationInMilliseconds = fullDuration.TotalMilliseconds / trackWidth;
-
-            TimeSpan startTime = TimeSpan.Zero;
-
-            TimeSpan xAxisTicInterval = CalculateGridInterval(fullDuration, trackWidth);
-
-            Pen whitePen = new Pen(Color.White);
-            Pen grayPen = new Pen(Color.Gray);
-            Font stringFont = new Font("Arial", 8);
-
-            int rows = bmp.Height;
-            int cols = bmp.Width;
-
-            // draw first time entry
-            string time = "HHmm";
-            if (xAxisPixelDurationInMilliseconds < 60000)
+            bmp.Mutate(g =>
             {
-                g.DrawString(time, stringFont, Brushes.White, new PointF(0, 3)); //draw time
-            }
-            else
-            {
-                g.DrawString("Hours", stringFont, Brushes.White, new PointF(0, 3)); //draw time
-            }
+                g.Clear(Color.Black);
 
-            // for columns, draw in X-axis lines
-            int xPixelInterval = (int)Math.Round(xAxisTicInterval.TotalMilliseconds / xAxisPixelDurationInMilliseconds);
-            int halfInterval = xPixelInterval / 2;
-            int halfheight = trackHeight / 3;
-            for (int x = 1; x < cols; x++)
-            {
-                if (x % halfInterval == 0)
+                double xAxisPixelDurationInMilliseconds = fullDuration.TotalMilliseconds / trackWidth;
+
+                TimeSpan startTime = TimeSpan.Zero;
+
+                TimeSpan xAxisTicInterval = CalculateGridInterval(fullDuration, trackWidth);
+
+                Pen whitePen = new Pen(Color.White, 1);
+                Pen grayPen = new Pen(Color.Gray, 1);
+                Font stringFont = SystemFonts.CreateFont("Arial", 8);
+
+                int rows = bmp.Height;
+                int cols = bmp.Width;
+
+                // draw first time entry
+                string time = "HHmm";
+                if (xAxisPixelDurationInMilliseconds < 60000)
                 {
-                    g.DrawLine(whitePen, x, 0, x, halfheight);
+                    g.DrawText(time, stringFont, Color.White, new PointF(0, 3)); //draw time
+                }
+                else
+                {
+                    g.DrawText("Hours", stringFont, Color.White, new PointF(0, 3)); //draw time
                 }
 
-                if (x % xPixelInterval == 0)
+                // for columns, draw in X-axis lines
+                int xPixelInterval =
+                    (int)Math.Round(xAxisTicInterval.TotalMilliseconds / xAxisPixelDurationInMilliseconds);
+                int halfInterval = xPixelInterval / 2;
+                int halfheight = trackHeight / 3;
+                for (int x = 1; x < cols; x++)
                 {
-                    int tickPosition = x;
-                    g.DrawLine(whitePen, tickPosition, 0, tickPosition, trackHeight);
-                    TimeSpan elapsedTimeSpan = TimeSpan.FromMilliseconds(xAxisPixelDurationInMilliseconds * tickPosition);
-                    if (xAxisPixelDurationInMilliseconds <= 1000)
+                    if (x % halfInterval == 0)
                     {
-                        time = $"{elapsedTimeSpan}";
-                    }
-                    else if (xAxisPixelDurationInMilliseconds < 60000)
-                    {
-                        time = $"{elapsedTimeSpan.Hours:d2}{elapsedTimeSpan.Minutes:d2}";
-                    }
-                    else
-                    {
-                        time = $"{elapsedTimeSpan.TotalHours:f0}";
+                        g.DrawLine(whitePen, x, 0, x, halfheight);
                     }
 
-                    g.DrawString(time, stringFont, Brushes.White, new PointF(tickPosition, 2)); //draw time
+                    if (x % xPixelInterval == 0)
+                    {
+                        int tickPosition = x;
+                        g.DrawLine(whitePen, tickPosition, 0, tickPosition, trackHeight);
+                        TimeSpan elapsedTimeSpan =
+                            TimeSpan.FromMilliseconds(xAxisPixelDurationInMilliseconds * tickPosition);
+                        if (xAxisPixelDurationInMilliseconds <= 1000)
+                        {
+                            time = $"{elapsedTimeSpan}";
+                        }
+                        else if (xAxisPixelDurationInMilliseconds < 60000)
+                        {
+                            time = $"{elapsedTimeSpan.Hours:d2}{elapsedTimeSpan.Minutes:d2}";
+                        }
+                        else
+                        {
+                            time = $"{elapsedTimeSpan.TotalHours:f0}";
+                        }
+
+                        g.DrawText(time, stringFont, Color.White, new PointF(tickPosition, 2)); //draw time
+                    }
                 }
-            }
 
-            g.DrawLine(whitePen, 0, 0, trackWidth, 0); //draw upper boundary
-            g.DrawLine(grayPen, 0, trackHeight - 1, trackWidth, trackHeight - 1); //draw lower boundary
+                g.DrawLine(whitePen, 0, 0, trackWidth, 0); //draw upper boundary
+                g.DrawLine(grayPen, 0, trackHeight - 1, trackWidth, trackHeight - 1); //draw lower boundary
+            });
+
             return bmp;
         }
 
@@ -1400,42 +1438,46 @@ namespace AudioAnalysisTools.StandardSpectrograms
         {
             int trackWidth = 30;
             Image<Rgb24> bmp = new Image<Rgb24>(trackWidth, trackHeight);
-            Graphics g = Graphics.FromImage(bmp);
-            g.Clear(Color.Black);
-
-            int daysInYear = 366;
-            double interval = daysInYear / (double)12;
-
-            string[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
-            Pen whitePen = new Pen(Color.White);
-
-            //Pen grayPen = new Pen(Color.Gray);
-            Font stringFont = new Font("Arial", 9);
-
-            for (int i = 0; i < 12; i++) //for pixels in the line
+            bmp.Mutate(g =>
             {
-                int Y = (int)Math.Round(offset + (i * interval));
+                g.Clear(Color.Black);
 
-                //if (offset % XaxisScale != 0) continue;
-                g.DrawLine(whitePen, Y, 0, Y, trackHeight);
+                int daysInYear = 366;
+                double interval = daysInYear / (double)12;
 
-                //hour = offset / XaxisScale;
-                //if (hour >= 24)
-                //{
-                //    offset = 0;
-                //    hour = 0;
-                //}
-                g.DrawLine(whitePen, 0, Y, trackWidth, Y);
-                g.DrawString(months[i], stringFont, Brushes.White, new PointF(1, Y + 6)); //draw time
-            } // end over all pixels
+                string[] months =
+                    { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
-            g.DrawLine(whitePen, 0, daysInYear + offset, trackWidth, daysInYear + offset);
+                Pen whitePen = new Pen(Color.White, 1);
 
-            //g.DrawLine(whitePen, 0, offset, trackWidth, offset);          //draw lower boundary
-            // g.DrawLine(whitePen, duration, 0, duration, trackHeight - 1);//draw right end boundary
+                //Pen grayPen = new Pen(Color.Gray);
+                Font stringFont = SystemFonts.CreateFont("Arial", 9);
 
-            // g.DrawString(title, stringFont, Brushes.White, new PointF(duration + 4, 3));
+                for (int i = 0; i < 12; i++) //for pixels in the line
+                {
+                    int Y = (int)Math.Round(offset + (i * interval));
+
+                    //if (offset % XaxisScale != 0) continue;
+                    g.DrawLine(whitePen, Y, 0, Y, trackHeight);
+
+                    //hour = offset / XaxisScale;
+                    //if (hour >= 24)
+                    //{
+                    //    offset = 0;
+                    //    hour = 0;
+                    //}
+                    g.DrawLine(whitePen, 0, Y, trackWidth, Y);
+                    g.DrawText(months[i], stringFont, Color.White, new PointF(1, Y + 6)); //draw time
+                } // end over all pixels
+
+                g.DrawLine(whitePen, 0, daysInYear + offset, trackWidth, daysInYear + offset);
+
+                //g.DrawLine(whitePen, 0, offset, trackWidth, offset);          //draw lower boundary
+                // g.DrawLine(whitePen, duration, 0, duration, trackHeight - 1);//draw right end boundary
+
+                // g.DrawString(title, stringFont, Brushes.White, new PointF(duration + 4, 3));
+            });
+            
             return bmp;
         }
 
@@ -1443,34 +1485,38 @@ namespace AudioAnalysisTools.StandardSpectrograms
         public static Image<Rgb24> DrawYearScale_horizontal(int trackWidth, int trackHeight)
         {
             Image<Rgb24> bmp = new Image<Rgb24>(trackWidth, trackHeight);
-            Graphics g = Graphics.FromImage(bmp);
-            g.Clear(Color.Black);
-
-            int daysInYear = 366;
-            double interval = daysInYear / (double)12;
-
-            string[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
-            Pen whitePen = new Pen(Color.White);
-
-            //Pen grayPen = new Pen(Color.Gray);
-            Font stringFont = new Font("Arial", 9);
-
-            for (int i = 0; i < 12; i++)
+            bmp.Mutate(g =>
             {
-                int X = (int)Math.Round(i * interval);
-                g.DrawLine(whitePen, X, 0, X, trackHeight);
+                g.Clear(Color.Black);
 
-                //g.DrawLine(whitePen, X, 0, X, trackWidth, Y);
-                g.DrawString(months[i], stringFont, Brushes.White, new PointF(X + 2, 2)); //draw time
-            } // end over all pixels
+                int daysInYear = 366;
+                double interval = daysInYear / (double)12;
 
-            g.DrawLine(whitePen, 0, daysInYear, trackWidth, daysInYear);
+                string[] months =
+                    { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
-            //g.DrawLine(whitePen, 0, offset, trackWidth, offset);          //draw lower boundary
-            // g.DrawLine(whitePen, duration, 0, duration, trackHeight - 1);//draw right end boundary
+                Pen whitePen = new Pen(Color.White, 1);
 
-            // g.DrawString(title, stringFont, Brushes.White, new PointF(duration + 4, 3));
+                //Pen grayPen = new Pen(Color.Gray);
+                Font stringFont = SystemFonts.CreateFont("Arial", 9);
+
+                for (int i = 0; i < 12; i++)
+                {
+                    int X = (int)Math.Round(i * interval);
+                    g.DrawLine(whitePen, X, 0, X, trackHeight);
+
+                    //g.DrawLine(whitePen, X, 0, X, trackWidth, Y);
+                    g.DrawText(months[i], stringFont, Color.White, new PointF(X + 2, 2)); //draw time
+                } // end over all pixels
+
+                g.DrawLine(whitePen, 0, daysInYear, trackWidth, daysInYear);
+
+                //g.DrawLine(whitePen, 0, offset, trackWidth, offset);          //draw lower boundary
+                // g.DrawLine(whitePen, duration, 0, duration, trackHeight - 1);//draw right end boundary
+
+                // g.DrawString(title, stringFont, Brushes.White, new PointF(duration + 4, 3));
+            });
+
             return bmp;
         }
 
@@ -1521,9 +1567,9 @@ namespace AudioAnalysisTools.StandardSpectrograms
         public static Image<Rgb24> DrawTimeTrack(TimeSpan duration, int width)
         {
             int height = HeightOfTimeScale;
-            Pen blackPen = new Pen(Color.Black);
-            Pen grayPen = new Pen(Color.DarkGray);
-            var bgBrush = new SolidBrush(Color.FromArgb(240, 240, 240));
+            Pen blackPen = new Pen(Color.Black, 1);
+            Pen grayPen = new Pen(Color.DarkGray, 1);
+            var bgBrush = new SolidBrush(Color.FromRgb(240, 240, 240));
 
             DateTime start = new DateTime(0);
             double secondsPerPixel = duration.TotalSeconds / width;
@@ -1531,9 +1577,9 @@ namespace AudioAnalysisTools.StandardSpectrograms
             byte[] hScale = GetXaxisTicLocations(width, duration);
 
             var bmp = new Image<Rgb24>(width, height);
-            var font = new Font("Tahoma", 8);
+            var font = SystemFonts.CreateFont("Tahoma", 8);
 
-            using (Graphics g = Graphics.FromImage(bmp))
+            bmp.Mutate(g =>
             {
                 g.FillRectangle(bgBrush, 0, 0, width, height);
 
@@ -1579,14 +1625,14 @@ namespace AudioAnalysisTools.StandardSpectrograms
                     {
                         int secs = (int)Math.Round(x * secondsPerPixel);
                         TimeSpan span = new TimeSpan(0, 0, secs);
-                        g.DrawString(span.ToString(), font, Brushes.Black, new PointF(x, 0));
+                        g.DrawText(span.ToString(), font, Color.Black, new PointF(x, 0));
                         prevLocation = x;
                     }
                 }
 
                 g.DrawLine(blackPen, 0, 0, width, 0);
                 g.DrawLine(blackPen, 0, height - 1, width, height - 1);
-            }
+            });
 
             return bmp;
         }

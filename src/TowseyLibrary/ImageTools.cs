@@ -3115,7 +3115,7 @@ namespace TowseyLibrary
         public static void DrawMatrix(byte[,] mBytes, string pathName)
         {
             double[,] matrix = ByteMatrix2DoublesMatrix(mBytes);
-            Image bmp = DrawNormalisedMatrix(matrix);
+            var bmp = DrawNormalisedMatrix(matrix);
             bmp.Save(pathName);
         }
 
@@ -3131,7 +3131,7 @@ namespace TowseyLibrary
                 matrix[0, i] = vector[i];
             }
 
-            Image bmp = DrawNormalisedMatrix(matrix);
+            Image<Rgb24> bmp = DrawNormalisedMatrix(matrix);
             bmp.Save(pathName);
         }
 
@@ -3142,13 +3142,13 @@ namespace TowseyLibrary
         /// <param name="pathName"></param>
         public static void DrawMatrix(double[,] matrix, string pathName)
         {
-            Image bmp = DrawNormalisedMatrix(matrix);
+            Image<Rgb24> bmp = DrawNormalisedMatrix(matrix);
             bmp.Save(pathName);
         }
 
         public static void DrawMatrix(double[,] matrix, double lowerBound, double upperBound, string pathName)
         {
-            Image bmp = DrawNormalisedMatrix(matrix, lowerBound, upperBound);
+            Image<Rgb24> bmp = DrawNormalisedMatrix(matrix, lowerBound, upperBound);
             bmp.Save(pathName);
         }
 
@@ -3157,13 +3157,13 @@ namespace TowseyLibrary
         /// </summary>
         /// <param name="matrix">the data</param>
         /// <param name="pathName"></param>
-        public static Image DrawNormalisedMatrix(double[,] matrix)
+        public static Image<Rgb24> DrawNormalisedMatrix(double[,] matrix)
         {
             double[,] norm = DataTools.normalise(matrix);
             return DrawMatrixWithoutNormalisation(norm);
         }
 
-        public static Image DrawNormalisedMatrix(double[,] matrix, double lowerBound, double upperBound)
+        public static Image<Rgb24> DrawNormalisedMatrix(double[,] matrix, double lowerBound, double upperBound)
         {
             double[,] norm = DataTools.NormaliseInZeroOne(matrix, lowerBound, upperBound);
             return DrawMatrixWithoutNormalisation(norm);
@@ -3173,7 +3173,7 @@ namespace TowseyLibrary
         /// Draws matrix after first normalising the data
         /// </summary>
         /// <param name="matrix">the data</param>
-        public static Image DrawReversedMatrix(double[,] matrix)
+        public static Image<Rgb24> DrawReversedMatrix(double[,] matrix)
         {
             double[,] norm = DataTools.normalise(matrix);
             return DrawReversedMatrixWithoutNormalisation(norm);
@@ -3185,7 +3185,7 @@ namespace TowseyLibrary
         /// </summary>
         /// <param name="matrix">the data</param>
         /// <param name="pathName"></param>
-        public static Image DrawReversedMatrixWithoutNormalisation(double[,] matrix)
+        public static Image<Rgb24> DrawReversedMatrixWithoutNormalisation(double[,] matrix)
         {
             int rows = matrix.GetLength(0); //number of rows
             int cols = matrix.GetLength(1); //number
