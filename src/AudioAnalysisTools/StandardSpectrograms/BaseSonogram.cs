@@ -18,6 +18,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
     using AudioAnalysisTools.WavTools;
     using SixLabors.ImageSharp.PixelFormats;
     using SixLabors.ImageSharp.Processing;
+    using SixLabors.Primitives;
     using TowseyLibrary;
 
     /// <summary>
@@ -263,7 +264,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// This method assumes that the spectrogram has linear Herz scale
         /// </summary>
         /// <param name="title">title to be added to spectrogram</param>
-        public Image GetImageFullyAnnotated(string title)
+        public Image<Rgb24> GetImageFullyAnnotated(string title)
         {
             var image = this.GetImage();
             if (image == null)
@@ -275,7 +276,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             return image;
         }
 
-        public Image GetImageFullyAnnotated(Image image, string title, int[,] gridLineLocations)
+        public Image<Rgb24> GetImageFullyAnnotated(Image<Rgb24> image, string title, int[,] gridLineLocations)
         {
             if (image == null)
             {
@@ -286,12 +287,12 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             var titleBar = LDSpectrogramRGB.DrawTitleBarOfGrayScaleSpectrogram(title, image.Width);
             var timeBmp = ImageTrack.DrawTimeTrack(this.Duration, image.Width);
-            var list = new List<Image> { titleBar, timeBmp, image, timeBmp };
+            var list = new List<Image<Rgb24>> { titleBar, timeBmp, image, timeBmp };
             var compositeImage = ImageTools.CombineImagesVertically(list);
             return compositeImage;
         }
 
-        public Image GetImageAnnotatedWithLinearHerzScale(Image image, string title)
+        public Image<Rgb24> GetImageAnnotatedWithLinearHerzScale(Image<Rgb24> image, string title)
         {
             // init with linear frequency scale and draw freq grid lines on image
             // image height will be half frame size.
@@ -307,12 +308,12 @@ namespace AudioAnalysisTools.StandardSpectrograms
             return compositeImage;
         }
 
-        public Image GetImage()
+        public Image<Rgb24> GetImage()
         {
             return this.GetImage(false, false, false);
         }
 
-        public Image GetImage(bool doHighlightSubband, bool add1KHzLines, bool doMelScale)
+        public Image<Rgb24> GetImage(bool doHighlightSubband, bool add1KHzLines, bool doMelScale)
         {
             // doHighlightSubband function still working but have removed min/max bounds from user control.
             // doHighlightSubband = true;
@@ -344,7 +345,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             return image;
         }
 
-        public Image GetImage_ReducedSonogramWithWidth(int width, bool drawGridLines)
+        public Image<Rgb24> GetImage_ReducedSonogramWithWidth(int width, bool drawGridLines)
         {
             var data = this.Data; //sonogram intensity values
             int frameCount = data.GetLength(0); // Number of spectra in sonogram
@@ -359,7 +360,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             return this.GetImage_ReducedSonogram(factor, drawGridLines);
         }
 
-        public Image GetImage_ReducedSonogram(int factor, bool drawGridLines)
+        public Image<Rgb24> GetImage_ReducedSonogram(int factor, bool drawGridLines)
         {
             //  double[] logEnergy = this.LogEnPerFrame;
             var data = this.Data; //sonogram intensity values
@@ -377,7 +378,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             //set up the 1000kHz scale
             int herzInterval = 1000;
             int[] vScale = FrequencyScale.CreateLinearYaxis(herzInterval, this.NyquistFrequency, imageHeight); //calculate location of 1000Hz grid lines
-            var bmp = new Image<Rgb24>(imageWidth, imageHeight, PixelFormat.Format24bppRgb);
+            var bmp = new Image<Rgb24>(imageWidth, imageHeight);
             for (int w = 0; w < imageWidth; w++)
             {
                 int start = w * subSample;
@@ -411,7 +412,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                     }
 
                     var col = grayScale[c];
-                    bmp.SetPixel(w, imageHeight - y - 1, col);
+                    bmp[w, imageHeight - y - 1] = col;
                 } //end over all freq bins
 
                 //set up grid color
@@ -433,7 +434,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                         }
 
                         int y = imageHeight - p;
-                        bmp.SetPixel(w, y, gridCol);
+                        bmp[w, y] = gridCol;
                     }
                 }
             }
@@ -486,7 +487,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             return Tuple.Create(Mt, min, max);
         }
 
-        public static Image GetSonogramImage(double[,] data, int nyquistFreq, int maxFrequency, bool doMelScale, int binHeight, bool doHighlightSubband, int subBandMinHz, int subBandMaxHz)
+        public static Image<Rgb24> GetSonogramImage(double[,] data, int nyquistFreq, int maxFrequency, bool doMelScale, int binHeight, bool doHighlightSubband, int subBandMinHz, int subBandMaxHz)
         {
             int width = data.GetLength(0); // Number of spectra in sonogram
             int fftBins = data.GetLength(1);
@@ -525,7 +526,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             Color[] grayScale = ImageTools.GrayScale();
 
-            var bmp = new Image<Rgb24>(width, imageHeight, PixelFormat.Format24bppRgb);
+            var bmp = new Image<Rgb24>(width, imageHeight);
             int yOffset = imageHeight;
 
             // for all freq bins
@@ -555,8 +556,8 @@ namespace AudioAnalysisTools.StandardSpectrograms
                             g = 255;
                         }
 
-                        var col = doHighlightSubband && IsInBand(y, minHighlightBin, maxHighlightBin) ? Color.FromArgb(c, g, c) : grayScale[c];
-                        bmp.SetPixel(x, yOffset - 1, col);
+                        var col = doHighlightSubband && IsInBand(y, minHighlightBin, maxHighlightBin) ? Color.FromRgb((byte)c, (byte)g, (byte)c) : grayScale[c];
+                        bmp[x, yOffset - 1] = col;
                     }//for all pixels in line
 
                     yOffset--;
@@ -571,7 +572,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// Normalises the values from min->max according to passed rank values.
         /// Therefore pixels in the normalised grey-scale image will range from 0 to 255.
         /// </summary>
-        public static Image GetSonogramImage(double[,] data, int minPercentile, int maxPercentile)
+        public static Image<Rgb24> GetSonogramImage(double[,] data, int minPercentile, int maxPercentile)
         {
             int width = data.GetLength(0); // Number of spectra in sonogram
             int binCount = data.GetLength(1);
@@ -586,7 +587,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             double range = max - min;
             Color[] grayScale = ImageTools.GrayScale();
 
-            var bmp = new Image<Rgb24>(width, imageHeight, PixelFormat.Format24bppRgb);
+            var bmp = new Image<Rgb24>(width, imageHeight);
             int yOffset = imageHeight;
             for (int y = 0; y < binCount; y++)
             {
@@ -609,7 +610,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                             c = 255;
                         }
 
-                        bmp.SetPixel(x, yOffset - 1, grayScale[c]);
+                        bmp[x, yOffset - 1] = grayScale[c];
                     }//for all pixels in line
 
                     yOffset--;
@@ -677,7 +678,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             return avSpectrum;
         }
 
-        public static Image FrameSonogram(Image image, Image titleBar, TimeSpan minuteOffset, TimeSpan xAxisTicInterval, TimeSpan xAxisPixelDuration,
+        public static Image<Rgb24> FrameSonogram(Image image, Image titleBar, TimeSpan minuteOffset, TimeSpan xAxisTicInterval, TimeSpan xAxisPixelDuration,
                                           TimeSpan labelInterval, int nyquist, int herzInterval)
         {
             double secondsDuration = xAxisPixelDuration.TotalSeconds * image.Width;
@@ -695,44 +696,50 @@ namespace AudioAnalysisTools.StandardSpectrograms
             var timeBmp = DrawTimeTrack(minuteOffset, xAxisPixelDuration, xAxisTicInterval, labelInterval, imageWidth, trackHeight, "Seconds");
 
             var compositeBmp = new Image<Rgb24>(imageWidth, imageHt); //get canvas for entire image
-            var gr = Graphics.FromImage(compositeBmp);
-            gr.Clear(Color.Black);
-            int offset = 0;
-            gr.DrawImage(titleBar, 0, offset); //draw in the top time scale
-            offset += timeBmp.Height;
-            gr.DrawImage(timeBmp, 0, offset); //draw
-            offset += titleBar.Height;
-            gr.DrawImage(image, 0, offset); //draw
-            offset += image.Height;
-            gr.DrawImage(timeBmp, 0, offset); //draw
+            compositeBmp.Mutate(gr =>
+            {
+                gr.Clear(Color.Black);
+                int offset = 0;
+                gr.DrawImage(titleBar, 0, offset); //draw in the top time scale
+                offset += timeBmp.Height;
+                gr.DrawImage(timeBmp, 0, offset); //draw
+                offset += titleBar.Height;
+                gr.DrawImage(image, 0, offset); //draw
+                offset += image.Height;
+                gr.DrawImage(timeBmp, 0, offset); //draw
+            });
+
             return compositeBmp;
         }
 
         public static Image DrawTitleBarOfGrayScaleSpectrogram(string title, int width)
         {
             var bmp = new Image<Rgb24>(width, SpectrogramConstants.HEIGHT_OF_TITLE_BAR);
-            var g = Graphics.FromImage(bmp);
-            g.Clear(Color.Black);
-
-            // var stringFont = new Font("Tahoma", 9);
-            var stringFont = new Font("Arial", 9);
-
-            //string text = title;
-            int X = 4;
-            g.DrawString(title, stringFont, Brushes.Wheat, new PointF(X, 3));
-
-            var stringSize = g.MeasureString(title, stringFont);
-            X += stringSize.ToSize().Width + 70;
-            string text = Meta.OrganizationTag;
-            stringSize = g.MeasureString(text, stringFont);
-            int x2 = width - stringSize.ToSize().Width - 2;
-            if (x2 > X)
+            bmp.Mutate(g =>
             {
-                g.DrawString(text, stringFont, Brushes.Wheat, new PointF(x2, 3));
-            }
+                g.Clear(Color.Black);
 
-            // g.DrawLine(pen, duration + 1, 0, trackWidth, 0);
-            g.DrawLine(new Pen(Color.Gray), 0, 0, width, 0); //draw upper boundary
+                // var stringFont = Drawing.Tahoma9;
+                var stringFont = Drawing.Arial9;
+
+                //string text = title;
+                int X = 4;
+                g.DrawText(title, stringFont, Color.Wheat, new PointF(X, 3));
+
+                var stringSize = g.MeasureString(title, stringFont);
+                X += stringSize.ToSize().Width + 70;
+                string text = Meta.OrganizationTag;
+                stringSize = g.MeasureString(text, stringFont);
+                int x2 = width - stringSize.ToSize().Width - 2;
+                if (x2 > X)
+                {
+                    g.DrawText(text, stringFont, Color.Wheat, new PointF(x2, 3));
+                }
+
+                // g.DrawLine(pen, duration + 1, 0, trackWidth, 0);
+                g.DrawLine(new Pen(Color.Gray, 1), 0, 0, width, 0); //draw upper boundary
+            });
+
             return bmp;
         }
 
@@ -740,40 +747,43 @@ namespace AudioAnalysisTools.StandardSpectrograms
         public static Image<Rgb24> DrawTimeTrack(TimeSpan offsetMinute, TimeSpan xAxisPixelDuration, TimeSpan xAxisTicInterval, TimeSpan labelInterval, int trackWidth, int trackHeight, string title)
         {
             var bmp = new Image<Rgb24>(trackWidth, trackHeight);
-            var g = Graphics.FromImage(bmp);
-            g.Clear(Color.Black);
-
-            double elapsedTime = offsetMinute.TotalSeconds;
-            double pixelDuration = xAxisPixelDuration.TotalSeconds;
-            int labelSecondsInterval = (int)labelInterval.TotalSeconds;
-            var whitePen = new Pen(Color.White);
-            var stringFont = new Font("Arial", 8);
-
-            // for columns, draw in second lines
-            double xInterval = (int)(xAxisTicInterval.TotalMilliseconds / xAxisPixelDuration.TotalMilliseconds);
-
-            // for pixels in the line
-            for (int x = 1; x < trackWidth; x++)
+            bmp.Mutate(g =>
             {
-                elapsedTime += pixelDuration;
-                if (x % xInterval <= pixelDuration)
+                g.Clear(Color.Black);
+
+                double elapsedTime = offsetMinute.TotalSeconds;
+                double pixelDuration = xAxisPixelDuration.TotalSeconds;
+                int labelSecondsInterval = (int)labelInterval.TotalSeconds;
+                var whitePen = new Pen(Color.White, 1);
+                var stringFont = Drawing.Arial8;
+
+                // for columns, draw in second lines
+                double xInterval = (int)(xAxisTicInterval.TotalMilliseconds / xAxisPixelDuration.TotalMilliseconds);
+
+                // for pixels in the line
+                for (int x = 1; x < trackWidth; x++)
                 {
-                    g.DrawLine(whitePen, x, 0, x, trackHeight);
-                    int totalSeconds = (int)Math.Round(elapsedTime);
-                    if (totalSeconds % labelSecondsInterval == 0)
+                    elapsedTime += pixelDuration;
+                    if (x % xInterval <= pixelDuration)
                     {
-                        int minutes = totalSeconds / 60;
-                        int seconds = totalSeconds % 60;
-                        string time = $"{minutes}m{seconds}s";
-                        g.DrawString(time, stringFont, Brushes.White, new PointF(x + 1, 2)); //draw time
+                        g.DrawLine(whitePen, x, 0, x, trackHeight);
+                        int totalSeconds = (int)Math.Round(elapsedTime);
+                        if (totalSeconds % labelSecondsInterval == 0)
+                        {
+                            int minutes = totalSeconds / 60;
+                            int seconds = totalSeconds % 60;
+                            string time = $"{minutes}m{seconds}s";
+                            g.DrawText(time, stringFont, Color.White, new PointF(x + 1, 2)); //draw time
+                        }
                     }
                 }
-            }
 
-            g.DrawLine(whitePen, 0, 0, trackWidth, 0); //draw upper boundary
-            g.DrawLine(whitePen, 0, trackHeight - 1, trackWidth, trackHeight - 1); //draw lower boundary
-            g.DrawLine(whitePen, trackWidth, 0, trackWidth, trackHeight - 1); //draw right end boundary
-            g.DrawString(title, stringFont, Brushes.White, new PointF(4, 3));
+                g.DrawLine(whitePen, 0, 0, trackWidth, 0); //draw upper boundary
+                g.DrawLine(whitePen, 0, trackHeight - 1, trackWidth, trackHeight - 1); //draw lower boundary
+                g.DrawLine(whitePen, trackWidth, 0, trackWidth, trackHeight - 1); //draw right end boundary
+                g.DrawText(title, stringFont, Color.White, new PointF(4, 3));
+            });
+
             return bmp;
         }
     }

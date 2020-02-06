@@ -10,8 +10,10 @@ namespace AudioAnalysisTools
     using System.IO;
     using System.Linq;
     using System.Text;
+    using Acoustics.Shared;
     using SixLabors.ImageSharp.PixelFormats;
     using SixLabors.ImageSharp.Processing;
+    using SixLabors.Primitives;
     using TowseyLibrary;
 
     [Obsolete("This class is not generalizeable and shouldn't be used until it can be made so.")]
@@ -227,18 +229,20 @@ namespace AudioAnalysisTools
                 int sunsetMinute = (int.Parse(sunsetArray[0]) * 60) + int.Parse(sunsetArray[1]) + 720;
                 int sunDayLength = sunsetMinute - sunriseMinute + 1;
 
-                Graphics g = Graphics.FromImage(image);
-                Color cbgn = Color.FromArgb(0, 0, 35);
-                g.Clear(cbgn);
-                g.FillRectangle(Brushes.Gray, nautiRiseMinute, 1, nautiDayLength, trackHeight - 2);
-                g.FillRectangle(Brushes.LightSalmon, civilRiseMinute, 1, civilDayLength, trackHeight - 2);
-                g.FillRectangle(Brushes.SkyBlue, sunriseMinute, 1, sunDayLength, trackHeight - 2);
-
-                if (moonPhase != null)
+                image.Mutate(g =>
                 {
-                    Font font = new Font("Arial", 9);
-                    g.DrawString(moonPhase, font, Brushes.White, new PointF(5, 1));
-                }
+                    Color cbgn = Color.FromRgb(0, 0, 35);
+                    g.Clear(cbgn);
+                    g.FillRectangle(Brushes.Solid(Color.Gray), nautiRiseMinute, 1, nautiDayLength, trackHeight - 2);
+                    g.FillRectangle(Brushes.Solid(Color.LightSalmon), civilRiseMinute, 1, civilDayLength, trackHeight - 2);
+                    g.FillRectangle(Brushes.Solid(Color.SkyBlue), sunriseMinute, 1, sunDayLength, trackHeight - 2);
+
+                    if (moonPhase != null)
+                    {
+                        var font = Drawing.Arial9;
+                        g.DrawText(moonPhase, font, Color.White, new PointF(5, 1));
+                    }
+                });
             }
             catch
             {
@@ -270,8 +274,8 @@ namespace AudioAnalysisTools
                 int sunsetMinute = (int.Parse(sunsetArray[0]) * 60) + int.Parse(sunsetArray[1]) + 720;
                 for (int px = 0; px < pixelStep; px++)
                 {
-                    image.SetPixel(sunriseMinute, imageRow, Color.White);
-                    image.SetPixel(sunsetMinute,  imageRow, Color.White);
+                    image[sunriseMinute, imageRow] = Color.White;
+                    image[sunsetMinute,  imageRow] = Color.White;
                     imageRow++;
                 }
 

@@ -10,6 +10,9 @@ namespace AudioAnalysisTools.Indices
     using System.Linq;
     using Acoustics.Shared;
     using AnalysisBase.ResultBases;
+    using SixLabors.ImageSharp.ColorSpaces;
+    using SixLabors.ImageSharp.PixelFormats;
+
     //using Fasterflect;
     using TowseyLibrary;
 
@@ -44,7 +47,7 @@ namespace AudioAnalysisTools.Indices
 
         public static Image CreateImageOfSpectralIndices(SpectralIndexValues spectralIndices)
         {
-            var images = new List<Image>();
+            var images = new List<Image<Rgb24>>();
             foreach (var key in Keys)
             {
                 var spectrum = CachedSelectors[key](spectralIndices);
@@ -54,7 +57,7 @@ namespace AudioAnalysisTools.Indices
                 images.Add(image);
             }
 
-            var combinedImage = ImageTools.CombineImagesVertically(images.ToArray());
+            var combinedImage = ImageTools.CombineImagesVertically(images);
             return combinedImage;
         }
         

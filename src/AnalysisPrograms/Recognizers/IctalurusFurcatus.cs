@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IctalurusFurcatus.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
@@ -26,6 +26,7 @@ namespace AnalysisPrograms.Recognizers
     using AudioAnalysisTools.WavTools;
     using Base;
     using log4net;
+    using SixLabors.ImageSharp.PixelFormats;
     using TowseyLibrary;
 
     /// <summary>
@@ -215,17 +216,17 @@ namespace AnalysisPrograms.Recognizers
 
                     double[] scores1 = AnalyseWaveformAtLocation(subsample, amplitudeThreshold, scoreThreshold);
                     string title1 = $"scores={fishCall.Timehms}";
-                    Image bmp1 = GraphsAndCharts.DrawGraph(title1, scores1, subsample.Length, 300, 1);
+                    var bmp1 = GraphsAndCharts.DrawGraph(title1, scores1, subsample.Length, 300, 1);
 
                     //bmp1.Save(path1.FullName);
 
                     string title2 = $"tStart={fishCall.Timehms}";
-                    Image bmp2 = GraphsAndCharts.DrawWaveform(title2, subsample, 1);
+                    var bmp2 = GraphsAndCharts.DrawWaveform(title2, subsample, 1);
                     var path1 = subSamplesDirectory.CombineFile($"scoresForTestSubsample_{fishCall.TimeSeconds}secs.png");
 
                     //var path2 = subSamplesDirectory.CombineFile($@"testSubsample_{times[t]}secs.wav.png");
-                    Image[] imageList = { bmp2, bmp1 };
-                    Image bmp3 = ImageTools.CombineImagesVertically(imageList);
+                    Image<Rgb24>[] imageList = { bmp2, bmp1 };
+                    var bmp3 = ImageTools.CombineImagesVertically(imageList);
                     bmp3.Save(path1.FullName);
 
                     //write wave form to txt file for later work in XLS

@@ -336,7 +336,7 @@ namespace TowseyLibrary
                 {
                     var value = (byte)(255 - M[r, c]);
 
-                    //Color color = Color.FromArgb(value, value, value);
+                    //Color color = Color.FromRgb(value, value, value);
                     image[c, r] = Color.FromRgb(value, value, value);
                 }
             }
@@ -520,7 +520,7 @@ namespace TowseyLibrary
                 var aedConfiguration = new Aed.AedConfiguration
                 {
                     //AedEventColor = Color.Red;
-                    //AedHitColor = Color.FromArgb(128, AedEventColor),
+                    //AedHitColor = Color.FromRgb(128, AedEventColor),
                     // This stops AED Wiener filter and noise removal.
                     NoiseReductionType = noiseReductionType,
                     IntensityThreshold = 20.0,

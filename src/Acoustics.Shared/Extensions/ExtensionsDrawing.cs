@@ -79,7 +79,8 @@ namespace System
         /// Cropped image.
         /// </returns>
         [Obsolete("This shim only exists for compatibility. Not needed when ImageSharp replaced System.Drawing")]
-        public static Image Crop(this Image source, Rectangle crop) => source.Clone(x => x.Crop(crop));
+        public static Image<T> Crop<T>(this Image<T> source, Rectangle crop)
+            where T : struct, IPixel<T> => source.Clone(x => x.Crop(crop));
 
         /// <summary>
         /// The to hex string.
@@ -257,15 +258,12 @@ namespace System
         /// </remarks>
         public static float GetBrightness(this Rgb24 pixel)
         {
+            float r = (float)pixel.R / 255.0f;
+            float g = (float)pixel.G / 255.0f;
+            float b = (float)pixel.B / 255.0f;
 
-            
-                float r = (float)pixel.R / 255.0f;
-                float g = (float)pixel.G / 255.0f;
-                float b = (float)pixel.B / 255.0f;
-
-                float max, min;
-
-                max = r; min = r;
+            var max = r;
+            var min = r;
 
             if (g > max)
             {
@@ -288,7 +286,6 @@ namespace System
             }
 
             return (max + min) / 2;
-            
         }
     }
 }

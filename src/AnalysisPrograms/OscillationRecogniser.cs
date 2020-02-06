@@ -1,4 +1,4 @@
-﻿// <copyright file="OscillationRecogniser.cs" company="QutEcoacoustics">
+// <copyright file="OscillationRecogniser.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
 // default options for dev
@@ -204,7 +204,7 @@ namespace AnalysisPrograms
 
             //double maxScore = 50.0; //assumed max posisble oscillations per second
 
-            using (System.Drawing.Image img = sonogram.GetImage(doHighlightSubband, add1kHzLines, doMelScale: false))
+            using (var img = sonogram.GetImage(doHighlightSubband, add1kHzLines, doMelScale: false))
             using (Image_MultiTrack image = new Image_MultiTrack(img))
             {
                 //img.Save(@"C:\SensorNetworks\WavFiles\temp1\testimage1.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);

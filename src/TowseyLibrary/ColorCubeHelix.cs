@@ -69,7 +69,7 @@ namespace TowseyLibrary
         /// <returns>
         /// The <see cref="Image"/>.
         /// </returns>
-        public Image DrawMatrixWithoutNormalization(double[,] matrix)
+        public Image<Rgb24> DrawMatrixWithoutNormalization(double[,] matrix)
         {
             var rows = matrix.GetLength(0); // number of rows
             var cols = matrix.GetLength(1); // number

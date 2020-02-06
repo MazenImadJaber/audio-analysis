@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SURFAnalysis.cs" company="QutEcoacoustics">
 // All code in this file and all associated files are the copyright and property of the QUT Ecoacoustics Research Group (formerly MQUTeR, and formerly QUT Bioacoustics Research Group).
 // </copyright>
@@ -34,6 +34,7 @@ namespace AnalysisPrograms
     using McMaster.Extensions.CommandLineUtils;
     using Production;
     using Production.Arguments;
+    using SixLabors.ImageSharp.PixelFormats;
     using TowseyLibrary;
 
     public class SurfAnalysis
@@ -356,7 +357,7 @@ namespace AnalysisPrograms
             var result = new AudioToSonogramResult();
 
             // init the image stack
-            var list = new List<Image>();
+            var list = new List<Image<Rgb24>>();
 
             // 1) draw amplitude spectrogram
             AudioRecording recordingSegment = new AudioRecording(sourceRecording.FullName);
@@ -405,7 +406,7 @@ namespace AnalysisPrograms
             image = sonogram.GetImageAnnotatedWithLinearHerzScale(image, "AMPLITUDE SPECTROGRAM + LCN + ridge detection");
             list.Add(image);
 
-            Image envelopeImage = ImageTrack.DrawWaveEnvelopeTrack(recordingSegment, image.Width);
+            var envelopeImage = ImageTrack.DrawWaveEnvelopeTrack(recordingSegment, image.Width);
             list.Add(envelopeImage);
 
             // 3) now draw the standard decibel spectrogram
@@ -418,7 +419,7 @@ namespace AnalysisPrograms
             image = sonogram.GetImageFullyAnnotated("DECIBEL SPECTROGRAM");
             list.Add(image);
 
-            Image segmentationImage = ImageTrack.DrawSegmentationTrack(
+            var segmentationImage = ImageTrack.DrawSegmentationTrack(
                 sonogram,
                 EndpointDetectionConfiguration.K1Threshold,
                 EndpointDetectionConfiguration.K2Threshold,
@@ -458,7 +459,7 @@ namespace AnalysisPrograms
             // 6) COMBINE THE SPECTROGRAM IMAGES
             Image compositeImage = ImageTools.CombineImagesVertically(list);
             FileInfo outputImage = new FileInfo(Path.Combine(opDir.FullName, sourceName + ".5spectro.png"));
-            compositeImage.Save(outputImage.FullName, ImageFormat.Png);
+            compositeImage.Save(outputImage.FullName);
             result.SpectrogramFile = outputImage;
 
             // 7) Generate the FREQUENCY x OSCILLATIONS Graphs and csv data

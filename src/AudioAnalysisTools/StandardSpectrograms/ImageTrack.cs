@@ -14,6 +14,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
     using SixLabors.ImageSharp.Processing;
     using SixLabors.Primitives;
     using TowseyLibrary;
+    using Acoustics.Shared;
 
     public enum TrackType
     {
@@ -263,7 +264,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         {
             bmp.Mutate(g =>
             {
-                g.DrawText(title, SystemFonts.CreateFont("Tahoma", 8), Color.Black, new PointF(10, bmp.Height - 2));
+                g.DrawText(title, Drawing.Tahoma8, Color.Black, new PointF(10, bmp.Height - 2));
             });
             return bmp;
         }
@@ -317,7 +318,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             int length = bmp.Width;
             bmp.Mutate(g =>
             {
-                var font = SystemFonts.CreateFont("Arial", 10);
+                var font = Drawing.Arial10;
                 g.DrawText(this.Name, font, Color.Red, new PointF(10, this.topOffset));
                 g.DrawText(this.Name, font, Color.Red, new PointF(length / 2, this.topOffset));
                 g.DrawText(this.Name, font, Color.Red, new PointF(length - 80, this.topOffset));
@@ -389,7 +390,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 //paint white and leave a black vertical histogram bar
                 //for (int z = 0; z < id; z++)
                 //{
-                //    bmp.SetPixel(w, this.topOffset + z, gray); // background
+                //    bmp[w, this.topOffset + z] = gray; // background
                 //}
 
                 for (int z = id; z < this.height; z++)
@@ -611,8 +612,8 @@ namespace AudioAnalysisTools.StandardSpectrograms
                         bmp[w, this.topOffset + 2] = Color.OrangeRed;
                     }
 
-                //bmp.SetPixel(w, this.topOffset, Color.OrangeRed);
-                //bmp.SetPixel(w, this.bottomOffset - 1, Color.OrangeRed);
+                //bmp[w, this.topOffset] = Color.OrangeRed;
+                //bmp[w, this.bottomOffset - 1] = Color.OrangeRed;
             }
 
             return bmp;
@@ -664,12 +665,12 @@ namespace AudioAnalysisTools.StandardSpectrograms
         //#### STATIC METHODS BELOW HERE TO DRAW TRACK ##############################################################################################
         //###########################################################################################################################################
 
-        public static Image DrawWaveEnvelopeTrack(AudioRecording recording, int imageWidth)
+        public static Image<Rgb24> DrawWaveEnvelopeTrack(AudioRecording recording, int imageWidth)
         {
             //int height = ImageTrack.DefaultHeight;
             double[,] envelope = recording.GetWaveForm(imageWidth);
 
-            Image envelopeImage = DrawWaveEnvelopeTrack(envelope);
+            var envelopeImage = DrawWaveEnvelopeTrack(envelope);
             return envelopeImage;
         }
 
@@ -767,7 +768,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 }
 
                 //paint white and leave a black vertical bar
-                //for (int z = 0; z < id; z++) bmp.SetPixel(w, z, Color.White); // draw bar by drawing in white backgorund
+                //for (int z = 0; z < id; z++) bmp[w, z] = Color.White; // draw bar by drawing in white backgorund
                 for (int z = id; z < DefaultHeight; z++)
                 {
                     bmp[w, z] = Color.Black;
@@ -998,7 +999,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             bmp.Mutate(g =>
             {
-                g.DrawText(title, SystemFonts.CreateFont("Arial", 10), Color.White, new PointF(imageWidth + 5, yOffset));
+                g.DrawText(title, Drawing.Arial10, Color.White, new PointF(imageWidth + 5, yOffset));
             });
         }
 
@@ -1044,7 +1045,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             bmp.Mutate(g =>
             {
-                g.DrawText(title, SystemFonts.CreateFont("Tahoma", 8), Color.White, new PointF(imageWidth + 5, 0));
+                g.DrawText(title, Drawing.Tahoma8, Color.White, new PointF(imageWidth + 5, 0));
             });
 
             return bmp;
@@ -1090,7 +1091,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             }//end over all pixels
 
             int endWidth = trackWidth - array.Length;
-            var font = SystemFonts.CreateFont("Arial", 9);
+            var font = Drawing.Arial9;
             bmp.Mutate(g =>
             {
                 g.FillRectangle(new SolidBrush(Color.Black), array.Length + 1, 0, endWidth, trackHeight);
@@ -1132,7 +1133,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             }//end over all pixels
 
             int endWidth = trackWidth - array.Length;
-            var font = SystemFonts.CreateFont("Arial", 9);
+            var font = Drawing.Arial9;
             bmp.Mutate(g =>
             {
                 g.FillRectangle(Brushes.Solid(Color.Black), array.Length + 1, 0, endWidth, trackHeight);
@@ -1172,7 +1173,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
                 //g.DrawLine(pen, duration + 1, 0, trackWidth, 0);
                 
-                g.DrawText(title, SystemFonts.CreateFont("Tahoma", 9), Color.Wheat, new PointF(4, 3));
+                g.DrawText(title, Drawing.Tahoma9, Color.Wheat, new PointF(4, 3));
             });
             return bmp;
         }
@@ -1230,7 +1231,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
             Pen whitePen = new Pen(Color.White, 1);
             Pen grayPen = new Pen(Color.Gray, 1);
-            Font stringFont = SystemFonts.CreateFont("Arial", 10);
+            Font stringFont = Drawing.Arial10;
 
             int rows = bmp.Height;
             int cols = bmp.Width;
@@ -1308,7 +1309,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 int min = (int)startOffset.TotalMinutes - 1;
                 var XaxisScale = gridInterval.TotalMinutes;
                 Pen whitePen = new Pen(Color.White, 1);
-                Font stringFont = SystemFonts.CreateFont("Arial", 9);
+                Font stringFont = Drawing.Arial9;
 
                 for (int x = 0; x < trackWidth; x++) //for pixels in the line
                 {
@@ -1355,7 +1356,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
                 Pen whitePen = new Pen(Color.White, 1);
                 Pen grayPen = new Pen(Color.Gray, 1);
-                Font stringFont = SystemFonts.CreateFont("Arial", 8);
+                Font stringFont = Drawing.Arial8;
 
                 int rows = bmp.Height;
                 int cols = bmp.Width;
@@ -1450,8 +1451,8 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
                 Pen whitePen = new Pen(Color.White, 1);
 
-                //Pen grayPen = new Pen(Color.Gray);
-                Font stringFont = SystemFonts.CreateFont("Arial", 9);
+                //Pen grayPen = new Pen(Color.Gray, 1);
+                Font stringFont = Drawing.Arial9;
 
                 for (int i = 0; i < 12; i++) //for pixels in the line
                 {
@@ -1475,7 +1476,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 //g.DrawLine(whitePen, 0, offset, trackWidth, offset);          //draw lower boundary
                 // g.DrawLine(whitePen, duration, 0, duration, trackHeight - 1);//draw right end boundary
 
-                // g.DrawString(title, stringFont, Brushes.White, new PointF(duration + 4, 3));
+                // g.DrawText(title, stringFont, Color.White, new PointF(duration + 4, 3));
             });
             
             return bmp;
@@ -1497,8 +1498,8 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
                 Pen whitePen = new Pen(Color.White, 1);
 
-                //Pen grayPen = new Pen(Color.Gray);
-                Font stringFont = SystemFonts.CreateFont("Arial", 9);
+                //Pen grayPen = new Pen(Color.Gray, 1);
+                Font stringFont = Drawing.Arial9;
 
                 for (int i = 0; i < 12; i++)
                 {
@@ -1514,7 +1515,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 //g.DrawLine(whitePen, 0, offset, trackWidth, offset);          //draw lower boundary
                 // g.DrawLine(whitePen, duration, 0, duration, trackHeight - 1);//draw right end boundary
 
-                // g.DrawString(title, stringFont, Brushes.White, new PointF(duration + 4, 3));
+                // g.DrawText(title, stringFont, Color.White, new PointF(duration + 4, 3));
             });
 
             return bmp;
@@ -1577,7 +1578,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             byte[] hScale = GetXaxisTicLocations(width, duration);
 
             var bmp = new Image<Rgb24>(width, height);
-            var font = SystemFonts.CreateFont("Tahoma", 8);
+            var font = Drawing.Tahoma8;
 
             bmp.Mutate(g =>
             {

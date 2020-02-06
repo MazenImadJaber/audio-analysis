@@ -78,7 +78,7 @@ namespace AudioAnalysisTools
             using (var recording = new AudioRecording(bytes))
             using (var img = recording.GetWaveFormInDecibels(width, height, WaveFormDbMin))
             {
-                image = new Image<Rgb24>(img);
+                image = img;
             }
 
             return image;
@@ -124,7 +124,7 @@ namespace AudioAnalysisTools
                 var sonogram = new SpectrogramStandard(sonogramConfig, audiorecording.WavReader);
                 using (var img = sonogram.GetImage())
                 {
-                    image = new Image<Rgb24>(img);
+                    image = img;
                 }
             }
 
@@ -183,7 +183,7 @@ namespace AudioAnalysisTools
             using (var recording = new AudioRecording(bytes))
             using (var img = recording.GetWaveFormInDecibels(width, height, WaveFormDbMin))
             {
-                image = new Image<Rgb24>(img);
+                image = (img.Clone());
             }
 
             return image;
@@ -202,7 +202,7 @@ namespace AudioAnalysisTools
         {
             IWavReader wavReader = new WavStreamReader(bytes);
 
-            return new Image<Rgb24>(GetSpectrogram(wavReader, 1));
+            return (GetSpectrogram(wavReader, 1));
         }
 
         /// <summary>
@@ -212,7 +212,7 @@ namespace AudioAnalysisTools
         /// <param name="reader">Wav Reader.</param>
         /// <param name="channel">Channel number.</param>
         /// <returns>Spectrogram image.</returns>
-        private static Image GetSpectrogram(IWavReader reader, int channel)
+        private static Image<Rgb24> GetSpectrogram(IWavReader reader, int channel)
         {
             /*
              * 80 pixels per second is too quick for Silverlight.
@@ -289,7 +289,7 @@ namespace AudioAnalysisTools
              * Done. Spectrogram is (finally) ready!
              */
 
-            Image image = GetImage(dbSonogram);
+            var image = GetImage(dbSonogram);
             return image;
         }
 
@@ -911,15 +911,16 @@ namespace AudioAnalysisTools
         /// <returns>
         /// the image.
         /// </returns>
-        private static Image GetImage(double[,] data)
+        private static Image<Rgb24> GetImage(double[,] data)
         {
             // Number of spectra in sonogram
             int width = data.GetLength(0);
             int fftBins = data.GetLength(1);
 
-            var bmp = UnsafeImage.GetImage(data, fftBins, width);
+            throw new NotSupportedException("Broken in .NET core port");
+            //var bmp = UnsafeImage.GetImage(data, fftBins, width);
 
-            return bmp;
+            return null;
         }
     }
 }

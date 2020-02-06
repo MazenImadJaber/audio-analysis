@@ -67,7 +67,7 @@ namespace AnalysisPrograms
             public AedConfiguration()
             {
                 this.AedEventColor = Color.Red;
-                this.AedHitColor = Color.FromArgb(128, this.AedEventColor);
+                this.AedHitColor = this.AedEventColor.WithAlpha(0.5f);
                 this.NoiseReductionType = NoiseReductionType.None;
             }
 
@@ -261,7 +261,7 @@ namespace AnalysisPrograms
             // save image of sonograms
             var outputImagePath = outputDir.CombineFile(recodingBaseName + ".Sonogram.png");
             Image image = DrawSonogram(results.Item3, results.Item1);
-            image.Save(outputImagePath.FullName, ImageFormat.Png);
+            image.Save(outputImagePath.FullName);
             Log.Info("Image saved to: " + outputImagePath.FullName);
 
             // output csv
@@ -300,7 +300,7 @@ namespace AnalysisPrograms
             if (analysisSettings.AnalysisImageSaveBehavior.ShouldSave(analysisResults.Events.Length))
             {
                 Image image = DrawSonogram(sonogram, results.Item1);
-                image.Save(segmentSettings.SegmentImageFile.FullName, ImageFormat.Png);
+                image.Save(segmentSettings.SegmentImageFile.FullName);
                 analysisResults.ImageFile = segmentSettings.SegmentImageFile;
             }
 

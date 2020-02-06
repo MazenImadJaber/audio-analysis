@@ -10,6 +10,7 @@ namespace TowseyLibrary
     using System.IO;
     using System.Linq;
     using System.Text;
+    using Acoustics.Shared;
     using SixLabors.Fonts;
     using SixLabors.ImageSharp.Processing;
     using SixLabors.Primitives;
@@ -108,7 +109,7 @@ namespace TowseyLibrary
             double[,] norm1 = DataTools.normalise(histo1);
             double[,] norm2 = DataTools.normalise(histo2);
             double[,] norm3 = DataTools.normalise(histo3);
-            var stringFont = SystemFonts.CreateFont("Arial", 12);
+            var stringFont = Drawing.Arial12;
 
             //Image bmp = ImageTools.DrawMatrixWithoutNormalisationGreenScale(norm);
             var bmp = ImageTools.DrawRGBMatrix(norm1, norm2, norm3); // RGB

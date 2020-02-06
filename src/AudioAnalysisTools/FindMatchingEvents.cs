@@ -20,7 +20,7 @@ namespace AudioAnalysisTools
     {
         public static double[,] ReadImage2BinaryMatrixDouble(string fileName)
         {
-            Image<Rgb24> bitmap = ImageTools.ReadImage2Bitmap(fileName);
+            Image<Rgb24> bitmap = Image.Load<Rgb24>(fileName);
             int height = bitmap.Height;  //height
             int width = bitmap.Width;    //width
             var matrix = new double[height, width];
@@ -29,7 +29,7 @@ namespace AudioAnalysisTools
             {
                 for (int c = 0; c < width; c++)
                 {
-                    Color color = bitmap.GetPixel(c, r);
+                    var color = bitmap[c, r];
                     if (color.R < 255 && color.G < 255 && color.B < 255)
                     {
                         matrix[r, c] = 1; // init an ON CELL = +1
@@ -46,7 +46,7 @@ namespace AudioAnalysisTools
 
         public static double[,] ReadImage2TrinaryMatrix(string fileName)
         {
-            Image<Rgb24> bitmap = ImageTools.ReadImage2Bitmap(fileName);
+            Image<Rgb24> bitmap = Image.Load<Rgb24>(fileName);
             int height = bitmap.Height;  //height
             int width = bitmap.Width;    //width
             var matrix = new double[height, width];
@@ -55,7 +55,7 @@ namespace AudioAnalysisTools
             {
                 for (int c = 0; c < width; c++)
                 {
-                    Color color = bitmap.GetPixel(c, r);
+                    var color = bitmap[c, r];
                     if (color.R < 255 && color.G < 255 && color.B < 255)
                     {
                         matrix[r, c] = 1;

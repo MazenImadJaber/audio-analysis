@@ -172,7 +172,7 @@ namespace AnalysisPrograms
                 double eventThreshold = 0.1;
                 Image image = DrawSonogram(sonogram, hits, scores, predictedEvents, eventThreshold);
 
-                image.Save(analysisSettings.SegmentSettings.SegmentImageFile.FullName, ImageFormat.Png);
+                image.Save(analysisSettings.SegmentSettings.SegmentImageFile.FullName);
             }
 
             analysisResults.Data = dataTableOfEvents;

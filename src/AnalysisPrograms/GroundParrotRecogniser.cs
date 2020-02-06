@@ -150,7 +150,7 @@ namespace AnalysisPrograms
 
             Log.Debug("EPR start");
 
-            IEnumerable<Tuple<Util.Rectangle<double, double>, double>> eprRects =
+            var eprRects =
                 EventPatternRecog.DetectGroundParrots(events, eprNormalisedMinScore);
             Log.Debug("EPR finished");
 
@@ -214,7 +214,7 @@ namespace AnalysisPrograms
             BaseSonogram sonogram = result.Item1;
             string imagePath = Path.Combine(outputFolder, Path.GetFileNameWithoutExtension(wavFilePath) + ".png");
             var image = Aed.DrawSonogram(sonogram, eprEvents);
-            image.Save(imagePath, ImageFormat.Png);
+            image.Save(imagePath);
 
             //ProcessingTypes.SaveAeCsv(eprEvents, outputFolder, wavFilePath);
 
@@ -338,7 +338,7 @@ namespace AnalysisPrograms
             if (analysisSettings.AnalysisImageSaveBehavior.ShouldSave(analysisResults.Events.Length))
             {
                 Image image = Aed.DrawSonogram(sonogram, results.Item2);
-                image.Save(segmentSettings.SegmentImageFile.FullName, ImageFormat.Png);
+                image.Save(segmentSettings.SegmentImageFile.FullName);
                 analysisResults.ImageFile = segmentSettings.SegmentImageFile;
             }
 

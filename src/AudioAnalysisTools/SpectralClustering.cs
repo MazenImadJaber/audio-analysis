@@ -616,7 +616,7 @@ namespace AudioAnalysisTools
         public static void SaveAndViewSpectrogramImage(Image image, string opDir, string fName, string imageViewer)
         {
             string imagePath = Path.Combine(opDir, fName);
-            image.Save(imagePath, ImageFormat.Png);
+            image.Save(imagePath);
             var fiImage = new FileInfo(imagePath);
             if (fiImage.Exists)
             {

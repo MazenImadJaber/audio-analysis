@@ -34,6 +34,7 @@ namespace AnalysisPrograms
     using log4net;
     using MathNet.Numerics;
     using McMaster.Extensions.CommandLineUtils;
+    using SixLabors.ImageSharp.PixelFormats;
     using TowseyLibrary;
 
     /// <summary>
@@ -116,7 +117,7 @@ namespace AnalysisPrograms
             var soxFile = new FileInfo(Path.Combine(output.FullName, sourceName + "SOX.png"));
             var result = GenerateFourSpectrogramImages(tempAudioSegment, soxFile, configDict, dataOnly: false, makeSoxSonogram: false);
             var outputImageFile = new FileInfo(Path.Combine(output.FullName, sourceName + ".FourSpectrograms.png"));
-            result.CompositeImage.Save(outputImageFile.FullName, ImageFormat.Png);
+            result.CompositeImage.Save(outputImageFile.FullName);
 
             LoggedConsole.WriteLine("\n##### FINISHED FILE ###################################################\n");
         }
@@ -203,7 +204,7 @@ namespace AnalysisPrograms
             else
             {
                 // init the image stack
-                var list = new List<Image>();
+                var list = new List<Image<Rgb24>>();
 
                 // IMAGE 1) draw amplitude spectrogram
                 var recordingSegment = new AudioRecording(sourceRecording.FullName);
@@ -252,7 +253,7 @@ namespace AnalysisPrograms
                 image = sonogram.GetImageAnnotatedWithLinearHerzScale(image, "AMPLITUDE SPECTROGRAM + LCN + ridge detection");
                 list.Add(image);
 
-                Image envelopeImage = ImageTrack.DrawWaveEnvelopeTrack(recordingSegment, image.Width);
+                var envelopeImage = ImageTrack.DrawWaveEnvelopeTrack(recordingSegment, image.Width);
                 list.Add(envelopeImage);
 
                 // IMAGE 2) now draw the standard decibel spectrogram
@@ -261,7 +262,7 @@ namespace AnalysisPrograms
                 image = sonogram.GetImageFullyAnnotated("DECIBEL SPECTROGRAM");
                 list.Add(image);
 
-                Image segmentationImage = ImageTrack.DrawSegmentationTrack(
+                var segmentationImage = ImageTrack.DrawSegmentationTrack(
                     sonogram,
                     EndpointDetectionConfiguration.K1Threshold,
                     EndpointDetectionConfiguration.K2Threshold,
@@ -310,7 +311,7 @@ namespace AnalysisPrograms
                 ////SpectrogramCepstral cepgram = new SpectrogramCepstral((AmplitudeSonogram)amplitudeSpg);
                 ////var mti3 = SpectrogramTools.Sonogram2MultiTrackImage(sonogram, configDict);
                 ////var image3 = mti3.GetImage();
-                ////image3.Save(fiImage.FullName + "3", ImageFormat.Png);
+                ////image3.Save(fiImage.FullName + "3");
 
                 // 6) COMBINE THE SPECTROGRAM IMAGES
                 result.CompositeImage = ImageTools.CombineImagesVertically(list);
@@ -347,7 +348,7 @@ namespace AnalysisPrograms
                 var soxImage = new FileInfo(Path.Combine(output.FullName, sourceName + ".SOX.png"));
                 var result = GenerateFourSpectrogramImages(tempAudioSegment, soxImage, configDict, dataOnly: false, makeSoxSonogram: false);
                 var outputImage = new FileInfo(Path.Combine(output.FullName, sourceName + ".FourSpectrograms.png"));
-                result.CompositeImage.Save(outputImage.FullName, ImageFormat.Png);
+                result.CompositeImage.Save(outputImage.FullName);
 
                 // construct output file names
                 var fileName = sourceName + ".FourSpectrogramsImageInfo";
@@ -458,7 +459,7 @@ namespace AnalysisPrograms
             if (analysisSettings.AnalysisImageSaveBehavior.ShouldSave(analysisResult.Events.Length))
             {
                 Debug.Assert(segmentSettings.SegmentImageFile.Exists);
-                spectrogramResult.CompositeImage.Save(segmentSettings.SegmentImageFile.FullName, ImageFormat.Png);
+                spectrogramResult.CompositeImage.Save(segmentSettings.SegmentImageFile.FullName);
             }
 
             if (saveCsv)

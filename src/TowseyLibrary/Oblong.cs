@@ -712,7 +712,7 @@ namespace TowseyLibrary
                 // TransformCoordinates(RowTop, ColumnLeft, RowBottom, ColumnRight, out x1, out y1, out x2, out y2, mWidth);
                 // for (int r = shape.RowTop; r <= shape.RowBottom; r++)
                 // for (int c = shape.ColumnLeft; c <= shape.ColumnRight; c++)
-                // bmp.SetPixel(c, r, colour);
+                // bmp[c, r] = colour;
                 for (int r = shape.RowTop; r <= shape.RowBottom; r++)
                 {
                     bmp[shape.ColumnLeft, r] = colour;
@@ -733,7 +733,7 @@ namespace TowseyLibrary
                     bmp[c, shape.RowBottom] = colour;
                 }
 
-                // bmp.SetPixel(c, r, colour);
+                // bmp[c, r] = colour;
                 // RowTop += shape.RowWidth;
             }
 

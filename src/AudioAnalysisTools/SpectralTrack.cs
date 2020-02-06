@@ -217,14 +217,14 @@ namespace AudioAnalysisTools
                 frame1 = frame2;
             }
 
-            //g.DrawString(this.Name, new Font("Tahoma", 8), Brushes.Black, new PointF(t1, y - 1));
+            //g.DrawText(this.Name, Drawing.Tahoma8, Color.Black, new PointF(t1, y - 1));
         }
 
         //public void DrawEvent(Graphics g, double framesPerSecond, double freqBinWidth, int sonogramHeight)
         //{
-        //    Pen p1 = new Pen(AcousticEvent.DEFAULT_BORDER_COLOR); // default colour
-        //    Pen p2 = new Pen(AcousticEvent.DEFAULT_SCORE_COLOR);
-        //    if (this.BorderColour != null) p1 = new Pen(this.BorderColour);
+        //    Pen p1 = new Pen(AcousticEvent.DEFAULT_BORDER_COLOR, 1); // default colour
+        //    Pen p2 = new Pen(AcousticEvent.DEFAULT_SCORE_COLOR, 1);
+        //    if (this.BorderColour != null) p1 = new Pen(this.BorderColour, 1);
 
         //    //calculate top and bottom freq bins
         //    int minFreqBin = (int)Math.Round(this.MinFreq / freqBinWidth);
@@ -256,7 +256,7 @@ namespace AudioAnalysisTools
         //    g.DrawLine(p2, t1 + 1, y1, t1 + 1, y2);
         //    g.DrawLine(p2, t1 + 2, y1, t1 + 2, y2);
         //    //g.DrawLine(p2, t1 + 3, y1, t1 + 3, y2);
-        //    g.DrawString(this.Name, new Font("Tahoma", 8), Brushes.Black, new PointF(t1, y - 1));
+        //    g.DrawText(this.Name, Drawing.Tahoma8, Color.Black, new PointF(t1, y - 1));
         //}
 
         //#########################################################################################################################################################

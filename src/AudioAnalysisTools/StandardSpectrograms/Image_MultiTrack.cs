@@ -16,7 +16,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
     public class Image_MultiTrack : IDisposable
     {
-        public Image SonogramImage { get; private set; }
+        public Image<Rgb24> SonogramImage { get; private set; }
 
         private List<ImageTrack> tracks = new List<ImageTrack>();
 
@@ -51,7 +51,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// Initializes a new instance of the <see cref="Image_MultiTrack"/> class.
         /// CONSTRUCTOR
         /// </summary>
-        public Image_MultiTrack(Image image)
+        public Image_MultiTrack(Image<Rgb24> image)
         {
             this.SonogramImage = image;
             this.Points = new List<PointOfInterest>();
@@ -155,7 +155,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// This means it cannot handle recording sonograms longer than 2 minutes.
         /// Therefore call a recursive method to draw the image.
         /// </summary>
-        public Image GetImage()
+        public Image<Rgba32> GetImage()
         {
             // Calculate total height of the bmp
             var height = this.CalculateImageHeight();
@@ -237,7 +237,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             {
                 track.topOffset = offset;
                 track.bottomOffset = offset + track.Height - 1;
-                track.DrawTrack(imageToReturn);
+                track.DrawTrack(imageToReturn.CloneAs<Rgb24>());
                 offset += track.Height;
             }
 
@@ -272,7 +272,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 //g.DrawRectangle(p1, x, y, x + 1, y + 1);
                 g.DrawLine(p1, x, y, x, y + 1);
 
-                // g.DrawString(e.Name, new Font("Tahoma", 6), Brushes.Black, new PointF(x, y - 1));
+                // g.DrawText(e.Name, Drawing.Tahoma6, Color.Black, new PointF(x, y - 1));
             }
         }
 
@@ -342,7 +342,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                     //int penID = (int)(paletteSize * normScore);
                     //if (penID >= paletteSize) penID = paletteSize - 1;
                     //g.DrawLine(pens[penID], r, imageHt - c, r + 1, imageHt - c);
-                    //g.DrawLine(new Pen(Color.Red), r, imageHt - c, r + 1, imageHt - c);
+                    //g.DrawLine(new Pen(Color.Red, 1), r, imageHt - c, r + 1, imageHt - c);
                     newBmp[r, imageHt - c] = Color.Red;
                 }
             }
@@ -468,7 +468,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                     //int red = (int)Math.Floor(newColor.R + ((255 - newColor.R) * factor));
                     //int grn = (int)Math.Floor(newColor.G + ((255 - newColor.G) * factor));
                     //int blu = (int)Math.Floor(newColor.B + ((255 - newColor.B) * factor));
-                    //g.DrawLine(new Pen(Color.FromArgb(red, grn, blu)), r, imageHt - c, r + 1, imageHt - c);
+                    //g.DrawLine(new Pen(Color.FromRgb(red, grn, blu)), r, imageHt - c, r + 1, imageHt - c);
                     g.DrawLine(new Pen(newColor, 1), r, imageHt - c, r + 1, imageHt - c);
                 }
             }

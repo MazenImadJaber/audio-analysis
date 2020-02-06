@@ -65,16 +65,16 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             Color[] colourPalette = new Color[N]; //palette
             for (int c = 0; c < N; c++)
             {
-                colourPalette[c] = Color.FromArgb(discreteColourValues[c, R], discreteColourValues[c, G], discreteColourValues[c, B]);
+                colourPalette[c] = Color.FromRgb(discreteColourValues[c, R], discreteColourValues[c, G], discreteColourValues[c, B]);
             }
 
             // read in the image
-            Image<Rgb24> image = ImageTools.ReadImage2Bitmap(inputPath);
+            Image<Rgb24> image = Image.Load<Rgb24>(inputPath);
             for (int x = 0; x < image.Width; x++)
             {
                 for (int y = 0; y < image.Height; y++)
                 {
-                    Color imageCol = image.GetPixel(x, y);
+                    var imageCol = image[x, y];
                     byte[] imageColorVector = new byte[3];
                     imageColorVector[0] = imageCol.R;
                     imageColorVector[1] = imageCol.G;
@@ -96,11 +96,11 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                     DataTools.MinMax(distance, out minindex, out maxindex, out min, out max);
 
                     //if ((col.R > 200) && (col.G > 200) && (col.B > 200))
-                    image.SetPixel(x, y, colourPalette[minindex]);
+                    image[x, y] = colourPalette[minindex];
                 }
             }
 
-            ImageTools.WriteBitmap2File(image, outputPath);
+            image.Save(outputPath);
         }
     }
 }

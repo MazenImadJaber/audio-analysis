@@ -8,6 +8,7 @@ namespace AudioAnalysisTools.DSP
     using SixLabors.ImageSharp;
     using System.Drawing.Imaging;
     using System.IO;
+    using Acoustics.Shared;
     using SixLabors.Fonts;
     using SixLabors.ImageSharp.ColorSpaces;
     using SixLabors.ImageSharp.PixelFormats;
@@ -408,7 +409,7 @@ namespace AudioAnalysisTools.DSP
 
                     if (y > 1)
                     {
-                        g.DrawText($"{hertzValue}", SystemFonts.CreateFont("Tahoma", 8), txtColour, new PointF(1, y));
+                        g.DrawText($"{hertzValue}", Drawing.Tahoma8, txtColour, new PointF(1, y));
                     }
                 }
             });

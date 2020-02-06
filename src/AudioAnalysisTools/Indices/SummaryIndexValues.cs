@@ -13,6 +13,7 @@ namespace AudioAnalysisTools.Indices
     using Fasterflect;
     using StandardSpectrograms;
     using TowseyLibrary;
+    using Fasterflect.Extensions;
 
     public class IndexCalculateResult
     {
@@ -104,7 +105,8 @@ namespace AudioAnalysisTools.Indices
                     continue;
                 }
 
-                this.SetPropertyValue(kvp.Key, kvp.Value.DefaultValueCasted);
+                MemberSetter setValue = Reflect.Setter(typeof(SummaryIndexValues), kvp.Key);
+                setValue(this, kvp.Value);
             }
         }
 

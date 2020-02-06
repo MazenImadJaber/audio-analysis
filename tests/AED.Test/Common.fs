@@ -1,4 +1,4 @@
-﻿module Common
+module Common
 
 open System.IO
 
@@ -9,6 +9,8 @@ open System.IO.Compression
 open System.Reflection
 open QutSensors.AudioAnalysis.AED.GetAcousticEvents
 open QutSensors.AudioAnalysis.AED.Util
+open Microsoft.FSharp
+open Microsoft.FSharp.Math
                        
 type TestMetadata = {Dir:string; BWthresh:double; smallThreshIn:int; smallThreshOut:int}
 let BAC2_20071015_045040 =

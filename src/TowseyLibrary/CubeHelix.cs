@@ -259,7 +259,7 @@ namespace TowseyLibrary
         /// </summary>
         /// <param name="matrix">the data</param>
         /// <param name="pathName"></param>
-            public Image DrawMatrixWithoutNormalisation(double[,] matrix)
+            public Image<Rgb24> DrawMatrixWithoutNormalisation(double[,] matrix)
         {
             int rows = matrix.GetLength(0); //number of rows
             int cols = matrix.GetLength(1); //number

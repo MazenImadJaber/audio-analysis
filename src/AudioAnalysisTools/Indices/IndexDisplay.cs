@@ -11,12 +11,14 @@ namespace AudioAnalysisTools.Indices
     using System.Linq;
     using System.Reflection;
     using System.Text;
+    using Acoustics.Shared;
     using AnalysisBase.ResultBases;
     using StandardSpectrograms;
     using log4net;
     using LongDurationSpectrograms;
     using SixLabors.ImageSharp.PixelFormats;
     using SixLabors.ImageSharp.Processing;
+    using SixLabors.Primitives;
     using TowseyLibrary;
 
     public static class IndexDisplay
@@ -95,7 +97,7 @@ namespace AudioAnalysisTools.Indices
             var backgroundColour = Color.White;
 
             // init list of bitmap images to store image tracks
-            var bitmapList = new List<Tuple<IndexProperties, Image>>(dictionaryOfSummaryIndices.Keys.Count);
+            var bitmapList = new List<Tuple<IndexProperties, Image<Rgb24>>>(dictionaryOfSummaryIndices.Keys.Count);
 
             // set up strings to store info about which indices are used
             var s1 = new StringBuilder("Indices not found:");
@@ -156,7 +158,7 @@ namespace AudioAnalysisTools.Indices
             }
 
             //draw the composite bitmap
-            var imageList = new List<Image>
+            var imageList = new List<Image<Rgb24>>
             {
                 titleBmp,
                 timeBmp1,
@@ -205,11 +207,12 @@ namespace AudioAnalysisTools.Indices
             int trackHeight = DefaultTrackHeight;
 
             var bmp = new Image<Rgb24>(trackWidth, trackHeight);
-            var g = Graphics.FromImage(bmp);
-
-            //g.Clear(grayScale[240]);
-            g.Clear(Color.LightGray);
-            g.DrawRectangle(new Pen(Color.White), 0, 0, trackWidth - 1, trackHeight - 1);
+            bmp.Mutate(g =>
+            {
+                //g.Clear(grayScale[240]);
+                g.Clear(Color.LightGray);
+                g.DrawRectangle(new Pen(Color.White, 1), 0, 0, trackWidth - 1, trackHeight - 1);
+            });
 
             // for pixels in the line
             for (int i = 0; i < dataLength; i++)
@@ -238,25 +241,29 @@ namespace AudioAnalysisTools.Indices
                 int barHeight = (int)Math.Round(value1 * trackHeight);
                 for (int y = 0; y < barHeight; y++)
                 {
-                    bmp.SetPixel(i, trackHeight - y - 1, Color.DarkBlue);
+                    bmp[i, trackHeight - y - 1] = Color.DarkBlue;
                 }
 
                 // now draw the clipping index
                 barHeight = (int)Math.Round(value2 * trackHeight);
                 for (int y = 0; y < barHeight; y++)
                 {
-                    bmp.SetPixel(i, trackHeight - y - 1, Color.Red);
+                    bmp[i, trackHeight - y - 1] = Color.Red;
                 }
             }
 
             // add in text
-            var font = new Font("Arial", 9.0f, FontStyle.Regular);
-            g.DrawString("Clipping", font, Brushes.DarkRed, new PointF(5, 1));
-            g.DrawString(" & High Amplitude", font, Brushes.DarkBlue, new PointF(50, 1));
+            bmp.Mutate(g =>
+            {
+                var font = Drawing.Arial9;
+                g.DrawText("Clipping", font, Color.DarkRed, new PointF(5, 1));
+                g.DrawText(" & High Amplitude", font, Color.DarkBlue, new PointF(50, 1));
+            });
+
             return bmp;
         }
 
-        public static Image DrawHighAmplitudeClippingTrack(SummaryIndexBase[] summaryIndices)
+        public static Image<Rgb24> DrawHighAmplitudeClippingTrack(SummaryIndexBase[] summaryIndices)
         {
             var highAmplitudeIndex = new double[summaryIndices.Length];
             var clippingIndex = new double[summaryIndices.Length];

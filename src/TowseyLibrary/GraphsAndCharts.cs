@@ -8,6 +8,7 @@ namespace TowseyLibrary
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using Acoustics.Shared;
     using SixLabors.Fonts;
     using SixLabors.ImageSharp;
     using SixLabors.ImageSharp.PixelFormats;
@@ -46,7 +47,7 @@ namespace TowseyLibrary
             var pen3 = new Pen(Color.Wheat, 1f);
             var pen4 = new Pen(Color.Purple, 1f);
             var brush = new SolidBrush(Color.Red);
-            var stringFont = SystemFonts.CreateFont("Arial", 9);
+            var stringFont = Drawing.Arial9;
 
             int barWidth = imageWidth / histogram.Length;
             if (barWidth < 1)
@@ -159,7 +160,7 @@ namespace TowseyLibrary
             Pen pen1 = new Pen(Color.White, 1f);
             Pen pen2 = new Pen(Color.Lime, 1f);
             Pen pen3 = new Pen(Color.Wheat, 1f);
-            var stringFont = SystemFonts.CreateFont("Arial", 9);
+            var stringFont = Drawing.Arial9;
 
             int barWidth = imageWidth / signal.Length;
 
@@ -226,12 +227,12 @@ namespace TowseyLibrary
             var pen1 = new Pen(Color.White, 1f);
             var pen2 = new Pen(Color.Red, 1f);
 
-            // Pen pen3 = new Pen(Color.Wheat);
-            // Pen pen4 = new Pen(Color.Purple);
+            // Pen pen3 = new Pen(Color.Wheat, 1);
+            // Pen pen4 = new Pen(Color.Purple, 1);
             // SolidBrush brush = new SolidBrush(Color.Red);
-            var stringFont = SystemFonts.CreateFont("Arial", 9);
+            var stringFont = Drawing.Arial9;
 
-            //Font stringFont = new Font("Tahoma", 9);
+            //Font stringFont = Drawing.Tahoma9;
             //SizeF stringSize = new SizeF();
 
 
@@ -276,14 +277,14 @@ namespace TowseyLibrary
         {
             Pen pen1 = new Pen(Color.White, 1f);
 
-            //Pen pen2 = new Pen(Color.Red);
+            //Pen pen2 = new Pen(Color.Red, 1);
             Pen pen3 = new Pen(Color.Wheat, 1f);
 
-            //Pen pen4 = new Pen(Color.Purple);
+            //Pen pen4 = new Pen(Color.Purple, 1);
             var brush = new SolidBrush(Color.Red);
-            var stringFont = SystemFonts.CreateFont("Arial", 9);
+            var stringFont = Drawing.Arial9;
 
-            //Font stringFont = new Font("Tahoma", 9);
+            //Font stringFont = Drawing.Tahoma9;
             //SizeF stringSize = new SizeF();
 
             int barWidth = imageWidth / histogram.Length;
@@ -373,7 +374,7 @@ namespace TowseyLibrary
             var imageList = new List<Image<Rgb24>> { image4A, image4B };
 
             Pen pen1 = new Pen(Color.Wheat, 1f);
-            var stringFont = SystemFonts.CreateFont("Arial", 9);
+            var stringFont = Drawing.Arial9;
             var bmp2 = new Image<Rgb24>(signal.Length, 25);
             bmp2.Mutate(g2 =>
             {

@@ -12,12 +12,11 @@ namespace Acoustics.Test
     using System.Linq;
     using Acoustics.Shared;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using MSTestExtensions;
     using static System.DateTimeOffset;
     using DateTimeOffset = System.DateTimeOffset;
 
     [TestClass]
-    public class FileDateHelpersTests : BaseTest
+    public class FileDateHelpersTests
     {
         [TestMethod]
         public void BasicTestCase()

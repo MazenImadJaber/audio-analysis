@@ -24,6 +24,7 @@ namespace AnalysisPrograms.Recognizers
     using AudioAnalysisTools.WavTools;
     using Base;
     using log4net;
+    using SixLabors.ImageSharp;
     using TowseyLibrary;
 
     /// <summary>

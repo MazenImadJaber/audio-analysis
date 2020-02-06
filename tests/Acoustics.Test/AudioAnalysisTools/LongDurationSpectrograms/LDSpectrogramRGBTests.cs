@@ -22,6 +22,8 @@ namespace Acoustics.Test.AudioAnalysisTools.LongDurationSpectrograms
     using global::AudioAnalysisTools.LongDurationSpectrograms;
     using global::TowseyLibrary;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.Primitives;
 
     [TestClass]
     public class LDSpectrogramRGBTests : OutputDirectoryTest
@@ -98,12 +100,12 @@ namespace Acoustics.Test.AudioAnalysisTools.LongDurationSpectrograms
 
             var image = (Image<Rgb24>)LDSpectrogramRGB.DrawRgbColourMatrix(redM, grnM, bluM, doReverseColour: true);
 
-            Assert.That.PixelIsColor(new Point(1, 1), Color.FromArgb(128, 128, 128), image);
-            Assert.That.PixelIsColor(new Point(2, 2), Color.FromArgb(128, 128, 128), image);
+            Assert.That.PixelIsColor(new Point(1, 1), Color.FromRgb(128, 128, 128), image);
+            Assert.That.PixelIsColor(new Point(2, 2), Color.FromRgb(128, 128, 128), image);
 
             // empty values are rendered as white because of `doReverseColour`
-            Assert.That.ImageRegionIsColor(Rectangle.FromLTRB(0,0, 1,5), Color.FromArgb(255, 255, 255), image);
-            Assert.That.ImageRegionIsColor(Rectangle.FromLTRB(4,0, 5,5), Color.FromArgb(255, 255, 255), image);
+            Assert.That.ImageRegionIsColor(Rectangle.FromLTRB(0,0, 1,5), Color.FromRgb(255, 255, 255), image);
+            Assert.That.ImageRegionIsColor(Rectangle.FromLTRB(4,0, 5,5), Color.FromRgb(255, 255, 255), image);
 
             // To intensify the blue, this method adds 0.7 * d3 to the green value;
             // and it adds 0.2 to the blue value;
@@ -111,7 +113,7 @@ namespace Acoustics.Test.AudioAnalysisTools.LongDurationSpectrograms
             int r = (1 - redM[3, 3]).ScaleUnitToByte();
             int g = (1 - (grnM[3, 3] + (0.7 * bluM[3, 3]))).ScaleUnitToByte();
             int b = (1 - (bluM[3, 3] + 0.2)).ScaleUnitToByte();
-            var cyanColor = Color.FromArgb(r, g, b);
+            var cyanColor = Color.FromRgb((byte)r, (byte)g, (byte)b);
             Assert.That.PixelIsColor(new Point(3, 3), cyanColor, image);
         }
     }

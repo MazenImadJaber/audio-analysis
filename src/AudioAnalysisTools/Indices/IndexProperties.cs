@@ -17,11 +17,13 @@ namespace AudioAnalysisTools.Indices
     using System.Collections.Generic;
     using SixLabors.ImageSharp;
     using System.IO;
+    using Acoustics.Shared;
     using Acoustics.Shared.ConfigFile;
     using AnalysisBase;
     using Newtonsoft.Json;
     using SixLabors.ImageSharp.PixelFormats;
     using SixLabors.ImageSharp.Processing;
+    using SixLabors.Primitives;
     using TowseyLibrary;
     using YamlDotNet.Serialization;
     using Zio;
@@ -223,13 +225,13 @@ namespace AudioAnalysisTools.Indices
             return $" {this.Name} ({this.NormMin:f2} .. {this.NormMax:f2} {this.Units})";
         }
 
-        public Image GetPlotImage(double[] array, List<GapsAndJoins> errors = null) => this.GetPlotImage(array, Color.White, errors);
+        public Image<Rgb24> GetPlotImage(double[] array, List<GapsAndJoins> errors = null) => this.GetPlotImage(array, Color.White, errors);
 
         /// <summary>
         /// This method called from Indexdisplay.DrawImageOfSummaryIndices().
         /// It draws a single plot/track of one summary index.
         /// </summary>
-        public Image GetPlotImage(double[] array, Color backgroundColour, List<GapsAndJoins> errors = null)
+        public Image<Rgb24> GetPlotImage(double[] array, Color backgroundColour, List<GapsAndJoins> errors = null)
         {
             int dataLength = array.Length;
             string annotation = this.GetPlotAnnotation();
@@ -238,9 +240,7 @@ namespace AudioAnalysisTools.Indices
             int trackWidth = dataLength + IndexDisplay.TrackEndPanelWidth;
             int trackHeight = IndexDisplay.DefaultTrackHeight;
 
-            Image<Rgb24> bmp = new Image<Rgb24>(trackWidth, trackHeight);
-            Graphics g = Graphics.FromImage(bmp);
-            g.Clear(backgroundColour);
+            var bmp = Drawing.NewImage(trackWidth, trackHeight, backgroundColour);
 
             // for pixels in the line
             for (int i = 0; i < dataLength; i++)
@@ -268,15 +268,18 @@ namespace AudioAnalysisTools.Indices
 
                 for (int y = 0; y < barHeight; y++)
                 {
-                    bmp.SetPixel(i, trackHeight - y - 1, barColor);
+                    bmp[i, trackHeight - y - 1] = barColor;
                 }
 
                 // draw upper boundary
-                bmp.SetPixel(i, 0, Color.Gray);
+                bmp[i, 0] = Color.Gray;
             }
 
-            var font = new Font("Arial", 9.0f, FontStyle.Regular);
-            g.DrawString(annotation, font, Brushes.Black, new PointF(dataLength, 5));
+            bmp.Mutate(g =>
+            {
+                var font = Drawing.Arial9;
+                g.DrawText(annotation, font, Color.Black, new PointF(dataLength, 5));
+            });
 
             // now add in image patches for possible erroneous segments
             bool errorsExist = errors != null && errors.Count > 0;

@@ -26,12 +26,12 @@ namespace TowseyLibrary
             //string path = @"C:\SensorNetworks\Output\Human\DM420036_min465Speech_0min.png";
             string path = @"C:\SensorNetworks\Output\Sonograms\TestForHoughTransform.png";
             FileInfo file = new FileInfo(path);
-            Image<Rgb24> sourceImage = ImageTools.ReadImage2Bitmap(file.FullName);
+            Image<Rgb24> sourceImage = Image.Load<Rgb24>(file.FullName);
 
             //Image<Rgb24> sourceImage = HoughTransform.CreateLargeImageWithLines();
             sourceImage = TileWiseHoughTransform(sourceImage);
             string path1 = @"C:\SensorNetworks\Output\Sonograms\opMatrix.png";
-            sourceImage.Save(path1, ImageFormat.Png);
+            sourceImage.Save(path1);
         }
 
         public static void Test2HoughTransform()
@@ -47,7 +47,7 @@ namespace TowseyLibrary
 
             var list = new List<HoughLine>();
             string path1 = @"C:\SensorNetworks\Output\Sonograms\opMatrix.png";
-            opImage.Save(path1, ImageFormat.Png);
+            opImage.Save(path1);
         }
 
         public static double[,] DoHoughTransform(Image<Rgb24> sourceImage, int directionsCount, bool saveTransformImage)
@@ -69,7 +69,7 @@ namespace TowseyLibrary
             {
                 Image<Rgb24> houghLineImage = lineTransform.ToBitmap();
                 string path = @"C:\SensorNetworks\Output\Sonograms\hough.png";
-                houghLineImage.Save(path, ImageFormat.Png);
+                houghLineImage.Save(path);
             }
 
             // get lines using relative intensity
@@ -134,7 +134,7 @@ namespace TowseyLibrary
             int rowCount = colCount;
             double angleResolution = 360 / (double)angleCount;
 
-            Pen pen = new Pen(Color.Red);
+            Pen pen = new Pen(Color.Red, 1);
             Graphics g = Graphics.FromImage(inputImage);
 
             for (int r = 0; r < maxRadius; r++)
@@ -270,7 +270,7 @@ namespace TowseyLibrary
             Image<Rgb24> image = new Image<Rgb24>(11, 11);
             Graphics g = Graphics.FromImage(image);
             g.Clear(Color.Black);
-            Pen pen = new Pen(Color.White);
+            Pen pen = new Pen(Color.White, 1);
 
             //g.DrawLine(pen, 0, 7, 10, 7);
             //g.DrawLine(pen, 0, 5, 10, 5);
@@ -282,7 +282,7 @@ namespace TowseyLibrary
             Image<Rgb24> image1 = filter.Apply(image);
 
             string path = @"C:\SensorNetworks\Output\Sonograms\matrix.png";
-            image1.Save(path, ImageFormat.Png);
+            image1.Save(path);
             return image1;
         }
 
@@ -292,7 +292,7 @@ namespace TowseyLibrary
             Image<Rgb24> image = new Image<Rgb24>(dim, dim);
             Graphics g = Graphics.FromImage(image);
             g.Clear(Color.Black);
-            Pen pen = new Pen(Color.White);
+            Pen pen = new Pen(Color.White, 1);
 
             //g.DrawLine(pen, 0, 7, 10, 7);
             //g.DrawLine(pen, 0, 5, 10, 5);
@@ -300,7 +300,7 @@ namespace TowseyLibrary
             g.DrawLine(pen, 5, 0, 5, dim);
 
             string path = @"C:\SensorNetworks\Output\Sonograms\matrix.png";
-            image.Save(path, ImageFormat.Png);
+            image.Save(path);
             return image;
         }
     }*/

@@ -11,6 +11,7 @@ namespace AudioAnalysisTools.Indices
     using Acoustics.Shared;
     using AnalysisBase.ResultBases;
     using Fasterflect;
+    using SixLabors.ImageSharp.PixelFormats;
     using TowseyLibrary;
 
     public class SpectralIndexValues : SpectralIndexBase
@@ -99,9 +100,9 @@ namespace AudioAnalysisTools.Indices
 
         public static string[] Keys { get; }
 
-        public static Image CreateImageOfSpectralIndices(SpectralIndexValues spectralIndices)
+        public static Image<Rgb24> CreateImageOfSpectralIndices(SpectralIndexValues spectralIndices)
         {
-            var images = new List<Image>();
+            var images = new List<Image<Rgb24>>();
             foreach (var key in Keys)
             {
                 var spectrum = CachedSelectors[key](spectralIndices);

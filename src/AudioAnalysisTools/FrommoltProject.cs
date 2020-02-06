@@ -69,7 +69,7 @@ namespace AudioAnalysisTools
             int defaultDayHeight = 300;
 
             var brush = Color.White;
-            Font stringFont = SystemFonts.CreateFont("Tahoma", 12);
+            Font stringFont = Drawing.Tahoma12;
 
             var list = new List<Image<Rgb24>>();
 
@@ -128,7 +128,7 @@ namespace AudioAnalysisTools
             var image = (Image<Rgb24>)Image.Load(imageFiles[0].FullName);
 
             var brush = Color.White;
-            Font stringFont = SystemFonts.CreateFont("Tahoma", 12);
+            Font stringFont = Drawing.Tahoma12;
 
             //create spacer image
             int width = 1;

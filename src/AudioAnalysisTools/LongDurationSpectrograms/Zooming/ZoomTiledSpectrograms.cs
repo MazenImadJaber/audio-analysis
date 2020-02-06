@@ -18,6 +18,8 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
     using Indices;
     using log4net;
     using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.ImageSharp.Processing;
+    using SixLabors.Primitives;
     using TileImage;
     using TowseyLibrary;
     using Zio;
@@ -372,7 +374,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
             // end all rows
         }
 
-        public static Image DrawFrameSpectrogramAtScale(
+        public static Image<Rgb24> DrawFrameSpectrogramAtScale(
             LdSpectrogramConfig config,
             SpectrogramZoomingConfig zoomingConfig,
             TimeSpan startTimeOfData,
@@ -389,7 +391,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
             frameData = MatrixTools.MatrixRotate90Clockwise(frameData);
 
             // Get an unchromed image
-            Image spectrogramImage = ZoomFocusedSpectrograms.DrawStandardSpectrogramInFalseColour(frameData);
+            var spectrogramImage = ZoomFocusedSpectrograms.DrawStandardSpectrogramInFalseColour(frameData);
 
             if (chromeOption == ImageChrome.Without)
             {
@@ -399,7 +401,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
             int nyquist = indexGeneration.SampleRateResampled / 2;
             int herzInterval = 1000;
             string title = $"ZOOM SCALE={frameScale.TotalMilliseconds}ms/pixel ";
-            Image titleBar = ZoomFocusedSpectrograms.DrawTitleBarOfZoomSpectrogram(title, spectrogramImage.Width);
+            var titleBar = ZoomFocusedSpectrograms.DrawTitleBarOfZoomSpectrogram(title, spectrogramImage.Width);
             spectrogramImage = ZoomFocusedSpectrograms.FrameZoomSpectrogram(
                 spectrogramImage,
                 titleBar,
@@ -448,7 +450,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
             // start the loop
             for (int t = 0; t < superTileCount; t++)
             {
-                Image image = DrawOneScaledIndexSpectrogramTile(
+                var image = DrawOneScaledIndexSpectrogramTile(
                     analysisConfig,
                     indexGeneration,
                     indexProperties,
@@ -464,7 +466,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
                     durationToPreviousTileBoundaryAtUnitScale: alignmentPadding,
                     spectrogramType: SpectrogramType.Index,
                     scale: imageScale,
-                    image: image,
+                    image: image.CloneAs<Rgba32>(),
                     timeOffset: startTime);
 
                 startTime += superTileDuration;
@@ -477,7 +479,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
             return superTiles;
         }
 
-        public static Image DrawOneScaledIndexSpectrogramTile(
+        public static Image<Rgb24> DrawOneScaledIndexSpectrogramTile(
             LdSpectrogramConfig config,
             IndexGenerationData indexGenerationData,
             Dictionary<string, IndexProperties> indexProperties,
@@ -514,7 +516,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
             }
 
             // get the plain unchromed spectrogram
-            Image ldSpectrogram = ZoomCommon.DrawIndexSpectrogramCommon(
+            var ldSpectrogram = ZoomCommon.DrawIndexSpectrogramCommon(
                 config,
                 indexGenerationData,
                 indexProperties,
@@ -531,8 +533,6 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
                 return ldSpectrogram;
             }
 
-            Graphics g2 = Graphics.FromImage(ldSpectrogram);
-
             int nyquist = 22050 / 2;
             if (indexGenerationData.SampleRateResampled > 0)
             {
@@ -547,7 +547,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
 
             string title = $"ZOOM SCALE={imageScale.TotalSeconds}s/pixel";
 
-            Image titleBar = ZoomFocusedSpectrograms.DrawTitleBarOfZoomSpectrogram(title, ldSpectrogram.Width);
+            var titleBar = ZoomFocusedSpectrograms.DrawTitleBarOfZoomSpectrogram(title, ldSpectrogram.Width);
             startTime += analysisStartTime;
             ldSpectrogram = ZoomFocusedSpectrograms.FrameZoomSpectrogram(
                 ldSpectrogram,
@@ -559,12 +559,12 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
                 hertzInterval);
 
             // create the base image
-            Image image = new Image<Rgb24>(ldSpectrogram.Width, ldSpectrogram.Height);
-            Graphics g1 = Graphics.FromImage(image);
-            g1.Clear(Color.DarkGray);
+            var image = Drawing.NewImage(ldSpectrogram.Width, ldSpectrogram.Height, Color.DarkGray);
 
             var xOffset = (int)(offsetTime.Ticks / imageScale.Ticks);
-            g1.DrawImage(ldSpectrogram, xOffset, 0);
+            image.Mutate(g1 => {
+                g1.DrawImage(ldSpectrogram, new Point(xOffset, 0), 1);
+            });
 
             return image;
         }
@@ -639,7 +639,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
                 // double[,] data = frameData.CompressMatrixInTemporalDirectionByTakingMax(imageScale);
                 double[,] data = frameData.CompressMatrixInTemporalDirectionByTakingAverage(imageScale);
 
-                Image spectrogramImage = DrawFrameSpectrogramAtScale(
+                var spectrogramImage = DrawFrameSpectrogramAtScale(
                     analysisConfig,
                     zoomingConfig,
                     startTimeOfData,
@@ -652,7 +652,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms.Zooming
                     alignmentPadding,
                     SpectrogramType.Frame,
                     imageScale,
-                    spectrogramImage,
+                    spectrogramImage.CloneAs<Rgba32>(),
                     startTimeOfData);
             }
 

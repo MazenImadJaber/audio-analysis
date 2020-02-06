@@ -20,6 +20,7 @@ namespace AnalysisPrograms.ContentDescription
     using AudioAnalysisTools.LongDurationSpectrograms;
     using AudioAnalysisTools.WavTools;
     using log4net;
+    using SixLabors.ImageSharp.PixelFormats;
     using TowseyLibrary;
 
     /// <summary>
@@ -269,7 +270,7 @@ namespace AnalysisPrograms.ContentDescription
             plotsImage.Save(Path.Combine(resultsDirectory.FullName, "DistributionsOfContentScores.png"));
 
             // Attach content description plots to LDFC spectrogram and write to file
-            var ldfcSpectrogram = Image.FromFile(ldfcSpectrogramPath);
+            var ldfcSpectrogram = Image.Load<Rgb24>(ldfcSpectrogramPath);
             var image = ContentVisualization.DrawLdfcSpectrogramWithContentScoreTracks(ldfcSpectrogram, contentPlots);
             var path3 = Path.Combine(resultsDirectory.FullName, basename + ".ContentDescription.png");
             image.Save(path3);

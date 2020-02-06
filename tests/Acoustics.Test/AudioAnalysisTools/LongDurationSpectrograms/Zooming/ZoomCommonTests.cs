@@ -16,6 +16,8 @@ namespace Acoustics.Test.AudioAnalysisTools.LongDurationSpectrograms.Zooming
     using global::AudioAnalysisTools.LongDurationSpectrograms.Zooming;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.Primitives;
 
     [TestClass]
     public class ZoomCommonTests

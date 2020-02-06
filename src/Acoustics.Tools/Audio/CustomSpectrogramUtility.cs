@@ -11,6 +11,7 @@ namespace Acoustics.Tools.Audio
     using SixLabors.ImageSharp.Advanced;
     using SixLabors.ImageSharp.Formats;
     using SixLabors.ImageSharp.PixelFormats;
+    using SixLabors.Primitives;
     using Wav;
 
     /// <summary>

@@ -339,7 +339,7 @@ namespace AnalysisPrograms
                 string imagePath = segmentSettings.SegmentImageFile.FullName;
                 const double EventThreshold = 0.1;
                 Image image = DrawSonogram(sonogram, hits, scores, results.Events, EventThreshold);
-                image.Save(imagePath, ImageFormat.Png);
+                image.Save(imagePath);
                 analysisResults.ImageFile = segmentSettings.SegmentImageFile;
             }
 

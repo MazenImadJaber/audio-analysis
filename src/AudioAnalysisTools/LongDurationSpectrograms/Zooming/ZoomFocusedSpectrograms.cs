@@ -34,6 +34,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
     using Indices;
     using SixLabors.ImageSharp.PixelFormats;
     using SixLabors.ImageSharp.Processing;
+    using SixLabors.Primitives;
     using StandardSpectrograms;
     using TowseyLibrary;
     using Zooming;
@@ -76,7 +77,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
             sw = Stopwatch.StartNew();
             int scaleCount = imageScales.Length;
-            var imageList = new List<Image>();
+            var imageList = new List<Image<Rgb24>>();
             for (int i = 0; i < scaleCount; i++)
             {
                 var imageScale = TimeSpan.FromSeconds(imageScales[i]);
@@ -152,7 +153,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             */
 
             // combine the images into a stack
-            Image combinedImage = ImageTools.CombineImagesVertically(imageList);
+            var combinedImage = ImageTools.CombineImagesVertically(imageList);
             string fileName = $"{fileStem}_FocalZOOM_min{focalTime.TotalMinutes:f1}.png";
             combinedImage.Save(Path.Combine(outputDirectory.FullName, fileName));
         }
@@ -161,7 +162,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
         /// This method can add in absolute time if you want.
         /// Currently commented out - see below.
         /// </summary>
-        public static Image DrawIndexSpectrogramAtScale(
+        public static Image<Rgb24> DrawIndexSpectrogramAtScale(
             LdSpectrogramConfig config,
             IndexGenerationData indexGenerationData,
             Dictionary<string, IndexProperties> indexProperties,
@@ -237,7 +238,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             int spectrogramWidth = (int)(spectrogramDuration.Ticks / imageScale.Ticks);
 
             // get the plain unchromed spectrogram
-            Image ldfcSpectrogram = ZoomCommon.DrawIndexSpectrogramCommon(
+            var ldfcSpectrogram = ZoomCommon.DrawIndexSpectrogramCommon(
                 config,
                 indexGenerationData,
                 indexProperties,
@@ -256,16 +257,18 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             }
 
             // now chrome spectrogram
-            Graphics g2 = Graphics.FromImage(ldfcSpectrogram);
-
-            // draw red line at focus time
-            if (focalTime != TimeSpan.Zero)
+            ldfcSpectrogram.Mutate(g2 =>
             {
-                Pen pen = new Pen(Color.Red);
-                TimeSpan focalOffset = focalTime - startTime;
-                int x1 = (int)(focalOffset.Ticks / imageScale.Ticks);
-                g2.DrawLine(pen, x1, 0, x1, ldfcSpectrogram.Height);
-            }
+
+                // draw red line at focus time
+                if (focalTime != TimeSpan.Zero)
+                {
+                    Pen pen = new Pen(Color.Red, 1);
+                    TimeSpan focalOffset = focalTime - startTime;
+                    int x1 = (int)(focalOffset.Ticks / imageScale.Ticks);
+                    g2.DrawLine(pen, x1, 0, x1, ldfcSpectrogram.Height);
+                }
+            });
 
             // draw the title bar
             int nyquist = 22050 / 2; // default
@@ -285,7 +288,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             //add chrome
             // NEXT LINE USED ONLY IF WANT ABSOLUTE TIME
             //startTime += recordingStartTime;
-            Image titleBar = DrawTitleBarOfZoomSpectrogram(title, ldfcSpectrogram.Width);
+            var titleBar = DrawTitleBarOfZoomSpectrogram(title, ldfcSpectrogram.Width);
             ldfcSpectrogram = FrameZoomSpectrogram(
                 ldfcSpectrogram,
                 titleBar,
@@ -296,12 +299,10 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                 herzInterval);
 
             // create the base canvas image on which to centre the focal image
-            Image image = new Image<Rgb24>(imageWidth, ldfcSpectrogram.Height);
-            Graphics g1 = Graphics.FromImage(image);
-            g1.Clear(Color.DarkGray);
+            var image = Drawing.NewImage(imageWidth, ldfcSpectrogram.Height, Color.DarkGray);
 
             int xOffset = (int)(offsetTime.Ticks / imageScale.Ticks);
-            g1.DrawImage(ldfcSpectrogram, xOffset, 0);
+            image.Mutate(g1 => g1.DrawImage(ldfcSpectrogram, new Point(xOffset, 0), 1));
             return image;
         }
 
@@ -357,18 +358,20 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                 spectralSelection = TemporalMatrix.CompressFrameSpectrograms(spectralSelection, compressionFactor);
             }
 
-            Image spectrogramImage = DrawStandardSpectrogramInFalseColour(spectralSelection);
-
-            Graphics g2 = Graphics.FromImage(spectrogramImage);
+            var spectrogramImage = DrawStandardSpectrogramInFalseColour(spectralSelection);
 
             int x1 = (int)(halfImageDuration.Ticks / imageScale.Ticks);
 
-            // draw focus time on image
-            if (focalTime != TimeSpan.Zero)
+            spectrogramImage.Mutate(g2 =>
             {
-                Pen pen = new Pen(Color.Red);
-                g2.DrawLine(pen, x1, 0, x1, spectrogramImage.Height);
-            }
+                // draw focus time on image
+                if (focalTime != TimeSpan.Zero)
+                {
+                    Pen pen = new Pen(Color.Red, 1);
+                    g2.DrawLine(pen, x1, 0, x1, spectrogramImage.Height);
+                }
+
+            });
 
             int nyquist = 22050 / 2; // default
             if (indexGenerationData.SampleRateResampled > 0)
@@ -378,7 +381,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
             int herzInterval = config.YAxisTicInterval;
             string title = $"ZOOM SCALE={imageScale.TotalMilliseconds}ms/pixel   Image duration={imageDuration} ";
-            Image titleBar = DrawTitleBarOfZoomSpectrogram(title, spectrogramImage.Width);
+            var titleBar = DrawTitleBarOfZoomSpectrogram(title, spectrogramImage.Width);
 
             // add the recording start time ONLY IF WANT ABSOLUTE TIME SCALE - obtained from info in file name
             // startTime += recordingStartTime;
@@ -394,12 +397,14 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
             // create the base image
             Image image = new Image<Rgb24>(imageWidth, spectrogramImage.Height);
-            Graphics g1 = Graphics.FromImage(image);
-            g1.Clear(Color.DarkGray);
+            image.Mutate(g1 =>
+            {
+                g1.Clear(Color.DarkGray);
 
-            //int xOffset = (int)(startTime.Ticks / imageScale.Ticks);
-            int xOffset = (imageWidth / 2) - x1;
-            g1.DrawImage(spectrogramImage, xOffset, 0);
+                //int xOffset = (int)(startTime.Ticks / imageScale.Ticks);
+                int xOffset = (imageWidth / 2) - x1;
+                g1.DrawImage(spectrogramImage, new Point(xOffset, 0), 1);
+            });
 
             return image;
         }
@@ -491,7 +496,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
         ///         Taken and adapted from Spectrogram Image 5 in the method of CLASS Audio2InputForConvCNN.cs:
         /// </summary>
         /// <param name="dbSpectrogramData">the sonogram data (NOT noise reduced) </param>
-        public static Image DrawStandardSpectrogramInFalseColour(double[,] dbSpectrogramData)
+        public static Image<Rgb24> DrawStandardSpectrogramInFalseColour(double[,] dbSpectrogramData)
         {
             // Do NOISE REDUCTION
             double noiseReductionParameter = 2.0;
@@ -536,43 +541,45 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             return image;
         }
 
-        public static Image DrawTitleBarOfZoomSpectrogram(string title, int width)
+        public static Image<Rgb24> DrawTitleBarOfZoomSpectrogram(string title, int width)
         {
             //Image colourChart = LDSpectrogramRGB.DrawColourScale(width, SpectrogramConstants.HEIGHT_OF_TITLE_BAR - 2);
             int height = SpectrogramConstants.HEIGHT_OF_TITLE_BAR;
-            Image<Rgb24> bmp = new Image<Rgb24>(width, height);
-            Graphics g = Graphics.FromImage(bmp);
-            g.Clear(Color.Black);
-            Font stringFont = new Font("Arial", 9);
+            var bmp = Drawing.NewImage(width, height, Color.Black);
+            var stringFont = Drawing.Arial9;
 
-            int x1 = 4;
-            g.DrawString(title, stringFont, Brushes.Wheat, new PointF(x1, 3));
-
-            SizeF stringSize = g.MeasureString(title, stringFont);
-            x1 += stringSize.ToSize().Width + 70;
-
-            //g.DrawString(text, stringFont, Brushes.Wheat, new PointF(X, 3));
-            //stringSize = g.MeasureString(text, stringFont);
-            //X += (stringSize.ToSize().Width + 1);
-            //g.DrawImage(colourChart, X, 1);
-
-            string text = Meta.OrganizationTag;
-            stringSize = g.MeasureString(text, stringFont);
-            int x2 = width - stringSize.ToSize().Width - 2;
-            if (x2 > x1)
+            bmp.Mutate(g =>
             {
-                g.DrawString(text, stringFont, Brushes.Wheat, new PointF(x2, 3));
-            }
+                int x1 = 4;
+                g.DrawText(title, stringFont, Color.Wheat, new PointF(x1, 3));
 
-            g.DrawLine(new Pen(Color.LightGray), 0, 0, width, 0); //draw upper boundary
-            g.DrawLine(new Pen(Color.LightGray), 0, 1, width, 1); //draw upper boundary
-            g.DrawLine(new Pen(Color.LightGray), 0, height - 1, width, height - 1); //draw lower boundary
-            g.DrawLine(new Pen(Color.Red), 0, 2, 0, height - 1);                    //draw start boundary
-            g.DrawLine(new Pen(Color.Pink), width - 1, 2, width - 1, height - 1);   //draw end boundary
+                SizeF stringSize = g.MeasureString(title, stringFont);
+                x1 += stringSize.ToSize().Width + 70;
+
+                //g.DrawText(text, stringFont, Color.Wheat, new PointF(X, 3));
+                //stringSize = g.MeasureString(text, stringFont);
+                //X += (stringSize.ToSize().Width + 1);
+                //g.DrawImage(colourChart, X, 1);
+
+                string text = Meta.OrganizationTag;
+                stringSize = g.MeasureString(text, stringFont);
+                int x2 = width - stringSize.ToSize().Width - 2;
+                if (x2 > x1)
+                {
+                    g.DrawText(text, stringFont, Color.Wheat, new PointF(x2, 3));
+                }
+
+                g.DrawLine(new Pen(Color.LightGray, 1), 0, 0, width, 0); //draw upper boundary
+                g.DrawLine(new Pen(Color.LightGray, 1), 0, 1, width, 1); //draw upper boundary
+                g.DrawLine(new Pen(Color.LightGray, 1), 0, height - 1, width, height - 1); //draw lower boundary
+                g.DrawLine(new Pen(Color.Red, 1), 0, 2, 0, height - 1); //draw start boundary
+                g.DrawLine(new Pen(Color.Pink, 1), width - 1, 2, width - 1, height - 1); //draw end boundary
+            });
+
             return bmp;
         }
 
-        public static Image FrameZoomSpectrogram(Image bmp1, Image titleBar, TimeSpan startOffset, TimeSpan xAxisPixelDuration, TimeSpan xAxisTicInterval, int nyquist, int herzInterval)
+        public static Image<Rgb24> FrameZoomSpectrogram(Image<Rgb24> bmp1, Image<Rgb24> titleBar, TimeSpan startOffset, TimeSpan xAxisPixelDuration, TimeSpan xAxisTicInterval, int nyquist, int herzInterval)
         {
             TimeSpan fullDuration = TimeSpan.FromTicks(xAxisPixelDuration.Ticks * bmp1.Width);
 
@@ -590,14 +597,17 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
             int imageHt = bmp1.Height + titleBar.Height + trackHeight + 1;
 
             Image<Rgb24> compositeBmp = new Image<Rgb24>(bmp1.Width, imageHt); //get canvas for entire image
-            Graphics gr = Graphics.FromImage(compositeBmp);
-            gr.Clear(Color.Black);
-            int offset = 0;
-            gr.DrawImage(titleBar, 0, offset); //draw in the top time scale
-            offset += titleBar.Height;
-            gr.DrawImage(bmp1, 0, offset); //draw
-            offset += bmp1.Height;
-            gr.DrawImage(timeBmp, 0, offset); //draw
+            compositeBmp.Mutate(gr =>
+            {
+                gr.Clear(Color.Black);
+                int offset = 0;
+                gr.DrawImage(titleBar, 0, offset); //draw in the top time scale
+                offset += titleBar.Height;
+                gr.DrawImage(bmp1, 0, offset); //draw
+                offset += bmp1.Height;
+                gr.DrawImage(timeBmp, 0, offset); //draw
+            });
+
             return compositeBmp;
         }
     }

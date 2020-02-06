@@ -10,6 +10,7 @@
 namespace AudioAnalysisTools.TileImage
 {
     using SixLabors.ImageSharp;
+    using SixLabors.ImageSharp.PixelFormats;
 
     public class DefaultSuperTile : ISuperTile
     {
@@ -19,6 +20,6 @@ namespace AudioAnalysisTools.TileImage
 
         public int OffsetY { get; set; }
 
-        public Image Image { get; set; }
+        public Image<Rgba32> Image { get; set; }
     }
 }

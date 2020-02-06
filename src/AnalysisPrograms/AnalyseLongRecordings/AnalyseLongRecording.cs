@@ -27,6 +27,7 @@ namespace AnalysisPrograms.AnalyseLongRecordings
     using AudioAnalysisTools.Indices;
     using log4net;
     using Production;
+    using SixLabors.ImageSharp.PixelFormats;
     using SourcePreparers;
 
     public partial class AnalyseLongRecording

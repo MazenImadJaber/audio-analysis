@@ -217,7 +217,7 @@ namespace AudioAnalysisTools.DSP
         /// <returns></returns>
         public static double[,] GetImageDataAsGrayIntensity(string imageFilePath, bool reversed)
         {
-            Image<Rgb24> image = (Image<Rgb24>)Image.FromFile(imageFilePath, true);
+            Image<Rgb24> image = Image.Load<Rgb24>(imageFilePath);
             var rowCount = image.Height;
             var colCount = image.Width;
             var result = new double[rowCount, colCount];
@@ -225,9 +225,9 @@ namespace AudioAnalysisTools.DSP
             {
                 for (int c = 0; c < colCount; c++)
                 {
-                    result[r, c] = (0.299 * image.GetPixel(c, r).R)
-                                 + (0.587 * image.GetPixel(c, r).G)
-                                 + (0.114 * image.GetPixel(c, r).B);
+                    result[r, c] = (0.299 * image[c, r].R)
+                                 + (0.587 * image[c, r].G)
+                                 + (0.114 * image[c, r].B);
                     if (reversed) // reverse the image
                     {
                         result[r, c] = 255 - result[r, c];

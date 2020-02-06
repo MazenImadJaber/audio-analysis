@@ -9,7 +9,7 @@ namespace TowseyLibrary
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-
+    using Acoustics.Shared;
     using Acoustics.Shared.Extensions;
     using AForge.Imaging.Filters;
     using MathNet.Numerics.LinearAlgebra;
@@ -2977,7 +2977,7 @@ namespace TowseyLibrary
             pens.Add(new Pen(Color.LimeGreen, 1f));
             pens.Add(new Pen(Color.Tomato, 1f));
 
-            //pens.Add(new Pen(Color.Indigo));
+            //pens.Add(new Pen(Color.Indigo, 1));
             pens.Add(new Pen(Color.Violet, 1f));
 
             //now add random coloured pens
@@ -3030,13 +3030,13 @@ namespace TowseyLibrary
 
             for (int i = 0; i < colourCount; i++)
             {
-                //c = Color.FromArgb(250, 15, 250);
+                //c = Color.FromRgb(250, 15, 250);
                 colorBmp.Mutate(o => o.Fill(colorArray[i]));
 
                 //int x = 0;
                 colorScale.Mutate(o => o.DrawImage(colorBmp, new Point(x, 0), 1f)); //dra
 
-                //c = Color.FromArgb(250, 15, 15);
+                //c = Color.FromRgb(250, 15, 15);
                 //gr2.Clear(c);
                 x += patchWidth;
                 colorScale.Mutate(o => o.DrawImage(colorBmp, new Point(x, 0), 1f)); //dra
@@ -3365,7 +3365,7 @@ namespace TowseyLibrary
         {
             int ticCount = (int)(image.Height / yTicInterval);
             var pen = new Pen(Color.White, 1f);
-            var font = SystemFonts.CreateFont("Arial", 10);
+            var font = Drawing.Arial10;
 
             image.Mutate(g => { 
                 
@@ -3406,7 +3406,7 @@ namespace TowseyLibrary
         {
             int ticCount = (int)((image.Width - scaleHeight) / xTicInterval);
             var pen = new Pen(Color.White, 1f);
-            var font = SystemFonts.CreateFont("Arial", 10);
+            var font = Drawing.Arial10;
 
             image.Mutate(g => {
                 // draw on the grid lines
@@ -3747,6 +3747,10 @@ namespace TowseyLibrary
         {
             return CombineImagesVertically(list.ToArray(), maxWidth);
         }
+        public static Image<T> CombineImagesVertically<T>(params Image<T>[] images) where T : struct, IPixel<T>
+        {
+            return CombineImagesVertically<T>(images);
+        }
 
         /// <summary>
         /// Stacks the passed images one on top of the other.
@@ -3809,7 +3813,7 @@ namespace TowseyLibrary
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
-        public static Image<T> CombineImagesInLine<T>(Image<T>[] array) where T : struct, IPixel<T>
+        public static Image<T> CombineImagesInLine<T>(params Image<T>[] array) where T : struct, IPixel<T>
         {
             int height = array[0].Height; // assume all images have the same height
 
@@ -3823,7 +3827,7 @@ namespace TowseyLibrary
                 }
             }
 
-            //Image compositeBmp = new Image(compositeWidth, height, PixelFormat.Format24bppRgb);
+            //Image compositeBmp = new Image(compositeWidth, height);
             var compositeBmp = new Image<T>(compositeWidth, height);
             int xOffset = 0;
             compositeBmp.Mutate(x => {

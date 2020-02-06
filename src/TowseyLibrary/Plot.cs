@@ -6,6 +6,7 @@ namespace TowseyLibrary
 {
     using System;
     using System.Collections.Generic;
+    using Acoustics.Shared;
     using SixLabors.Fonts;
     using SixLabors.ImageSharp;
     using SixLabors.ImageSharp.PixelFormats;
@@ -133,14 +134,12 @@ namespace TowseyLibrary
             return image;
         }
 
-        public Image DrawAnnotatedPlot(int height)
+        public Image<Rgb24> DrawAnnotatedPlot(int height)
         {
             var image = this.DrawPlot(height);
             int length = image.Width;
 
-            // var family = new FontFamily("Arial");
-            // var font = new Font(family, 10, FontStyle.Regular, GraphicsUnit.Pixel);
-            var font = SystemFonts.CreateFont("Tahoma", 9);
+            var font = Drawing.Tahoma9;
             image.Mutate(g =>
             {
                 g.DrawText(this.title, font, Color.Red, new PointF(8, 0));
