@@ -361,9 +361,7 @@ namespace AnalysisPrograms.Recognizers
             if (returnDebugImage)
             {
                 // display a variety of debug score arrays
-                double[] normalisedScores;
-                double normalisedThreshold;
-                DataTools.Normalise(intensity, lrConfig.DecibelThreshold, out normalisedScores, out normalisedThreshold);
+                DataTools.Normalise(intensity, lrConfig.DecibelThreshold, out var normalisedScores, out var normalisedThreshold);
                 var intensityPlot = new Plot("Intensity", normalisedScores, normalisedThreshold);
                 DataTools.Normalise(periodicity, 10, out normalisedScores, out normalisedThreshold);
                 var periodicityPlot = new Plot("Periodicity", normalisedScores, normalisedThreshold);

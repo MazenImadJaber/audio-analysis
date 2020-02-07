@@ -126,9 +126,7 @@ namespace AForge.Imaging.Filters
     /// 
     public class CannyEdgeDetector : BaseUsingCopyPartialFilter
     {
-        private GaussianBlurProcessor gaussianFilter;
-        private byte lowThreshold = 20;
-        private byte highThreshold = 100;
+        private readonly GaussianBlurProcessor gaussianFilter;
 
         /// <summary>
         /// Low threshold.
@@ -141,11 +139,7 @@ namespace AForge.Imaging.Filters
         /// <para>Default value is set to <b>20</b>.</para>
         /// </remarks>
         /// 
-        public byte LowThreshold
-        {
-            get { return lowThreshold; }
-            set { lowThreshold = value; }
-        }
+        public byte LowThreshold { get; set; } = 20;
 
         /// <summary>
         /// High threshold.
@@ -158,11 +152,7 @@ namespace AForge.Imaging.Filters
         /// <para>Default value is set to <b>100</b>.</para>
         /// </remarks>
         /// 
-        public byte HighThreshold
-        {
-            get { return highThreshold; }
-            set { highThreshold = value; }
-        }
+        public byte HighThreshold { get; set; } = 100;
 
         /// <summary>
         /// Gaussian sigma.
@@ -170,10 +160,7 @@ namespace AForge.Imaging.Filters
         /// 
         /// <remarks>Sigma value for <see cref="GaussianBlur.Sigma">Gaussian bluring</see>.</remarks>
         /// 
-        public float GaussianSigma
-        {
-            get { return gaussianFilter.Sigma; }
-        }
+        public float GaussianSigma => this.gaussianFilter.Sigma;
 
         /// <summary>
         /// Gaussian size.
@@ -181,10 +168,7 @@ namespace AForge.Imaging.Filters
         /// 
         /// <remarks>Size of <see cref="GaussianBlur.Size">Gaussian kernel</see>.</remarks>
         /// 
-        public int GaussianSize
-        {
-            get { return gaussianFilter.Radius; }
-        }
+        public int GaussianSize => this.gaussianFilter.Radius;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CannyEdgeDetector"/> class.
@@ -211,8 +195,8 @@ namespace AForge.Imaging.Filters
         /// 
         public CannyEdgeDetector(byte lowThreshold, byte highThreshold) : this()
         {
-            this.lowThreshold = lowThreshold;
-            this.highThreshold = highThreshold;
+            this.LowThreshold = lowThreshold;
+            this.HighThreshold = highThreshold;
         }
 
         /// <summary>
@@ -226,8 +210,8 @@ namespace AForge.Imaging.Filters
         public CannyEdgeDetector(byte lowThreshold, byte highThreshold, float sigma, int radius)
             : this(sigma, radius)
         {
-            this.lowThreshold = lowThreshold;
-            this.highThreshold = highThreshold;
+            this.LowThreshold = lowThreshold;
+            this.HighThreshold = highThreshold;
         }
 
         /// <summary>
@@ -394,9 +378,9 @@ namespace AForge.Imaging.Filters
                 // for each pixel
                 for (int x = startX; x < stopX; x++)
                 {
-                    if (destination[startY, startX].PackedValue < highThreshold)
+                    if (destination[startY, startX].PackedValue < this.HighThreshold)
                     {
-                        if (destination[startY, startX].PackedValue < lowThreshold)
+                        if (destination[startY, startX].PackedValue < this.LowThreshold)
                         {
                             // non edge
                             destination[startY, startX] = new Gray8(0);
@@ -404,14 +388,14 @@ namespace AForge.Imaging.Filters
                         else
                         {
                             // check 8 neighboring pixels
-                            if ((destination[startY - 1, startX].PackedValue < highThreshold) &&
-                                (destination[startY + 1, startX].PackedValue < highThreshold) &&
-                                (destination[startY - 1, startX - 1].PackedValue < highThreshold) &&
-                                (destination[startY - 1, startX].PackedValue < highThreshold) &&
-                                (destination[startY - 1, startX + 1].PackedValue < highThreshold) &&
-                                (destination[startY + 1, startX - 1].PackedValue < highThreshold) &&
-                                (destination[startY + 1, startX].PackedValue < highThreshold) &&
-                                (destination[startY + 1, startX + 1].PackedValue < highThreshold))
+                            if ((destination[startY - 1, startX].PackedValue < this.HighThreshold) &&
+                                (destination[startY + 1, startX].PackedValue < this.HighThreshold) &&
+                                (destination[startY - 1, startX - 1].PackedValue < this.HighThreshold) &&
+                                (destination[startY - 1, startX].PackedValue < this.HighThreshold) &&
+                                (destination[startY - 1, startX + 1].PackedValue < this.HighThreshold) &&
+                                (destination[startY + 1, startX - 1].PackedValue < this.HighThreshold) &&
+                                (destination[startY + 1, startX].PackedValue < this.HighThreshold) &&
+                                (destination[startY + 1, startX + 1].PackedValue < this.HighThreshold))
                             {
                                 destination[startY, startX] = new Gray8(0);
                             }

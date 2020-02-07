@@ -28,8 +28,6 @@ namespace AudioAnalysisTools.TileImage
         private const double Epsilon = 1.0 / (2.0 * TimeSpan.TicksPerSecond);
 
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-        private readonly SortedSet<Layer> calculatedLayers;
         private readonly DirectoryEntry output;
         private readonly TilingProfile profile;
         private readonly Dictionary<double, HashSet<Tuple<int, int>>> superTileHistory = new Dictionary<double, HashSet<Tuple<int, int>>>();
@@ -77,7 +75,7 @@ namespace AudioAnalysisTools.TileImage
             this.output = output;
             this.profile = profile;
 
-            this.calculatedLayers = this.CalculateLayers(
+            this.CalculatedLayers = this.CalculateLayers(
                 xScales,
                 xUnitScale,
                 unitWidth,
@@ -88,7 +86,7 @@ namespace AudioAnalysisTools.TileImage
             this.WriteImages = true;
         }
 
-        public SortedSet<Layer> CalculatedLayers => this.calculatedLayers;
+        public SortedSet<Layer> CalculatedLayers { get; }
 
         public UPath OutputDirectory => this.output.Path;
 
@@ -204,7 +202,7 @@ namespace AudioAnalysisTools.TileImage
 
                     // construct the resulting name of the tile to produced
                     string name = this.profile.GetFileBaseName(
-                        this.calculatedLayers,
+                        this.CalculatedLayers,
                         layer,
                         new Point(layerLeft, layerTop));
 
@@ -628,26 +626,22 @@ namespace AudioAnalysisTools.TileImage
                 xScale = xMore ? xEnumerator.Current : xScale;
                 yScale = yMore ? yEnumerator.Current : yScale;
 
-                int xLayerLength, yLayerLength;
-                int xTiles, yTiles;
-                double xNormalizedScale, yNormalizedScale;
-
                 CalculateScaleStats(
                     xUnitScale,
                     unitWidth,
                     this.profile.TileWidth,
                     xScale,
-                    out xNormalizedScale,
-                    out xLayerLength,
-                    out xTiles);
+                    out var xNormalizedScale,
+                    out var xLayerLength,
+                    out var xTiles);
                 CalculateScaleStats(
                     yUnitScale,
                     unitHeight,
                     this.profile.TileHeight,
                     yScale,
-                    out yNormalizedScale,
-                    out yLayerLength,
-                    out yTiles);
+                    out var yNormalizedScale,
+                    out var yLayerLength,
+                    out var yTiles);
 
                 results.Add(
                     new Layer(scaleIndex)

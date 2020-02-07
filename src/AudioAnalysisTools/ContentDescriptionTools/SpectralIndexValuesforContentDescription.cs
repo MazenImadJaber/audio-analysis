@@ -13,7 +13,7 @@ namespace AudioAnalysisTools.Indices
     using SixLabors.ImageSharp.ColorSpaces;
     using SixLabors.ImageSharp.PixelFormats;
 
-    //using Fasterflect;
+    //
     using TowseyLibrary;
 
     /// <summary>

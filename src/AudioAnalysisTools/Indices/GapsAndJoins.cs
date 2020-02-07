@@ -50,9 +50,9 @@ namespace AudioAnalysisTools.Indices
         public const string KeyFileJoin = "FileJoin";
         public const string KeyZeroSignal = "ZeroSignal";
 
-        private static string gapDescriptionMissingData = "No Recording";
-        private static string gapDescriptionZeroSignal = "ERROR: Zero Signal";
-        private static string gapDescriptionInvalidValue = "Invalid Index Value";
+        private static readonly string gapDescriptionMissingData = "No Recording";
+        private static readonly string gapDescriptionZeroSignal = "ERROR: Zero Signal";
+        private static readonly string gapDescriptionInvalidValue = "Invalid Index Value";
         public static string gapDescriptionFileJoin = "File Join";
 
         public string GapDescription { get; set; }

@@ -124,8 +124,7 @@ namespace AnalysisPrograms
 
             //draw images of sonograms
             string imagePath = outputDir + Path.GetFileNameWithoutExtension(recordingPath.Name) + ".png";
-            double min, max;
-            DataTools.MinMax(intensity, out min, out max);
+            DataTools.MinMax(intensity, out var min, out var max);
             double threshold_norm = dBThreshold / max; //min = 0.0;
             intensity = DataTools.normalise(intensity);
             if (DRAW_SONOGRAMS == 2)

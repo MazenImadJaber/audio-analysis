@@ -91,9 +91,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                         distance[c] = DataTools.EuclideanDistance(imageColorVector, colourVector);
                     }
 
-                    int minindex, maxindex;
-                    double min, max;
-                    DataTools.MinMax(distance, out minindex, out maxindex, out min, out max);
+                    DataTools.MinMax(distance, out var minindex, out var maxindex, out var min, out var max);
 
                     //if ((col.R > 200) && (col.G > 200) && (col.B > 200))
                     image[x, y] = colourPalette[minindex];

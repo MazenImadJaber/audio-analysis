@@ -28,7 +28,7 @@ namespace TowseyLibrary
 
             public const int maxPalletteSize = 256;
             public int maxPalletteIndex = maxPalletteSize - 1;
-            private ColorSpaceConverter converter;
+            private readonly ColorSpaceConverter converter;
 
             public CubeHelix(string mode)
             {

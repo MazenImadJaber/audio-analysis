@@ -215,8 +215,7 @@ namespace AudioAnalysisTools.Indices
                     continue;
                 }
 
-                DateTimeOffset startDto;
-                if (!FileDateHelpers.FileNameContainsDateTime(file.Name, out startDto, offsetHint))
+                if (!FileDateHelpers.FileNameContainsDateTime(file.Name, out var startDto, offsetHint))
                 {
                     LoggedConsole.WriteWarnLine($"WARNING: {key} Concatenation Time Check: INVALID DateTime in File Name {file.Name}");
                 }

@@ -33,8 +33,6 @@ namespace TowseyLibrary
 
         private const int FeatureCount = CountColCentroidFuzzySet + 2; // centroid location + freqWidth + time duration.
 
-        private static int maxCol = 256; // default value
-
         private int[] colCentroidFuzzySet;
 
         /// <summary>
@@ -82,29 +80,12 @@ namespace TowseyLibrary
             this.FuzzySetCentres();
         }
 
-        public static int MaxCol
-        {
-            get
-            {
-                return maxCol;
-            }
-
-            set
-            {
-                maxCol = value;
-            }
-        }
+        public static int MaxCol { get; set; } = 256;
 
         /// <summary>
         ///     Gets location of Oblong's centre column in parent matrix
         /// </summary>
-        public int ColCentroid
-        {
-            get
-            {
-                return this.ColumnLeft + ((this.ColumnRight - this.ColumnLeft + 1) / 2);
-            }
-        }
+        public int ColCentroid => this.ColumnLeft + ((this.ColumnRight - this.ColumnLeft + 1) / 2);
 
         public int ColWidth { get; private set; }
 
@@ -303,7 +284,7 @@ namespace TowseyLibrary
                 return null;
             }
 
-            int binWidth = maxCol / binCount;
+            int binWidth = MaxCol / binCount;
 
             var distribution = new int[binCount];
             for (int i = 0; i < shapes.Count; i++)
@@ -317,7 +298,7 @@ namespace TowseyLibrary
                 distribution[bin]++;
             }
 
-            LoggedConsole.WriteLine("Number of data columns = " + maxCol);
+            LoggedConsole.WriteLine("Number of data columns = " + MaxCol);
 
             LoggedConsole.WriteLine("One bin = " + binWidth + " of the original data columns.");
 
@@ -947,7 +928,7 @@ namespace TowseyLibrary
             // features[0] /= (double)maxCols; //column centroid
             // features[1] /= (double)maxCols; //column centroid
             // features[2] /= (double)maxCols; //column centroid
-            features[CountColCentroidFuzzySet] /= maxCol; // column width
+            features[CountColCentroidFuzzySet] /= MaxCol; // column width
             features[CountColCentroidFuzzySet + 1] /= maxRows; // row width
 
             for (int i = 0; i < FeatureCount; i++)
@@ -1231,10 +1212,10 @@ namespace TowseyLibrary
 
         private void FuzzySetCentres()
         {
-            int space = maxCol / (CountColCentroidFuzzySet - 1);
+            int space = MaxCol / (CountColCentroidFuzzySet - 1);
             this.colCentroidFuzzySet = new int[CountColCentroidFuzzySet];
             this.colCentroidFuzzySet[0] = 0;
-            this.colCentroidFuzzySet[CountColCentroidFuzzySet - 1] = maxCol;
+            this.colCentroidFuzzySet[CountColCentroidFuzzySet - 1] = MaxCol;
             for (int i = 1; i < CountColCentroidFuzzySet - 1; i++)
             {
                 this.colCentroidFuzzySet[i] = i * space;
@@ -1271,7 +1252,7 @@ namespace TowseyLibrary
             }
 
             // calculate membership of fuzzy set n;
-            if (row > maxCol || row <= this.colCentroidFuzzySet[n - 2])
+            if (row > MaxCol || row <= this.colCentroidFuzzySet[n - 2])
             {
                 FM[n - 1] = 0;
             }

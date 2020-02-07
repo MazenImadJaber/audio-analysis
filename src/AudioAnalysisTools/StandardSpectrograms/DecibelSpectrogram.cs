@@ -148,9 +148,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         {
             // normalise the data between 0 and 95th percentiles
             int binCount = 100;
-            double min;
-            double max;
-            DataTools.MinMax(data, out min, out max);
+            DataTools.MinMax(data, out var min, out var max);
             double binWidth = (max - min) / binCount;
             var histogram = Histogram.Histo(data, binCount, min, max, binWidth);
 

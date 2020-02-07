@@ -543,9 +543,7 @@ namespace AnalysisPrograms
 
                         var indexArray = ConvertEventsToSummaryIndices(output2);
 
-                        double[] normalisedScores;
-                        double normalisedThreshold;
-                        DataTools.Normalise(indexArray, 2, out normalisedScores, out normalisedThreshold);
+                        DataTools.Normalise(indexArray, 2, out var normalisedScores, out var normalisedThreshold);
 
                         //var plot = new Plot("Cane Toad", normalisedScores, normalisedThreshold);
                         var recognizerTrack = GraphsAndCharts.DrawGraph("Canetoad events", normalisedScores, 32);

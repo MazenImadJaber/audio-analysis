@@ -63,14 +63,9 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
         /// </summary>
         public TimeSpan TimeOffset { get; }
 
-        double ISuperTile.Scale
-        {
-            get
-            {
+        double ISuperTile.Scale =>
                 // round scale to counter IEEE float rounding issues
                 // ReSharper disable once ArrangeAccessorOwnerBody
-                return Math.Round(this.Scale.TotalSeconds, 10);
-            }
-        }
+                Math.Round(this.Scale.TotalSeconds, 10);
     }
 }

@@ -118,8 +118,7 @@ namespace AnalysisPrograms.Recognizers
             {
                 // high pass filter
                 int windowLength = 71;
-                double[] highPassFilteredSignal;
-                DSP_IIRFilter.ApplyMovingAvHighPassFilter(samples, windowLength, out highPassFilteredSignal);
+                DSP_IIRFilter.ApplyMovingAvHighPassFilter(samples, windowLength, out var highPassFilteredSignal);
 
                 //DSP_IIRFilter filter2 = new DSP_IIRFilter("Chebyshev_Highpass_400");
                 //int order2 = filter2.order;
@@ -143,12 +142,8 @@ namespace AnalysisPrograms.Recognizers
             }
 
             // calculate an amplitude threshold that is above Nth percentile of amplitudes in the subsample
-            int[] histogramOfAmplitudes;
-            double minAmplitude;
-            double maxAmplitude;
-            double binWidth;
             int window = 66;
-            Histogram.GetHistogramOfWaveAmplitudes(bandPassFilteredSignal, window, out histogramOfAmplitudes, out minAmplitude, out maxAmplitude, out binWidth);
+            Histogram.GetHistogramOfWaveAmplitudes(bandPassFilteredSignal, window, out var histogramOfAmplitudes, out var minAmplitude, out var maxAmplitude, out var binWidth);
             int percentileBin = Histogram.GetPercentileBin(histogramOfAmplitudes, percentile);
 
             double amplitudeThreshold = (percentileBin + 1) * binWidth;
@@ -445,8 +440,7 @@ namespace AnalysisPrograms.Recognizers
                 }
 
                 double[] subsampleWav = DataTools.Subarray(signal, i, templateLength);
-                double min, max;
-                DataTools.MinMax(subsampleWav, out min, out max);
+                DataTools.MinMax(subsampleWav, out var min, out var max);
                 if (max - min < amplitudeThreshold)
                 {
                     continue;

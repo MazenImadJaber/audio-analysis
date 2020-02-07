@@ -17,7 +17,6 @@ namespace AudioAnalysisTools.WavTools
 
     public class AudioRecording : IDisposable
     {
-        private readonly WavReader wavReader;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AudioRecording"/> class.
@@ -27,7 +26,7 @@ namespace AudioAnalysisTools.WavTools
         /// </summary>
         public AudioRecording(WavReader wavReader)
         {
-            this.wavReader = wavReader;
+            this.WavReader = wavReader;
         }
 
         public AudioRecording(FileInfo audioFile)
@@ -47,7 +46,7 @@ namespace AudioAnalysisTools.WavTools
             this.Bytes = bytes;
             if (this.Bytes != null)
             {
-                this.wavReader = new WavReader(bytes);
+                this.WavReader = new WavReader(bytes);
             }
         }
 
@@ -61,7 +60,7 @@ namespace AudioAnalysisTools.WavTools
         {
             this.FilePath = path;
             this.BaseName = Path.GetFileNameWithoutExtension(path);
-            this.wavReader = new WavReader(path);
+            this.WavReader = new WavReader(path);
         }
 
         /// <summary>
@@ -77,7 +76,7 @@ namespace AudioAnalysisTools.WavTools
             this.Bytes = bytes;
             if (this.Bytes != null)
             {
-                this.wavReader = new WavReader(bytes);
+                this.WavReader = new WavReader(bytes);
             }
         }
 
@@ -94,9 +93,9 @@ namespace AudioAnalysisTools.WavTools
         {
             get
             {
-                if (this.wavReader != null)
+                if (this.WavReader != null)
                 {
-                    return this.wavReader.SampleRate;
+                    return this.WavReader.SampleRate;
                 }
 
                 return -int.MaxValue;
@@ -107,9 +106,9 @@ namespace AudioAnalysisTools.WavTools
         {
             get
             {
-                if (this.wavReader != null)
+                if (this.WavReader != null)
                 {
-                    return this.wavReader.SampleRate / 2;
+                    return this.WavReader.SampleRate / 2;
                 }
 
                 return -int.MaxValue;
@@ -120,9 +119,9 @@ namespace AudioAnalysisTools.WavTools
         {
             get
             {
-                if (this.wavReader != null)
+                if (this.WavReader != null)
                 {
-                    return this.wavReader.BitsPerSample;
+                    return this.WavReader.BitsPerSample;
                 }
 
                 return -int.MaxValue;
@@ -133,9 +132,9 @@ namespace AudioAnalysisTools.WavTools
         {
             get
             {
-                if (this.wavReader != null)
+                if (this.WavReader != null)
                 {
-                    return this.wavReader.Epsilon;
+                    return this.WavReader.Epsilon;
                 }
 
                 return -double.MaxValue;
@@ -147,7 +146,7 @@ namespace AudioAnalysisTools.WavTools
         /// Audio must be in wav format.
         /// Use MasterAudioUtility to convert or segment the audio first.
         /// </summary>
-        public WavReader WavReader => this.wavReader;
+        public WavReader WavReader { get; }
 
         /// <summary>
         /// Gets returns Time Span of the recording
@@ -157,9 +156,8 @@ namespace AudioAnalysisTools.WavTools
         public static AudioRecording Filter_IIR(AudioRecording audio, string filterName)
         {
             DSP_IIRFilter filter = new DSP_IIRFilter(filterName);
-            double[] output;
-            filter.ApplyIIRFilter(audio.wavReader.Samples, out output);
-            int channels = audio.wavReader.Channels;
+            filter.ApplyIIRFilter(audio.WavReader.Samples, out var output);
+            int channels = audio.WavReader.Channels;
             int bitsPerSample = audio.BitsPerSample;
             int sampleRate = audio.SampleRate;
             WavReader wr = new WavReader(output, channels, bitsPerSample, sampleRate);
@@ -331,7 +329,7 @@ namespace AudioAnalysisTools.WavTools
 
         public void Dispose()
         {
-            this.wavReader.Dispose();
+            this.WavReader.Dispose();
         }
 
         //########################################################################################################################################################################

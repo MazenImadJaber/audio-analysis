@@ -219,8 +219,7 @@ namespace AudioAnalysisTools
 
                     if (file.Exists)
                     {
-                        int binCount;
-                        double[,] matrix = IndexMatrices.ReadSpectrogram(file, out binCount);
+                        double[,] matrix = IndexMatrices.ReadSpectrogram(file, out var binCount);
 
                         // create or get the array of spectral values.
                         double[] aggregateArray = new double[reducedSpectralLength];

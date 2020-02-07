@@ -150,9 +150,6 @@ namespace AnalysisPrograms.Recognizers
             // ######################################################################
             // ii: DO THE ANALYSIS AND RECOVER SCORES OR WHATEVER
             //minDuration = 1.0;
-            double[] scores; // predefinition of score array
-            List<AcousticEvent> acousticEvents;
-            double[,] hits;
             Oscillations2012.Execute(
                 (SpectrogramStandard)sonogram,
                 minHz,
@@ -164,9 +161,9 @@ namespace AnalysisPrograms.Recognizers
                 eventThreshold,
                 minDuration,
                 maxDuration,
-                out scores,
-                out acousticEvents,
-                out hits,
+                out var scores,
+                out var acousticEvents,
+                out var hits,
                 segmentStartOffset);
 
             acousticEvents.ForEach(ae =>

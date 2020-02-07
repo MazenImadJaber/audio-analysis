@@ -51,15 +51,9 @@ namespace AnalysisPrograms
         public const string AnalysisName = "LSKiwi3";
         public const int ResampleRate = 17640;
 
-        public string DisplayName
-        {
-            get { return "Little Spotted Kiwi v3"; }
-        }
+        public string DisplayName => "Little Spotted Kiwi v3";
 
-        public string Identifier
-        {
-            get { return "Towsey." + AnalysisName; }
-        }
+        public string Identifier => "Towsey." + AnalysisName;
 
         /// <summary>
         /// A WRAPPER AROUND THE analyser.Analyze(analysisSettings) METHOD
@@ -1171,27 +1165,15 @@ namespace AnalysisPrograms
             return processedtable;
         }
 
-        public AnalysisSettings DefaultSettings
+        public AnalysisSettings DefaultSettings => new AnalysisSettings
         {
-            get
-            {
-                return new AnalysisSettings
-                {
-                    AnalysisMaxSegmentDuration = TimeSpan.FromMinutes(1),
-                    AnalysisMinSegmentDuration = TimeSpan.FromSeconds(30),
-                    SegmentMediaType = MediaTypes.MediaTypeWav,
-                    SegmentOverlapDuration = TimeSpan.Zero,
-                    AnalysisTargetSampleRate = ResampleRate,
-                };
-            }
-        }
+            AnalysisMaxSegmentDuration = TimeSpan.FromMinutes(1),
+            AnalysisMinSegmentDuration = TimeSpan.FromSeconds(30),
+            SegmentMediaType = MediaTypes.MediaTypeWav,
+            SegmentOverlapDuration = TimeSpan.Zero,
+            AnalysisTargetSampleRate = ResampleRate,
+        };
 
-        public string DefaultConfiguration
-        {
-            get
-            {
-                return string.Empty;
-            }
-        }
+        public string DefaultConfiguration => string.Empty;
     }
 }

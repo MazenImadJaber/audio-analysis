@@ -379,8 +379,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
 
         public bool ReadStandardDeviationSpectrogramCsvs(DirectoryInfo ipdir, string fileName)
         {
-            int freqBinCount;
-            this.spgrStdDevMatrices = IndexMatrices.ReadSpectrogramCsvFiles(ipdir, fileName, this.ColorMap, out freqBinCount);
+            this.spgrStdDevMatrices = IndexMatrices.ReadSpectrogramCsvFiles(ipdir, fileName, this.ColorMap, out var freqBinCount);
             this.FrameWidth = freqBinCount * 2;
             if (this.spgrStdDevMatrices == null)
             {

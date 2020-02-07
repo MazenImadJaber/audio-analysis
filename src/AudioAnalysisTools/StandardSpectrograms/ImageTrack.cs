@@ -91,43 +91,25 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
         public int bottomOffset { get; set; } //set to track's BOTTOM pixel row in final image
 
-        private int height = DefaultHeight;
-
-        public int Height
-        {
-            get { return this.height; } set { this.height = value; }
-        }
+        public int Height { get; set; } = DefaultHeight;
 
         private int[] intData = null; // used to store segmentation state for example
-        private double[] doubleData = null;
-        private double[,] doubleMatrix = null;
+        private readonly double[] doubleData = null;
+        private readonly double[,] doubleMatrix = null;
 
         private TimeSpan timeSpan { get; set; }
 
         private double timeScale { get; set; } //pixels per second - not actually used from 30-08-2012
 
-        private double[] doubleData1 = null;
-        private double[] doubleData2 = null;
+        private readonly double[] doubleData1 = null;
+        private readonly double[] doubleData2 = null;
 
         //these params used for segmentation track
         public double SegmentationThreshold_k1 { get; set; }
 
         public double SegmentationThreshold_k2 { get; set; }
 
-        private int garbageID = 0;
-
-        public int GarbageID
-        {
-            get
-            {
-                return this.garbageID;
-            }
-
-            set
-            {
-                this.garbageID = value;
-            }
-        }
+        public int GarbageID { get; set; } = 0;
 
         /// <summary>
         /// CONSTRUCTOR
@@ -138,7 +120,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         {
             this.TrackType = type;
             this.intData = data;
-            this.height = this.SetTrackHeight();
+            this.Height = this.SetTrackHeight();
 
             //if(SonoImage.Verbose)LoggedConsole.WriteLine("\tTrack CONSTRUCTOR: trackType = " + type + "  Data = " + data.ToString());
         }
@@ -147,7 +129,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         {
             this.TrackType = type;
             this.doubleData = data;
-            this.height = this.SetTrackHeight();
+            this.Height = this.SetTrackHeight();
 
             //if (SonoImage.Verbose) LoggedConsole.WriteLine("\tTrack CONSTRUCTOR: trackType = " + type + "  Data = " + data.ToString());
         }
@@ -163,14 +145,14 @@ namespace AudioAnalysisTools.StandardSpectrograms
             this.TrackType = type;
             this.doubleData1 = data1;
             this.doubleData2 = data2;
-            this.height = this.SetTrackHeight();
+            this.Height = this.SetTrackHeight();
         }
 
         public ImageTrack(TrackType type, double[,] data)
         {
             this.TrackType = type;
             this.doubleMatrix = data;
-            this.height = this.SetTrackHeight();
+            this.Height = this.SetTrackHeight();
         }
 
         public ImageTrack(TrackType type, TimeSpan t, double pixelsPerSecond)
@@ -178,7 +160,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             this.TrackType = type;
             this.timeSpan = t;
             this.timeScale = pixelsPerSecond;
-            this.height = this.SetTrackHeight();
+            this.Height = this.SetTrackHeight();
         }
 
         public ImageTrack(TrackType type)
@@ -287,7 +269,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 return bmp;
             }
 
-            int bottom = this.topOffset + this.height - 1;
+            int bottom = this.topOffset + this.Height - 1;
             for (int x = 0; x < Math.Min(bmp.Width, this.intData.Length); x++)
             {
                 Color col = TrackColors[this.intData[x]];
@@ -296,12 +278,12 @@ namespace AudioAnalysisTools.StandardSpectrograms
                     col = white;
                 }
 
-                if (this.intData[x] == this.garbageID)
+                if (this.intData[x] == this.GarbageID)
                 {
                     col = gray;
                 }
 
-                for (int z = 0; z < this.height; z++)
+                for (int z = 0; z < this.Height; z++)
                 {
                     bmp[x, this.topOffset + z] = col;  //add in hits
                 }
@@ -349,7 +331,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             }
 
             Color gray = Color.FromRgb(235, 235, 235); // use as background
-            int baseLine = this.topOffset + this.height - 2;
+            int baseLine = this.topOffset + this.Height - 2;
 
             //int length = (bmpWidth <= doubleData.Length) ? bmpWidth : doubleData.Length;
             //for (int w = 0; w < length; w++)
@@ -393,7 +375,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                 //    bmp[w, this.topOffset + z] = gray; // background
                 //}
 
-                for (int z = id; z < this.height; z++)
+                for (int z = id; z < this.Height; z++)
                 {
                     bmp[w, this.topOffset + z] = Color.Black; // draw the score bar
                 }
@@ -446,7 +428,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
             }
 
             Color gray = Color.FromRgb(235, 235, 235); // use as background
-            int baseLine = this.topOffset + this.height - 2;
+            int baseLine = this.topOffset + this.Height - 2;
 
             //int length = (bmpWidth <= doubleData.Length) ? bmpWidth : doubleData.Length;
             //for (int w = 0; w < length; w++)
@@ -480,7 +462,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                     bmp[w, this.topOffset + z] = gray; // background
                 }
 
-                for (int z = id; z < this.height; z++)
+                for (int z = id; z < this.Height; z++)
                 {
                     bmp[w, this.topOffset + z] = Color.Black; // draw the score bar
                 }
@@ -583,7 +565,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         /// <returns></returns>
         public Image<Rgb24> DrawWaveEnvelopeTrack(Image<Rgb24> bmp)
         {
-            int halfHeight = this.height / 2;
+            int halfHeight = this.Height / 2;
             Color c = Color.FromRgb(10, 200, 255);
 
             for (int w = 0; w < bmp.Width; w++)
@@ -1145,17 +1127,13 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
         public static void DrawScoreTrack(Image<Rgb24> bmp, double[] array, int yOffset, int trackHeight, double threshold, string title)
         {
-            double minVal;
-            double maxVal;
-            DataTools.MinMax(array, out minVal, out maxVal);
+            DataTools.MinMax(array, out var minVal, out var maxVal);
             DrawScoreTrack(bmp, array, yOffset, trackHeight, minVal, maxVal, threshold, title);
         }
 
         public static Image<Rgb24> DrawGrayScaleScoreTrack(double[] array, int trackHeight, double threshold, string title)
         {
-            double minVal;
-            double maxVal;
-            DataTools.MinMax(array, out minVal, out maxVal);
+            DataTools.MinMax(array, out var minVal, out var maxVal);
             Image<Rgb24> bitmap = DrawGrayScaleScoreTrack(array, minVal, maxVal, threshold, title);
             return bitmap;
         }

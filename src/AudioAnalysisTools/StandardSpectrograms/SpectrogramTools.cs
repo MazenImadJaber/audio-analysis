@@ -583,8 +583,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                     freqBin[r] = spectrogram[r, j];
                 }
 
-                double av, sd;
-                NormalDist.AverageAndSD(freqBin, out av, out sd);
+                NormalDist.AverageAndSD(freqBin, out var av, out var sd);
                 avgSpectrum[j] = av; // store average of the bin
 
                 //varSpectrum[j] = sd * sd; // store var of the bin
@@ -691,8 +690,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
                     freqBin[r] = amplitudeSpectrogram[r, j] * amplitudeSpectrogram[r, j];  //convert amplitude to energy or power.
                 }
 
-                double av, sd;
-                NormalDist.AverageAndSD(freqBin, out av, out sd);
+                NormalDist.AverageAndSD(freqBin, out var av, out var sd);
                 avgSpectrum[j] = av; // store average of the bin
                 varSpectrum[j] = sd * sd; // store var of the bin
                 covSpectrum[j] = sd * sd / av; //store the coefficient of variation of the bin
@@ -795,9 +793,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
 
         public static double[,] ExtractFreqSubband(double[,] m, int minHz, int maxHz, bool doMelscale, int binCount, double binWidth)
         {
-            int c1;
-            int c2;
-            AcousticEvent.Freq2BinIDs(doMelscale, minHz, maxHz, binCount, binWidth, out c1, out c2);
+            AcousticEvent.Freq2BinIDs(doMelscale, minHz, maxHz, binCount, binWidth, out var c1, out var c2);
             return DataTools.Submatrix(m, 0, c1, m.GetLength(0) - 1, c2);
         }
 
@@ -832,8 +828,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         public static double[] ExtractModalNoiseSubband(double[] modalNoise, int minHz, int maxHz, bool doMelScale, int nyquist, double binWidth)
         {
             //extract subband modal noise profile
-            int c1, c2;
-            AcousticEvent.Freq2BinIDs(doMelScale, minHz, maxHz, nyquist, binWidth, out c1, out c2);
+            AcousticEvent.Freq2BinIDs(doMelScale, minHz, maxHz, nyquist, binWidth, out var c1, out var c2);
             int subbandCount = c2 - c1 + 1;
             var subband = new double[subbandCount];
             for (int i = 0; i < subbandCount; i++)

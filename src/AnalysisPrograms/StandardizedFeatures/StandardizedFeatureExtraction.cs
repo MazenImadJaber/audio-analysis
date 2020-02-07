@@ -39,15 +39,9 @@ namespace AnalysisPrograms.StandardizedFeatures
         }
 
         // Implemented from AbstractStrongAnalyser
-        public override string DisplayName
-        {
-            get { return "Standardized Feature Extraction"; }
-        }
+        public override string DisplayName => "Standardized Feature Extraction";
 
-        public override string Identifier
-        {
-            get { return "Ecosounds.StandardizedFeatures"; }
-        }
+        public override string Identifier => "Ecosounds.StandardizedFeatures";
 
         public override AnalyzerConfig ParseConfig(FileInfo file)
         {

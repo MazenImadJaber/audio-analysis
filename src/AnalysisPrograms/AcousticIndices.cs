@@ -73,16 +73,10 @@ namespace AnalysisPrograms
         [Serializable]
         public class AcousticIndicesConfig : IndexCalculateConfig
         {
-            private LdSpectrogramConfig ldfcsConfig = new LdSpectrogramConfig();
-
             /// <summary>
             /// Gets or sets the LDFC spectrogram configuration.
             /// </summary>
-            public LdSpectrogramConfig LdSpectrogramConfig
-            {
-                get => this.ldfcsConfig;
-                protected set => this.ldfcsConfig = value;
-            }
+            public LdSpectrogramConfig LdSpectrogramConfig { get; protected set; } = new LdSpectrogramConfig();
 
             public bool TileOutput { get; private set; } = false;
 

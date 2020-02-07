@@ -285,21 +285,9 @@ namespace AnalysisPrograms
         private const string EcosoundsGroundParrotIdentifier = "Ecosounds.GroundParrot";
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public override string DisplayName
-        {
-            get
-            {
-                return "Ground Parrot Recognizer";
-            }
-        }
+        public override string DisplayName => "Ground Parrot Recognizer";
 
-        public override string Identifier
-        {
-            get
-            {
-                return EcosoundsGroundParrotIdentifier;
-            }
-        }
+        public override string Identifier => EcosoundsGroundParrotIdentifier;
 
         public override AnalysisResult2 Analyze<T>(AnalysisSettings analysisSettings, SegmentSettings<T> segmentSettings)
         {

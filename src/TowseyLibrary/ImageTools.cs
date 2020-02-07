@@ -121,7 +121,7 @@ namespace TowseyLibrary
                              /*Color.Yellow,*/ Color.YellowGreen,
         };
 
-        private static double[,] lowPassKernal =
+        private static readonly double[,] lowPassKernal =
         {
         {
             0.1, 0.1, 0.1,
@@ -134,7 +134,7 @@ namespace TowseyLibrary
                                             },
         };
 
-        private static double[,] highPassKernal1 =
+        private static readonly double[,] highPassKernal1 =
         {
         {
             -1.0, -1.0, -1.0,
@@ -147,7 +147,7 @@ namespace TowseyLibrary
         },
     };
 
-        private static double[,] highPassKernal2 =
+        private static readonly double[,] highPassKernal2 =
         {
         {
             -0.3, -0.3, -0.3, -0.3, -0.3,
@@ -166,7 +166,7 @@ namespace TowseyLibrary
                                             },
         };
 
-        private static double[,] vertLineKernal =
+        private static readonly double[,] vertLineKernal =
         {
         {
             -0.5, 1.0, -0.5,
@@ -179,7 +179,7 @@ namespace TowseyLibrary
         },
     };
 
-        private static double[,] horiLineKernal3 =
+        private static readonly double[,] horiLineKernal3 =
         {
         {
             -0.5, -0.5, -0.5,
@@ -192,7 +192,7 @@ namespace TowseyLibrary
         },
     };
 
-        private static double[,] horiLineKernal5 =
+        private static readonly double[,] horiLineKernal5 =
         {
         {
             -0.5, -0.5, -0.5, -0.5, -0.5,
@@ -205,7 +205,7 @@ namespace TowseyLibrary
         },
     };
 
-        private static double[,] diagLineKernal1 =
+        private static readonly double[,] diagLineKernal1 =
         {
         {
             2.0, -1.0, -1.0,
@@ -218,7 +218,7 @@ namespace TowseyLibrary
         },
     };
 
-        private static double[,] diagLineKernal2 =
+        private static readonly double[,] diagLineKernal2 =
         {
         {
             -1.0, -1.0, 2.0,
@@ -231,7 +231,7 @@ namespace TowseyLibrary
         },
     };
 
-        private static double[,] Laplace1Kernal =
+        private static readonly double[,] Laplace1Kernal =
         {
         {
             0.0, -1.0, 0.0,
@@ -244,7 +244,7 @@ namespace TowseyLibrary
         },
     };
 
-        private static double[,] Laplace2Kernal =
+        private static readonly double[,] Laplace2Kernal =
         {
         {
             -1.0, -1.0, -1.0,
@@ -257,7 +257,7 @@ namespace TowseyLibrary
         },
     };
 
-        private static double[,] Laplace3Kernal =
+        private static readonly double[,] Laplace3Kernal =
         {
         {
             1.0, -2.0, 1.0,
@@ -270,7 +270,7 @@ namespace TowseyLibrary
         },
     };
 
-        private static double[,] Laplace4Kernal =
+        private static readonly double[,] Laplace4Kernal =
         {
         {
             -1.0, -1.0, -1.0,
@@ -283,7 +283,7 @@ namespace TowseyLibrary
         },
     }; //subtracts original
 
-        private static double[,] grid2 =
+        private static readonly double[,] grid2 =
         {
         {
             -0.5, 1.0, -1.0, 1.0, -1.0, 1.0, -0.5,
@@ -304,7 +304,7 @@ namespace TowseyLibrary
         //static double[,] grid2Wave =      { { -0.5, 1.0, -1.5, 2.0, -1.5, 1.0, -0.5},
         //                                    { -0.5, 1.0, -1.5, 2.0, -1.5, 1.0, -0.5},
         //                                    { -0.5, 1.0, -1.5, 2.0, -1.5, 1.0, -0.5}};
-        private static double[,] grid3 =
+        private static readonly double[,] grid3 =
         {
         {
             -0.5, 1.0, -0.5, -0.5, 1.0, -0.5, -0.5, 1.0, -0.5,
@@ -329,7 +329,7 @@ namespace TowseyLibrary
                                             },
         };
 
-        private static double[,] grid4 =
+        private static readonly double[,] grid4 =
         {
         {
             -0.375, 1.0, -0.375, -0.375, -0.375, 1.0, -0.375, -0.375, -0.375, 1.0, -0.375,
@@ -354,7 +354,7 @@ namespace TowseyLibrary
                                             },
         };
 
-        private static double[,] grid2Wave =
+        private static readonly double[,] grid2Wave =
         {
         {
             -0.5, -0.5, -0.5,
@@ -379,7 +379,7 @@ namespace TowseyLibrary
                                             },
         };
 
-        private static double[,] grid3Wave =
+        private static readonly double[,] grid3Wave =
         {
         {
             -0.5, -0.5, -0.5,
@@ -670,9 +670,7 @@ namespace TowseyLibrary
                 noiseScores[n] = sum / kRows;
             }
 
-            double noiseAv;
-            double noiseSd;
-            NormalDist.AverageAndSD(noiseScores, out noiseAv, out noiseSd);
+            NormalDist.AverageAndSD(noiseScores, out var noiseAv, out var noiseSd);
             LoggedConsole.WriteLine("noiseAv=" + noiseAv + "   noiseSd=" + noiseSd);
 
             double[,] newMatrix = new double[mRows, mCols]; //init new matrix to return
@@ -991,9 +989,7 @@ namespace TowseyLibrary
                     double DivideDEF_avBelow = (grid[g] + grid[h] + grid[i]) / 3;
                     double DivideDEF_avAbove = (grid[a] + grid[b] + grid[c]) / 3;
                     differences[3] = Math.Abs(DivideDEF_avAbove - DivideDEF_avBelow);
-                    double gridMin;
-                    double gridMax;
-                    DataTools.MinMax(differences, out gridMin, out gridMax);
+                    DataTools.MinMax(differences, out var gridMin, out var gridMax);
 
                     newMatrix[y, x] = gridMax;
                     if (min > gridMin)
@@ -1109,9 +1105,7 @@ namespace TowseyLibrary
                         differences[3] = 0.0;
                     }
 
-                    double diffMin;
-                    double diffMax;
-                    DataTools.MinMax(differences, out diffMin, out diffMax);
+                    DataTools.MinMax(differences, out var diffMin, out var diffMax);
 
                     newMatrix[y, x] = diffMax;
                     if (min > diffMin)
@@ -1211,8 +1205,7 @@ namespace TowseyLibrary
 
             //ridge magnitude having slope=2Pi/8;
             ridgeMagnitudes[2, 1] = MatrixTools.SumPositiveDiagonal(m) / cols;
-            double upperAv, lowerAv;
-            MatrixTools.AverageValuesInTriangleAboveAndBelowPositiveDiagonal(m, out upperAv, out lowerAv);
+            MatrixTools.AverageValuesInTriangleAboveAndBelowPositiveDiagonal(m, out var upperAv, out var lowerAv);
             ridgeMagnitudes[2, 0] = upperAv;
             ridgeMagnitudes[2, 2] = lowerAv;
 
@@ -1275,9 +1268,7 @@ namespace TowseyLibrary
                 differences[i] /= 2; // want average of both differences because easier to select an appropiate decibel threshold for ridge magnitude.
             }
 
-            int indexMin, indexMax;
-            double diffMin, diffMax;
-            DataTools.MinMax(differences, out indexMin, out indexMax, out diffMin, out diffMax);
+            DataTools.MinMax(differences, out var indexMin, out var indexMax, out var diffMin, out var diffMax);
 
             //double threshold = min + (max - min) / 4; //threshold is 1/5th of range above min
             double threshold = 0; // dB
@@ -1313,9 +1304,7 @@ namespace TowseyLibrary
                 return;
             }
 
-            int indexMin, indexMax;
-            double diffMin, diffMax;
-            DataTools.MinMax(ridgeMagnitudes, out indexMin, out indexMax, out diffMin, out diffMax);
+            DataTools.MinMax(ridgeMagnitudes, out var indexMin, out var indexMax, out var diffMin, out var diffMax);
 
             double threshold = 0; // dB
             isRidge = ridgeMagnitudes[indexMax] > threshold;
@@ -1526,9 +1515,7 @@ namespace TowseyLibrary
             ridgeMagnitudes[2] = MatrixTools.DotProduct(ridgeDir2Mask, m);
             ridgeMagnitudes[3] = MatrixTools.DotProduct(ridgeDir3Mask, m);
 
-            int indexMin, indexMax;
-            double diffMin, diffMax;
-            DataTools.MinMax(ridgeMagnitudes, out indexMin, out indexMax, out diffMin, out diffMax);
+            DataTools.MinMax(ridgeMagnitudes, out var indexMin, out var indexMax, out var diffMin, out var diffMax);
 
             // dB
             double threshold = 0;
@@ -1710,9 +1697,7 @@ namespace TowseyLibrary
             cornerMagnitudes[6] = MatrixTools.DotProduct(ridgeDir6Mask, m);
             cornerMagnitudes[7] = MatrixTools.DotProduct(ridgeDir7Mask, m);
 
-            int indexMin, indexMax;
-            double diffMin, diffMax;
-            DataTools.MinMax(cornerMagnitudes, out indexMin, out indexMax, out diffMin, out diffMax);
+            DataTools.MinMax(cornerMagnitudes, out var indexMin, out var indexMax, out var diffMin, out var diffMax);
 
             // dB
             double threshold = 0;
@@ -1864,14 +1849,10 @@ namespace TowseyLibrary
         {
             int binCount = 50;
             int count = M.GetLength(0) * M.GetLength(1);
-            double binWidth;
-            double min;
-            double max;
-            int[] powerHisto = Histogram.Histo(M, binCount, out binWidth, out min, out max);
+            int[] powerHisto = Histogram.Histo(M, binCount, out var binWidth, out var min, out var max);
             powerHisto[binCount - 1] = 0; //just in case it is the max ????????????????????????????????????? !!!!!!!!!!!!!!!
             double[] smooth = DataTools.filterMovingAverage(powerHisto, 3);
-            int maxindex;
-            DataTools.getMaxIndex(smooth, out maxindex);
+            DataTools.getMaxIndex(smooth, out var maxindex);
 
             //calculate threshold for upper percentile
             int clipCount = (int)(upperCut * count);
@@ -1912,9 +1893,7 @@ namespace TowseyLibrary
             double[,] tmpM = new double[height, ncbbc];
             double[,] outM = new double[height, width];
             double[,] thresholdSubatrix = DataTools.Submatrix(matrix, 0, 0, height - 1, bandWidth);
-            double lowerThreshold;
-            double upperThreshold;
-            PercentileThresholds(thresholdSubatrix, lowerPercentile, upperPercentile, out lowerThreshold, out upperThreshold);
+            PercentileThresholds(thresholdSubatrix, lowerPercentile, upperPercentile, out var lowerThreshold, out var upperThreshold);
 
             for (int col = 0; col < width; col++)
             {
@@ -2006,9 +1985,7 @@ namespace TowseyLibrary
                         }
                     }
 
-                    double av;
-                    double sd;
-                    NormalDist.AverageAndSD(values, out av, out sd);
+                    NormalDist.AverageAndSD(values, out var av, out var sd);
                     if (sd < 0.0001)
                     {
                         sd = 0.0001;
@@ -2050,9 +2027,7 @@ namespace TowseyLibrary
                     subMatrix = DataTools.Submatrix(matrix, 0, start, height - 1, stop);
                 }
 
-                double av;
-                double sd;
-                NormalDist.AverageAndSD(subMatrix, out av, out sd);
+                NormalDist.AverageAndSD(subMatrix, out var av, out var sd);
                 if (sd < 0.0001)
                 {
                     sd = 0.0001;  //to prevent division by zero
@@ -2096,9 +2071,7 @@ namespace TowseyLibrary
                     subMatrix = DataTools.Submatrix(matrix, 0, start, height - 1, stop);
                 }
 
-                double av;
-                double sd;
-                NormalDist.AverageAndSD(subMatrix, out av, out sd);
+                NormalDist.AverageAndSD(subMatrix, out var av, out var sd);
 
                 //LoggedConsole.WriteLine(0 + "," + start + "," + (height - 1) + "," + stop + "   Threshold " + b + "=" + threshold);
 
@@ -2208,9 +2181,7 @@ namespace TowseyLibrary
                 }
 
                 double[,] subMatrix = DataTools.Submatrix(blurM, 0, start, height - 1, stop);
-                double lowerThreshold;
-                double upperThreshold;
-                PercentileThresholds(subMatrix, lowerShoulder, upperShoulder, out lowerThreshold, out upperThreshold);
+                PercentileThresholds(subMatrix, lowerShoulder, upperShoulder, out var lowerThreshold, out var upperThreshold);
 
                 //LoggedConsole.WriteLine(0 + "," + start + "," + (height - 1) + "," + stop + "   Threshold " + b + "=" + threshold);
 
@@ -2280,9 +2251,7 @@ namespace TowseyLibrary
             double[,] M = new double[height, width];
 
             double[,] subMatrix = DataTools.Submatrix(blurM, 0, 0, height - 1, bandWidth);
-            double lowerThreshold;
-            double upperThreshold;
-            PercentileThresholds(subMatrix, lowerShoulder, upperShoulder, out lowerThreshold, out upperThreshold);
+            PercentileThresholds(subMatrix, lowerShoulder, upperShoulder, out var lowerThreshold, out var upperThreshold);
 
             for (int col = 0; col < width; col++) //for all cols
             {
@@ -2343,8 +2312,7 @@ namespace TowseyLibrary
                         continue; //already have something here
                     }
 
-                    int colWidth; //colWidth of object
-                    Oblong.ColumnWidth(m2, x, y, out colWidth);
+                    Oblong.ColumnWidth(m2, x, y, out var colWidth);
                     int x2 = x + colWidth;
                     for (int j = x; j < x2; j++)
                     {
@@ -2388,8 +2356,7 @@ namespace TowseyLibrary
 
                     //int rowWidth; //rowWidth of object
                     //Shape.Row_Width(m2, x, y, out rowWidth);
-                    int colWidth; //colWidth of object
-                    Oblong.ColumnWidth(tmpM, x, y, out colWidth);
+                    Oblong.ColumnWidth(tmpM, x, y, out var colWidth);
                     int x2 = x + colWidth;
 
                     //check to see if object is in blob
@@ -2445,8 +2412,7 @@ namespace TowseyLibrary
                         continue; //already have something here
                     }
 
-                    int colWidth; //colWidth of object
-                    Oblong.ColumnWidth(m2, x, y, out colWidth);
+                    Oblong.ColumnWidth(m2, x, y, out var colWidth);
                     int x2 = x + colWidth - 1;
                     for (int j = x; j < x2; j++)
                     {
@@ -2491,8 +2457,7 @@ namespace TowseyLibrary
                         continue; //already have something here
                     }
 
-                    int colWidth; //colWidth of object
-                    Oblong.ColumnWidth(tmpM, x, y, out colWidth);
+                    Oblong.ColumnWidth(tmpM, x, y, out var colWidth);
 
                     int x2 = x + colWidth;
 
@@ -2587,8 +2552,7 @@ namespace TowseyLibrary
                         continue; //already have something here
                     }
 
-                    int colWidth; //colWidth of object
-                    Oblong.ColumnWidth(m2, x, y, out colWidth);
+                    Oblong.ColumnWidth(m2, x, y, out var colWidth);
                     int x2 = x + colWidth - 1;
                     for (int j = x; j < x2; j++)
                     {
@@ -2633,8 +2597,7 @@ namespace TowseyLibrary
                         continue; //already have something here
                     }
 
-                    int colWidth; //colWidth of object
-                    Oblong.ColumnWidth(tmpM, x, y, out colWidth);
+                    Oblong.ColumnWidth(tmpM, x, y, out var colWidth);
 
                     int x2 = x + colWidth;
 
@@ -2738,9 +2701,7 @@ namespace TowseyLibrary
             double[,] M = new double[height, width];
 
             double[,] subMatrix = DataTools.Submatrix(tmpM, 0, 0, height - 1, bandWidth);
-            double lowerThreshold;
-            double upperThreshold;
-            PercentileThresholds(subMatrix, lowerShoulder, upperShoulder, out lowerThreshold, out upperThreshold);
+            PercentileThresholds(subMatrix, lowerShoulder, upperShoulder, out var lowerThreshold, out var upperThreshold);
 
             for (int col = 2; col < width; col++) // for all cols
             {
@@ -2812,10 +2773,8 @@ namespace TowseyLibrary
                         continue; //already have something here
                     }
 
-                    int rowWidth; //rowWidth of object
-                    Oblong.Row_Width(m, x, y, out rowWidth);
-                    int colWidth; //colWidth of object
-                    Oblong.ColumnWidth(m, x, y, out colWidth);
+                    Oblong.Row_Width(m, x, y, out var rowWidth);
+                    Oblong.ColumnWidth(m, x, y, out var colWidth);
                     bool sizeOK = rowWidth >= minRowWidth && colWidth >= minColWidth;
 
                     if (sizeOK)
@@ -2858,10 +2817,8 @@ namespace TowseyLibrary
                         continue; //already have something here
                     }
 
-                    int rowWidth; //rowWidth of object
-                    Oblong.Row_Width(m, x, y, out rowWidth);
-                    int colWidth; //colWidth of object
-                    Oblong.ColumnWidth(m, x, y, out colWidth);
+                    Oblong.Row_Width(m, x, y, out var rowWidth);
+                    Oblong.ColumnWidth(m, x, y, out var colWidth);
                     bool sizeOK = false;
                     if (rowWidth >= minRowWidth && colWidth >= minColWidth)
                     {

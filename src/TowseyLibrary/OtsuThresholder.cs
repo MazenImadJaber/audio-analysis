@@ -85,10 +85,7 @@ namespace TowseyLibrary
             byte[,] matrix = ConvertColourImageToGreyScaleMatrix((Image<Rgb24>)srcImage);
             double[,] ipMatrix = MatrixTools.ConvertMatrixOfByte2Double(matrix);
 
-            byte[,] opByteMatrix;
-            Image<Rgb24> histoImage;
-            double threshold;
-            GetGlobalOtsuThreshold(ipMatrix, out opByteMatrix, out threshold, out histoImage);
+            GetGlobalOtsuThreshold(ipMatrix, out var opByteMatrix, out var threshold, out var histoImage);
             Console.WriteLine("Threshold: {0}", threshold);
 
             Image<Rgb24> opImage = ConvertMatrixToGreyScaleImage(opByteMatrix);
@@ -390,11 +387,10 @@ namespace TowseyLibrary
             int height = matrix.GetLength(0);
 
             byte[] vector = DataTools.Matrix2Array(matrix);
-            byte[] outputArray;
 
             // Create Otsu Thresholder
             OtsuThresholder thresholder = new OtsuThresholder();
-            threshold = thresholder.CalculateThreshold(vector, out outputArray);
+            threshold = thresholder.CalculateThreshold(vector, out var outputArray);
             m2 = DataTools.Array2Matrix(outputArray, width, height);
         }
 
@@ -404,11 +400,10 @@ namespace TowseyLibrary
             int height = matrix.GetLength(0);
 
             byte[] vector = DataTools.Matrix2Array(matrix);
-            byte[] outputArray;
 
             // Create Otsu Thresholder
             OtsuThresholder thresholder = new OtsuThresholder();
-            threshold = thresholder.CalculateThreshold(vector, out outputArray);
+            threshold = thresholder.CalculateThreshold(vector, out var outputArray);
             m2 = DataTools.Array2Matrix(outputArray, width, height);
             histogramImage = CreateHistogramFrame(thresholder, height, 256);
         }
@@ -420,11 +415,9 @@ namespace TowseyLibrary
                 throw new ArgumentNullException(nameof(inputMatrix));
             }
 
-            double min, max;
-            var normMatrix = MatrixTools.NormaliseInZeroOne(inputMatrix, out min, out max);
+            var normMatrix = MatrixTools.NormaliseInZeroOne(inputMatrix, out var min, out var max);
             var byteMatrix = MatrixTools.ConvertMatrixOfDouble2Byte(normMatrix);
-            int threshold;
-            GetOtsuThreshold(byteMatrix, out opByteMatrix, out threshold, out histogramImage);
+            GetOtsuThreshold(byteMatrix, out opByteMatrix, out var threshold, out histogramImage);
             opThreshold = threshold / (double)byte.MaxValue;
             opThreshold = min + (opThreshold * (max - min));
         }
@@ -459,8 +452,7 @@ namespace TowseyLibrary
                     // debug check for min and max - make sure it worked
                     int[] bd = DataTools.GetByteDistribution(localMatrix);
 
-                    byte minIntensity, maxIntensity;
-                    int[] histo = Histogram.Histo(localMatrix, out minIntensity, out maxIntensity);
+                    int[] histo = Histogram.Histo(localMatrix, out var minIntensity, out var maxIntensity);
                     int lowerBinBound = Histogram.GetPercentileBin(histo, minPercentileBound);
                     int upperBinBound = Histogram.GetPercentileBin(histo, maxPercentileBound);
                     int range = upperBinBound - lowerBinBound;

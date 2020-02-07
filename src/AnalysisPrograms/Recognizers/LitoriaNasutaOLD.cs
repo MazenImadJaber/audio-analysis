@@ -148,9 +148,7 @@ namespace AnalysisPrograms.Recognizers
 
             var maxDb = amplitudeArray.MaxOrDefault();
 
-            double[] normalisedScores;
-            double normalisedThreshold;
-            DataTools.Normalise(thresholdedPlot, decibelThreshold, out normalisedScores, out normalisedThreshold);
+            DataTools.Normalise(thresholdedPlot, decibelThreshold, out var normalisedScores, out var normalisedThreshold);
             var text = string.Format($"{this.DisplayName} (Fullscale={maxDb:f1}dB)");
             var plot = new Plot(text, normalisedScores, normalisedThreshold);
 

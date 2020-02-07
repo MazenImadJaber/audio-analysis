@@ -94,7 +94,7 @@ namespace AnalysisPrograms.Recognizers
             //      string abbreviatedSpeciesName = (string)configuration[AnalysisKeys.AbbreviatedSpeciesName] ?? "<no.sp>";
 
             //RecognizerResults results = Gruntwork1(audioRecording, configuration, outputDirectory, segmentStartOffset);
-            RecognizerResults results = Gruntwork2(audioRecording, configuration, outputDirectory, segmentStartOffset);
+            RecognizerResults results = this.Gruntwork2(audioRecording, configuration, outputDirectory, segmentStartOffset);
 
             return results;
         }
@@ -230,9 +230,7 @@ namespace AnalysisPrograms.Recognizers
             } // loop through all spectra
 
             // We now have a list of potential hits for LimCon. This needs to be filtered.
-            double[] prunedScores;
-            List<Point> startEnds;
-            Plot.FindStartsAndEndsOfScoreEvents(scores, eventThresholdDb, minFrameWidth, maxFrameWidth, out prunedScores, out startEnds);
+            Plot.FindStartsAndEndsOfScoreEvents(scores, eventThresholdDb, minFrameWidth, maxFrameWidth, out var prunedScores, out var startEnds);
 
             // loop through the score array and find beginning and end of potential events
             var potentialEvents = new List<AcousticEvent>();

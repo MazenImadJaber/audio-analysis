@@ -10,10 +10,9 @@ namespace AudioAnalysisTools.Indices
     using System.Linq;
     using AnalysisBase.ResultBases;
     using DSP;
-    using Fasterflect;
+    using FastMember;
     using StandardSpectrograms;
     using TowseyLibrary;
-    using Fasterflect.Extensions;
 
     public class IndexCalculateResult
     {
@@ -74,9 +73,12 @@ namespace AudioAnalysisTools.Indices
     /// </summary>
     public class SummaryIndexValues : SummaryIndexBase
     {
+        private static readonly TypeAccessor CachedSetter;
+
         static SummaryIndexValues()
         {
             CachedSelectors = ReflectionExtensions.GetGetters<SummaryIndexValues, object>();
+            CachedSetter = TypeAccessor.Create(typeof(SummaryIndexValues));
         }
 
         /// <summary>
@@ -105,8 +107,7 @@ namespace AudioAnalysisTools.Indices
                     continue;
                 }
 
-                MemberSetter setValue = Reflect.Setter(typeof(SummaryIndexValues), kvp.Key);
-                setValue(this, kvp.Value);
+                CachedSetter[this, kvp.Key] = kvp.Value;
             }
         }
 

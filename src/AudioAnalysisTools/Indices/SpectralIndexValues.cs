@@ -10,7 +10,6 @@ namespace AudioAnalysisTools.Indices
     using System.Linq;
     using Acoustics.Shared;
     using AnalysisBase.ResultBases;
-    using Fasterflect;
     using SixLabors.ImageSharp.PixelFormats;
     using TowseyLibrary;
 

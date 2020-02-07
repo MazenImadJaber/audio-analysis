@@ -152,10 +152,7 @@ namespace AnalysisPrograms
                 config = LdSpectrogramConfig.ReadYamlToConfig(arguments.FalseColourSpectrogramConfig.ToFileInfo());
             }
 
-            string originalBaseName;
-            string[] otherSegments;
-            string analysisTag;
-            FilenameHelpers.ParseAnalysisFileName(indexGenerationDataFile, out originalBaseName, out analysisTag, out otherSegments);
+            FilenameHelpers.ParseAnalysisFileName(indexGenerationDataFile, out var originalBaseName, out var analysisTag, out var otherSegments);
 
             // CHECK FOR ERROR SEGMENTS - get zero signal array
             var input = arguments.InputDataDirectory.ToDirectoryInfo();

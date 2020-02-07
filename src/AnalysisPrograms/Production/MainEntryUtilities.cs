@@ -27,7 +27,7 @@ namespace AnalysisPrograms
     using AnalysisPrograms.Production;
     using AnalysisPrograms.Production.Arguments;
     using AnalysisPrograms.Production.Parsers;
-    using Fasterflect;
+    
     using log4net;
     using McMaster.Extensions.CommandLineUtils;
     using static System.Environment;

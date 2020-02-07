@@ -134,13 +134,7 @@ namespace AudioAnalysisTools
         /// <summary>Gets or sets units = Hertz</summary>
         public double HighFrequencyHertz { get; set; }
 
-        public double Bandwidth
-        {
-            get
-            {
-                return this.HighFrequencyHertz - this.LowFrequencyHertz + 1;
-            }
-        }
+        public double Bandwidth => this.HighFrequencyHertz - this.LowFrequencyHertz + 1;
 
         public bool IsMelscale { get; set; }
 

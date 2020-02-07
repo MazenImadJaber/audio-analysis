@@ -149,9 +149,7 @@ namespace AnalysisPrograms.Recognizers
             }
 
             // Perpare a normalised plot for later display with spectrogram
-            double[] normalisedScores;
-            double normalisedThreshold;
-            DataTools.Normalise(croakScoreArray, decibelThreshold, out normalisedScores, out normalisedThreshold);
+            DataTools.Normalise(croakScoreArray, decibelThreshold, out var normalisedScores, out var normalisedThreshold);
             var text1 = string.Format($"Croak scores (threshold={decibelThreshold})");
             var croakPlot1 = new Plot(text1, normalisedScores, normalisedThreshold);
 

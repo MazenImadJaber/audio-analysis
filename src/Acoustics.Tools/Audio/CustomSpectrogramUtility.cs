@@ -663,9 +663,7 @@ namespace Acoustics.Tools.Audio
             //*******************************************************************************************************************
 
 
-            double minIntensity; // min value in matrix
-            double maxIntensity; // max value in matrix
-            MinMax(matrix, out minIntensity, out maxIntensity);
+            MinMax(matrix, out var minIntensity, out var maxIntensity);
             double binWidth = (maxIntensity - minIntensity) / binCount;  // width of an intensity bin
             // LoggedConsole.WriteLine("minIntensity=" + minIntensity + "  maxIntensity=" + maxIntensity + "  binWidth=" + binWidth);
 
@@ -701,8 +699,7 @@ namespace Acoustics.Tools.Audio
                 int[] histo = Histo(submatrix, binCount, minIntensity, maxIntensity, binWidth);
                 //DataTools.writeBarGraph(histo);
                 double[] smoothHisto = FilterMovingAverage(histo, 7);
-                int maxindex; //mode
-                GetMaxIndex(smoothHisto, out maxindex); //this is mode of histogram
+                GetMaxIndex(smoothHisto, out var maxindex); //this is mode of histogram
                 if (maxindex > binLimit)
                 {
                     maxindex = binLimit;

@@ -18,12 +18,9 @@ namespace AudioAnalysisTools.StandardSpectrograms
     {
         public Image<Rgb24> SonogramImage { get; private set; }
 
-        private List<ImageTrack> tracks = new List<ImageTrack>();
+        private readonly List<ImageTrack> tracks = new List<ImageTrack>();
 
-        public IEnumerable<ImageTrack> Tracks
-        {
-            get { return this.tracks; }
-        }
+        public IEnumerable<ImageTrack> Tracks => this.tracks;
 
         public IEnumerable<AcousticEvent> eventList { get; set; }
 
@@ -436,8 +433,7 @@ namespace AudioAnalysisTools.StandardSpectrograms
         {
             int rows = this.SuperimposedDiscreteColorMatrix.GetLength(0);
             int cols = this.SuperimposedDiscreteColorMatrix.GetLength(1);
-            int min, max;
-            MatrixTools.MinMax(this.SuperimposedDiscreteColorMatrix, out min, out max);
+            MatrixTools.MinMax(this.SuperimposedDiscreteColorMatrix, out var min, out var max);
             int palleteLength = ImageTools.DarkColors.Length;
 
             //Color[] palette = { Color.Crimson, Color.Red, Color.Orange, Color.Yellow, Color.Lime, Color.Green, Color.Blue, Color.Indigo, Color.Violet, Color.Purple };

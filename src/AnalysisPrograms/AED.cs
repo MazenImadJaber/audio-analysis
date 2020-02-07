@@ -103,41 +103,23 @@ namespace AnalysisPrograms
         /// <summary>
         ///     Gets the initial (default) settings for the analysis.
         /// </summary>
-        public override AnalysisSettings DefaultSettings
+        public override AnalysisSettings DefaultSettings => new AnalysisSettings
         {
-            get
-            {
-                return new AnalysisSettings
-                           {
-                               AnalysisMaxSegmentDuration = TimeSpan.FromMinutes(1),
-                               AnalysisMinSegmentDuration = TimeSpan.FromSeconds(20),
-                               SegmentMediaType = MediaTypes.MediaTypeWav,
-                               SegmentOverlapDuration = TimeSpan.Zero,
-                           };
-            }
-        }
+            AnalysisMaxSegmentDuration = TimeSpan.FromMinutes(1),
+            AnalysisMinSegmentDuration = TimeSpan.FromSeconds(20),
+            SegmentMediaType = MediaTypes.MediaTypeWav,
+            SegmentOverlapDuration = TimeSpan.Zero,
+        };
 
         /// <summary>
         ///     Gets the name to display for the analysis.
         /// </summary>
-        public override string DisplayName
-        {
-            get
-            {
-                return "AED";
-            }
-        }
+        public override string DisplayName => "AED";
 
         /// <summary>
         ///     Gets Identifier.
         /// </summary>
-        public override string Identifier
-        {
-            get
-            {
-                return EcosoundsAedIdentifier;
-            }
-        }
+        public override string Identifier => EcosoundsAedIdentifier;
 
         public static Tuple<AcousticEvent[], AudioRecording, BaseSonogram> Detect(
             FileInfo audioFile,

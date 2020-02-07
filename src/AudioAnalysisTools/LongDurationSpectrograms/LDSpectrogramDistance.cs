@@ -301,8 +301,7 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
  // rows
 
             double[] array = DataTools.Matrix2Array(d12Matrix);
-            double avDist, sdDist;
-            NormalDist.AverageAndSD(array, out avDist, out sdDist);
+            NormalDist.AverageAndSD(array, out var avDist, out var sdDist);
             for (int row = 0; row < rows; row++)
             {
                 for (int col = 0; col < cols; col++)

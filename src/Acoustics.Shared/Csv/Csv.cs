@@ -22,7 +22,6 @@ namespace Acoustics.Shared.Csv
     using CsvHelper;
     using CsvHelper.Configuration;
     using CsvHelper.TypeConversion;
-    using Fasterflect;
     using log4net;
     using SixLabors.Primitives;
     using Zio;
