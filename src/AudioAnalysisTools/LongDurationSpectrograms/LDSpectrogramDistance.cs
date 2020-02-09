@@ -8,7 +8,6 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
     using System;
     using System.Collections.Generic;
     using SixLabors.ImageSharp;
-    using System.Drawing.Imaging;
     using System.IO;
     using Acoustics.Shared;
     using Acoustics.Shared.ConfigFile;
@@ -16,8 +15,8 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
     using Indices;
     using SixLabors.ImageSharp.PixelFormats;
     using SixLabors.ImageSharp.Processing;
-    using SixLabors.Primitives;
     using TowseyLibrary;
+    using Path = System.IO.Path;
 
     public static class LDSpectrogramDistance
     {

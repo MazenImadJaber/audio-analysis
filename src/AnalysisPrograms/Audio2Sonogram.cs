@@ -14,7 +14,6 @@ namespace AnalysisPrograms
     using System.Collections.Generic;
     using System.Diagnostics;
     using SixLabors.ImageSharp;
-    using System.Drawing.Imaging;
     using System.IO;
     using System.Reflection;
     using System.Text;
@@ -36,6 +35,7 @@ namespace AnalysisPrograms
     using McMaster.Extensions.CommandLineUtils;
     using SixLabors.ImageSharp.PixelFormats;
     using TowseyLibrary;
+    using Path = System.IO.Path;
 
     /// <summary>
     /// Produces standard greyscale spectrograms of various types from a wav audio file - EITHER custom OR via SOX.

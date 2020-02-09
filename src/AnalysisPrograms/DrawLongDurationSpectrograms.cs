@@ -26,14 +26,12 @@ namespace AnalysisPrograms
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using SixLabors.ImageSharp;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using Acoustics.Shared;
     using Acoustics.Shared.Csv;
-    using AnalyseLongRecordings;
     using AudioAnalysisTools;
     using AudioAnalysisTools.Indices;
     using AudioAnalysisTools.LongDurationSpectrograms;
@@ -46,10 +44,10 @@ namespace AnalysisPrograms
     using Production.Validation;
     using SixLabors.ImageSharp.PixelFormats;
     using SixLabors.ImageSharp.Processing;
-    using SixLabors.Primitives;
     using TowseyLibrary;
 
     using Zio;
+    using Path = System.IO.Path;
 
     /// <summary>
     /// First argument on command line to call this action is "ColourSpectrogram"
