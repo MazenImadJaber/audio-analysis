@@ -916,15 +916,10 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                         b = 0.5;
                     }
 
-                    // get HSV values
-                    var v = r;
-                    var h = g * 360;
-                    var s = Math.Max(0.1,b);
-
                     // enhance blue color - it is difficult to see on a black background
                     // This is a hack - there should be a principled way to do this!
                     // The effect is to create a more visible cyan colour.
-                    /*  if (r < 0.1 && g < 0.1 && b > 0.1)
+                  /*  if (r < 0.1 && g < 0.1 && b > 0.1)
                       {
                           g += 0.7 * b;
                           b += 0.2;
@@ -935,8 +930,48 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                       }
                       */
 
-                    // calculate the chroma
-                    
+                    var min = Math.Min(r, Math.Min(g, b));
+                    var max = Math.Max(r, Math.Max(g, b));
+                    var delta = max - min;
+                    var v = max;
+                    var s = 0.0;
+                    var h= -1.0;
+                    if (max != 0)
+                    {
+                        s = delta / max;
+                    }
+
+                    if (r == max)
+                    {
+                        h = (g - b) / delta;
+                    }
+                    else if (g == max)
+                    {
+                        h = 2 + ((b - r) / delta); // between cyan & yellow
+                    }
+                    else
+                    {
+                        h = 4 + ((r - g) / delta); // between magenta & cyan
+                    }
+
+                    h *= 60; // degrees
+
+                    if (h < 0)
+                    {
+                        h += 360;
+                    }
+
+                    if (s < 0.3)
+                    {
+                        s *= 2;
+                    }
+
+                    if (v < 0.1)
+                    {
+                        v *= 2;
+                    }
+
+                    s = Math.Min(s, 1.0);
                     var chroma = v * s; // Chroma
                     var m = v - chroma;
 
@@ -961,8 +996,8 @@ namespace AudioAnalysisTools.LongDurationSpectrograms
                     }
                     else if (h >= 120 && h < 180)
                     {
-                       g1 = chroma;
-                       b1 = x;
+                        g1 = chroma;
+                        b1 = x;
                     }
                     else if (h >= 180 && h < 240)
                     {
